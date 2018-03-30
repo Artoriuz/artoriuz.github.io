@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+	<title>Processamento digital de imagens</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" type="text/css" href="./css/default.css" />
+	<link rel="stylesheet" type="text/css" href="./css/syntax.css" />
+	<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?skin=doxy"></script>
+</head>
+
+<body>
+	<header>
+		<hgroup>
+			<h1>
+				<a href="./image_processing.html">Processamento digital de imagens</a>
+			</h1>
+			<h2>João Vitor Rafael Chrisóstomo</h2>
+		</hgroup>
+	</header>
+	<nav>
+		<menu>
+			<a href="./index.html">Home</a>
+			<a href="https://github.com/artoriuz">GitHub</a>
+		</menu>
+	</nav>
+	<section>
+		<section id="atividades">
+			<h2>Atividades</h2>
+			<a href="#negativo"><li><h4>Negativo</h4></li></a>
+			<a href=#quadrantes><li><h4>Quadrantes</h4></li></a>
+			<a href=#contagem><li><h4>Contagem de objetos</h4></li></a>
+			<a href=#equalização><li><h4>Equalização de histogramas</h4></li></a>
+			<a href=#movimentos><li><h4>Detecção de movimentos</h4></li></a>
+			<a href=#lapgauss><li><h4>Filtros Laplaciano e Gaussiano</h4></li></a>
+			<a href=#lapgauss><li><h4>Tilt-shift</h4></li></a>
+		</section>
+		<section id="posts">
+			<br>
+			<br>
+			<h3 id="negativo">Negativo</h3>
+			<p>A primeira atividade da disciplina consiste em inverter as cores de uma imagem. Para realizar esta atividade, é necessário
+				primeiro entender que em imagens digitais representadas em uma matriz de cores RGB, há 3 canais (vermelho, verde e azul),
+				e todas as outras cores são representadas por um conjunto destas 3. </p>
+			<p>Embora existam diversos padrões e quantidades diferentes de bits por canal possam ser usadas dependendo da aplicação e
+				de quanta precisão ou alcance seja necessário, imagens digitais em sua grande maioria possuem canais de 8 bits onde cada
+				canal pode assumir qualquer valor inteiro entre 0 e 255, totalizando 24 bits por pixel ou 16777216 possíveis cores distintas.</p>
+			<p>O branco é representado por uma combinação dos 3 canais de cores em seus níveis máximos (255, 255, 255), ou #FFFFFF, e
+				sabemos que o "negativo" de uma cor é o resultado da diferença entre o branco e a própria cor. Podemos então simplesmente
+				fazer uma simples subtração para conseguir o negativo de uma imagem, ou melhor ainda, uma operação lógica NOT com os
+				bits que representam os 3 canais de cores.</p>
+			<p>Abaixo vemos a nossa imagem inicial:</p>
+			<p>
+				<img src="./images/inverse/reina.png" alt="Original Reina" class="center">
+			</p>
+			<p>O seguinte programa pergunta ao usuário as coordenadas que o mesmo deseja inverter, e então mostra a imagem resultante
+				com a área invertida:</p>
+			<pre class="prettyprint">
+	<code>
+#include &#60;opencv2/opencv.hpp&#62;
+#include &#60;iostream&#62;
+using namespace std;
+using namespace cv;
+
+int main(int argc, char** argv) {
+
+	Mat img = imread(argv[1]);
+	if (!image.data) {
+		cout << "imagem nao carregou corretamente" << endl;
+		return(-1);
+	}
+	
+	Mat img_out = Mat::zeros(img.rows, img.cols, CV_8UC3);
+
+	int pos_xi, pos_yi, pos_xf, pos_yf;
+
+	cout << "digite o pixel x inicial:" << endl;
+	cin >> pos_xi;
+	cout << "digite o pixel y inicial:" << endl;
+	cin >> pos_yi;
+
+	cout << "digite o pixel x final:" << endl;
+	cin >> pos_xf;
+	cout << "digite o pixel y final:" << endl;
+	cin >> pos_yf;
+
+	namedWindow("janela", WINDOW_AUTOSIZE);
+	imshow("janela", img);
+	waitKey();
+
+
+	for (int i = 0; i < img.rows; i++) {
+		for (int j = 0; j < img.cols; j++) {
+			if (i > pos_xi && i < pos_xf && j > pos_yi && j < pos_yf) {
+				bitwise_not(img.at<Vec3b>(i, j), img_out.at<Vec3b>(i, j));
+			}
+			else {
+				img_out.at<Vec3b>(i, j) = img.at<Vec3b>(i, j);
+			}
+		}
+	}
+	imshow("janela", img);
+
+	namedWindow("janelaout", WINDOW_AUTOSIZE);
+	imshow("janelaout", img_out);
+
+	waitKey();
+	return 0;
+}
+
+    </code>
+	</pre>
+			<p>Abaixo podemos ver a imagem resultante:</p>
+			<p>
+				<img src="./images/inverse/inverted_reina.png" alt="Inverted Reina" class="center">
+			</p>
+			<br>
+			<br>
+			<nav>
+				<menu>
+					<a href="./index.html">Home</a>
+					<a href="#atividades">Atividades</a>
+					<a href="https://github.com/artoriuz">GitHub</a>
+				</menu>
+			</nav>
+			<br>
+			<br>
+			<h3 id="quadrantes">Quadrantes</h3>
+			<p>A segunda atividade da disciplina consistem em inverter os quadrantes de uma imagem. Podemos entender que qualquer imagem
+				digital pode ser dividida em 4 quadrantes onde cada um deles forma uma sub-matriz com 1/4 da informação da imagem.</p>
+			<p>Abaixo podemos ver a configuração dos quadrantes na imagem original:</p>
+			<p>
+				<img src="./images/quadrants/correct.png" alt="Original Quadrants" class="center">
+			</p>
+			<p>A inversão dos quadrantes, como pedida, deve ser feita da seguinte forma:</p>
+			<p>
+				<img src="./images/quadrants/inverted.png" alt="Inverted Quadrants" class="center">
+			</p>
+			<p>O programa que realiza a inversão dos quandrantes é o seguinte:</p>
+			<pre class="prettyprint">
+	<code>
+#include &#60;opencv2/opencv.hpp&#62;
+#include &#60;iostream&#62;
+using namespace std;
+using namespace cv;
+
+int main(int argc, char** argv) {
+
+	Mat img = imread(argv[1]);
+	if (!image.data) {
+		cout << "imagem nao carregou corretamente" << endl;
+		return(-1);
+	}
+
+	Mat img_out = Mat::zeros(img.rows, img.cols, CV_8UC3);
+
+	namedWindow("janela", WINDOW_AUTOSIZE);
+	imshow("janela", img);
+	waitKey();
+
+	for (int i = 0; i < img.rows; i++) {
+		for (int j = 0; j < img.cols; j++) {
+			if (i < img.rows / 2 && j < img.cols / 2) {
+				img_out.at<Vec3b>(i + img.rows / 2, j + img.cols / 2) = img.at<Vec3b>(i, j);
+			}
+			else if (i < img.rows / 2 && j > img.cols / 2) {
+				img_out.at<Vec3b>(i + img.rows / 2, j - img.cols / 2) = img.at<Vec3b>(i, j);
+			}
+			else if (i > img.rows / 2 && j < img.cols / 2) {
+				img_out.at<Vec3b>(i - img.rows / 2, j + img.cols / 2) = img.at<Vec3b>(i, j);
+			}
+			else if (i > img.rows / 2 && j > img.cols / 2) {
+				img_out.at<Vec3b>(i - img.rows / 2, j - img.cols / 2) = img.at<Vec3b>(i, j);
+			}
+		}
+	}
+
+	imshow("janela", img);
+
+	namedWindow("janelaout", WINDOW_AUTOSIZE);
+	imshow("janelaout", img_out);
+
+	waitKey();
+	return 0;
+}
+
+	</code>
+	</pre>
+			<p>Abaixo podemos ver a imagem original:</p>
+			<p>
+				<img src="./images/quadrants/rin_correct.png" alt="Correct Rin" class="center">
+			</p>
+			<p>E abaixo, a imagem após ser processada pelo programa:</p>
+			<p>
+				<img src="./images/quadrants/rin_inverted.png" alt="Inverted Rin" class="center">
+			</p>
+			<br>
+			<br>
+			<nav>
+				<menu>
+					<a href="./index.html">Home</a>
+					<a href="#atividades">Atividades</a>
+					<a href="https://github.com/artoriuz">GitHub</a>
+				</menu>
+			</nav>
+			<br>
+			<br>
+			<h3 id="contagem">Contagem de objetos</h3>
+			<p>A próxima tarefa consiste em uma contagem de objetos, sendo importante diferenciar os objetos com bolhas e os objetos
+				sem bolhas na cena.</p>
+			<p>Abaixo podemos ver a imagem a ser processada:</p>
+			<p>
+				<img src="./images/count/bolhas.png" alt="Original image" class="center">
+			</p>
+			<p>O programa funciona de maneira relativamente simples, primeiramente todos os objetos que se encontram nas bordas são deletados
+				da cena. Após isto, o fundo é pintado de uma cor que o identifique como fundo, diferente da cor das "bolhas", ou dos
+				"buracos" como são chamados no código. Em seguida, o programa irá procurar por pixeis brancos e então utulizar a posição
+				do mesmo como seed de um algoritmo que "pinta" todo o aglomerado de pixeis brancos em sua redondeza de uma cor, cor que
+				é incrementada cada vez que o mesmo encontra novo aglomerado de pixeis brancos.</p>
+			<p>Após isto, o programa irá procurar por buracos, checar a cor do pixel logo imediatamente a esquerda do primeiro pixel
+				encontrado pertencente ao buraco, e caso esta já não tenha sido encontrada, incrementar o número de objetos com bolhas/buracos.</p>
+			<p>Isto precisa ser feito para que um objeto com mais de um buraco não seja detectado como mais de um objeto.</p>
+			<p>A seguir o código fonte deste programa:</p>
+			<pre class="prettyprint">
+	<code>
+#include &#60;opencv2/opencv.hpp&#62;
+#include &#60;iostream&#62;
+using namespace std;
+using namespace cv;
+
+int main(int argc, char** argv) {
+	
+	Mat image = imread(argv[1], CV_LOAD_IMAGE_GRAYSCALE);
+	if (!image.data) {
+		cout << "imagem nao carregou corretamente" << endl;
+		return(-1);
+	}
+
+	long int obj_total = 0;
+	long int obj_with_holes = 0;
+	long int obj_found_colour = 2;
+	long int obj_colour_aux = 0;
+
+	CvPoint p;
+
+	namedWindow("Labelling", CV_WINDOW_KEEPRATIO);
+	imshow("Labelling", image);
+	waitKey();
+
+	for (int i = 0; i < image.rows; i++) {
+		for (int j = 0; j < image.cols; j++) {
+			if (i == 0 || j == 0 || i == image.rows - 1 || j == image.cols - 1) {
+				image.at<uchar>(i, j) = 255;
+			}
+		}
+	}
+	p.x = 0; p.y = 0;
+	floodFill(image, p, 0); //Retirada das bolhas que tocam as bordas
+
+	imshow("Labelling", image);
+	waitKey();
+
+	floodFill(image, p, 1); //Mudança do valor da cor de fundo
+
+	imshow("Labelling", image);
+	waitKey();
+
+	for (int i = 0; i < image.rows; i++) { //Marca todos os objetos como sem bolha
+		for (int j = 0; j < image.cols; j++) {
+			if (image.at<uchar>(i, j) == 255) {
+				obj_total++; //Achou algo
+				p.x = j;
+				p.y = i;
+				floodFill(image, p, obj_found_colour);
+				obj_found_colour++;
+			}
+		}
+	}
+
+	imshow("Labelling", image);
+	waitKey();
+
+	for (int x = 0; x < image.rows; x++) { //Fazer uma busca dos objetos com buracos
+		for (int y = 0; y < image.cols; y++) {
+			if (image.at<uchar>(x, y) == 0 && image.at<uchar>(x, y - 1) != obj_colour_aux) {
+				obj_colour_aux = image.at<uchar>(x, y - 1);
+				p.x = y;
+				p.y = x;
+				floodFill(image, p, obj_colour_aux);
+				obj_with_holes++;
+			}
+			else if (image.at<uchar>(x, y) == 0 && image.at<uchar>(x, y - 1) == obj_colour_aux) {
+				p.x = y;
+				p.y = x;
+				floodFill(image, p, obj_colour_aux);
+			}
+		}
+	}
+
+	imshow("Labelling", image);
+	waitKey();
+
+	imwrite("labeling.png", image);
+
+	cout << "Number of elements without holes: " << obj_total - obj_with_holes << endl;
+	cout << "Number of elements with holes: " << obj_with_holes << endl;
+
+	waitKey();
+	return 0;
+}
+			
+			
+
+	</code>
+	</pre>
+			<p>Seguindo a lógica do programa, logo após deletarmos todos os elementos que encostam na borda, temos a seguinte imagem:</p>
+			<p>
+				<img src="./images/count/bolhas_no_border_obj.png" alt="Border elements were removed" class="center">
+			</p>
+			<p>Então, contamos a quantidade total de objetos incrementando a cor com que estes são pintados na cena:</p>
+			<p>
+				<img src="./images/count/bolhas_count_1.png" alt="Objects were found" class="center">
+			</p>
+			<p>E então, contamos as bolhas levando em consideração a cor de seu objeto para que não haja equívoco na quantidade de objetos
+				com bolhas:</p>
+			<p>
+				<img src="./images/count/bolhas_count_2.png" alt="Objects with holes were found" class="center">
+			</p>
+			<p>E então podemos ver o resultado do programa na saída do terminal:</p>
+			<p>
+				<img src="./images/count/bolhas_result.png" alt="Terminal text output" class="center">
+			</p>
+			<p>Para averiguar que o programa de fato funcionaria para uma imagem com objetos que contém mais de uma bolha, editei a imagem
+				original e incluí um objeto com 2 bolhas:</p>
+			<p>
+				<img src="./images/count/bolhas2.png" alt="Edited image" class="center">
+			</p>
+			<p>A seguir, a mesma sequência de imagens já explanada. Primeiro os objetos são contados e depois os objetos com bolhas são
+				identificados:</p>
+			<p>
+				<img src="./images/count/bolhas2_count_1.png" alt="Objects were found" class="center">
+			</p>
+			<p>
+				<img src="./images/count/bolhas2_count_2.png" alt="Objects with holes were found" class="center">
+			</p>
+			<p>E logo a seguir, a saída de texto no terminal:</p>
+			<p>
+				<img src="./images/count/bolhas_result.png" alt="Terminal text output" class="center">
+			</p>
+			<br>
+			<br>
+			<nav>
+				<menu>
+					<a href="./index.html">Home</a>
+					<a href="#atividades">Atividades</a>
+					<a href="https://github.com/artoriuz">GitHub</a>
+				</menu>
+			</nav>
+			<br>
+			<br>
+			<h3 id="equalização">Equalização de histogramas</h3>
+			<p>Esta tarefa consiste em uma equalização dos níveis de cinza de uma imagem, isto é, dar a esta imagem o maior nível de contraste possível utilizando
+				os níveis já existentes da mesma como entrada de uma função. 
+			</p>
+			<p>Abaixo podemos ver a imagem original utilizada:
+			</p>
+			<p>
+				<img src="./images/equalisation/charlotte_original.png" alt="Original image" class="center">
+			</p>
+			<p>
+				Como queremos fazer uma equalização em tons de cinza, temos que carregar a imagem como uma imagem em greyscale utilizando o próprio OpenCV.
+				Abaixo podemos ver a imagem em tons de cinza:
+			</p>
+			<p>
+				<img src="./images/equalisation/charlotte_greyscale.png" alt="Greyscale image" class="center">
+			</p>
+			<p>
+				Nosso objetivo é equalizar os tons de cinza da imagem, e mostrar na tela o histograma representativo da mesma. Segue abaixo o código do programa que mostra
+				o histograma da imagem original, a equaliza, e também mostra o novo histograma da imagem de saída equalizada:
+			</p>
+			<p>
+				<pre class="prettyprint">
+					<code>
+#include &#60;opencv2/opencv.hpp&#62;
+#include &#60;iostream&#62;
+using namespace cv;
+using namespace std;
+
+int main(int argc, char** argv) {
+	Mat img, img_eql, hist, hist_eql;
+	img = imread(argv[1], CV_LOAD_IMAGE_GRAYSCALE);
+
+	equalizeHist(img, img_eql);
+
+	bool uniform = true;
+	bool acummulate = false;
+
+	int nbins = 128;
+	float range[] = { 0, 256 };
+	const float *histrange = { range };
+
+	int width = img.cols;
+	int height = img.rows;
+
+	int histw = nbins, histh = nbins / 4;
+
+	Mat hist_img(histh, histw, CV_8UC1, Scalar(0, 0, 0));
+	Mat hist_img_eql(histh, histw, CV_8UC1, Scalar(0, 0, 0));
+
+	calcHist(&img, 1, 0, Mat(), hist, 1, &nbins, &histrange, uniform, acummulate);
+	calcHist(&img_eql, 1, 0, Mat(), hist_eql, 1, &nbins, &histrange, uniform, acummulate);
+
+	normalize(hist, hist, 0, hist_img.rows, NORM_MINMAX, -1, Mat());
+	normalize(hist_eql, hist_eql, 0, hist_img.rows, NORM_MINMAX, -1, Mat());
+
+	hist_img.setTo(Scalar(0));
+	hist_img_eql.setTo(Scalar(0));
+
+	for (int i = 0; i&#60;nbins; i++) {
+		line(hist_img, Point(i, histh), Point(i, cvRound(hist.at&#60;float&#62;(i))), Scalar(255, 255, 255), 1, 8, 0);
+	}
+	for (int i = 0; i&#60;nbins; i++) {
+		line(hist_img_eql, Point(i, histh), Point(i, cvRound(hist_eql.at&#60;float&#62;(i))), Scalar(255, 255, 255), 1, 8, 0);
+	}
+
+	hist_img.copyTo(img(Rect(10, 10, nbins, histh)));
+	hist_img_eql.copyTo(img_eql(Rect(10, 10, nbins, histh)));
+
+	namedWindow("Original", WINDOW_AUTOSIZE);
+	namedWindow("Equalised", WINDOW_AUTOSIZE);
+
+	imshow("Original", img);
+	imshow("Equalised", img_eql);
+	waitKey();
+
+	return 0;
+}
+					</code>
+				</pre>
+			</p>
+			<p>
+				Abaixo podemos ver o primeiro plot do programa, o plot da imagem original em tons de cinza com seu histograma no lado superior esquerdo:
+			</p>
+			<p>
+				<img src="./images/equalisation/charlotte_greyscale_histogram.png" alt="Greyscale image with its histogram" class="center">
+			</p>
+			<p>
+				E abaixo podemos ver o mesmo plot, porém da imagem equalizada:
+			</p>
+			<p>
+				<img src="./images/equalisation/charlotte_greyscale_equalised_histogram.png" alt="Greyscale image with its histogram" class="center">
+			</p>
+			<p>
+				Uma deficiência do código acima é que ele é feito para ser utilizados com imagens, entretando poderíamos muito bem fazer uma adaptação simples para que o mesmo 
+				seja utilizado com cameras ou vídeos. 
+			</p>
+			<p>
+				No exemplo abaixo, foi utilizado um vídeo para demonstração pois não possuo uma webcam que posso utilizar para testes. Para utilizar com uma camera basta trocar "argv[1]" em "VideoCapture cap()" para "0" de forma
+				com que fique VideoCapture cap(0). 
+			</p>
+			<p>
+				<pre class="prettyprint">
+					<code>
+#include &#60;opencv2/opencv.hpp&#62;
+#include &#60;iostream&#62;
+using namespace cv;
+using namespace std;
+
+int main(int argc, char** argv) {
+	Mat img, img_eql, hist, hist_eql;
+	VideoCapture cap(argv[1]);
+	while (1) {
+		cap >> img;
+		cvtColor(img, img, CV_BGR2GRAY);
+		equalizeHist(img, img_eql);
+
+		bool uniform = true;
+		bool acummulate = false;
+
+		int nbins = 128;
+		float range[] = { 0, 256 };
+		const float *histrange = { range };
+
+		int width = img.cols;
+		int height = img.rows;
+
+		int histw = nbins, histh = nbins / 4;
+
+		Mat hist_img(histh, histw, CV_8UC1, Scalar(0, 0, 0));
+		Mat hist_img_eql(histh, histw, CV_8UC1, Scalar(0, 0, 0));
+
+		calcHist(&img, 1, 0, Mat(), hist, 1, &nbins, &histrange, uniform, acummulate);
+		calcHist(&img_eql, 1, 0, Mat(), hist_eql, 1, &nbins, &histrange, uniform, acummulate);
+
+		normalize(hist, hist, 0, hist_img.rows, NORM_MINMAX, -1, Mat());
+		normalize(hist_eql, hist_eql, 0, hist_img.rows, NORM_MINMAX, -1, Mat());
+
+		hist_img.setTo(Scalar(0));
+		hist_img_eql.setTo(Scalar(0));
+
+		for (int i = 0; i&#60;nbins; i++) {
+			line(hist_img, Point(i, histh), Point(i, cvRound(hist.at&#60;float&#62;(i))), Scalar(255, 255, 255), 1, 8, 0);
+		}
+		for (int i = 0; i&#60;nbins; i++) {
+			line(hist_img_eql, Point(i, histh), Point(i, cvRound(hist_eql.at&#60;float&#62;(i))), Scalar(255, 255, 255), 1, 8, 0);
+		}
+
+		hist_img.copyTo(img(Rect(10, 10, nbins, histh)));
+		hist_img_eql.copyTo(img_eql(Rect(10, 10, nbins, histh)));
+
+		namedWindow("Original", WINDOW_AUTOSIZE);
+		namedWindow("Equalised", WINDOW_AUTOSIZE);
+
+		imshow("Original", img);
+		imshow("Equalised", img_eql);
+		if (waitKey(30) >= 0) break;
+	}
+	return 0;
+}
+					</code>
+				</pre>
+			</p>
+		<p>
+			Abaixo um vídeo para demonstrar o funcionamento do programa:
+		</p>
+		<p>
+			<video width="960" height="293" controls>
+				<source src="./video/equalise.mp4" type="video/mp4">
+				I'm sorry; your browser doesn't support HTML5 video in MP4 with H.264.
+			</video>
+		</p>
+		<br>
+		<br>
+		<nav>
+			<menu>
+				<a href="./index.html">Home</a>
+				<a href="#atividades">Atividades</a>
+				<a href="https://github.com/artoriuz">GitHub</a>
+			</menu>
+		</nav>
+		<br>
+		<br>
+		<h3 id="movimentos">Detecção de movimentos</h3>
+		<p>
+			Como já sabemos, ima imagem nada mais é do que uma matriz de píxeis que podem assumir valores diferentes. Um vídeo por sua vez, nada mais é que um array temporal de imagens
+			onde os valores dos píxeis são atualizados a cada frame. 
+		</p>
+		<p>
+			Nosso objetivo é fazer uma detecção de movimentos, e como sabemos que um vídeo é composto por uma série de frames podemos comparar estes frames e decidir se houve ou não um
+			movimento. A comparação implementada no algorítmo é simples, ela simplesmente faz um somatório do módulo da subtração entre os valores de todos os píxeis do frame atual
+			e seus respectivos valores no frame imediatamente passado.
+		</p>
+		<p>
+			O programa também mostra na tela a diferença entre o frame atual e o passado, como forma de vídeo. Valores próximos do preto significam que não houve mudança 
+			significativa nos valores deste píxel entre o frame passado e o frame atual, e valores próximos do branco significam que a diferença entre eles foi muito significativa.
+		</p>
+		<p>
+			A conclusão é que, na diferença entre o frame atual e o frame imediatamente passado, valores próximos do preto significam que não houve movimentos significativos no vídeo.
+			E valores próximos do branco significam que de fato houve movimento significativo no vídeo. 
+		</p>
+		<p>
+			Abaixo a implementação do algoritmo:
+		</p>
+		<p>
+			<pre class="prettyprint">
+				<code>
+#include &#60;opencv2/opencv.hpp&#62;
+#include &#60;iostream&#62;
+using namespace cv;
+using namespace std;
+
+int main(int argc, char** argv) {
+	long frame_counter = 0, difference_total_value = 0;
+	Mat frame, frame_past, difference;
+	VideoCapture cap(argv[1]);
+	
+	int width = cap.get(CV_CAP_PROP_FRAME_WIDTH);
+	int height = cap.get(CV_CAP_PROP_FRAME_HEIGHT);
+	
+	difference = Mat::zeros(height, width, CV_8UC1);
+
+	while (1) {
+		cap >> frame;
+		cvtColor(frame, frame, CV_BGR2GRAY);
+		
+		difference_total_value = 0;
+		for (int i = 0; i < frame.rows; i++) {
+			for (int j = 0; j < frame.cols; j++) {
+				if (frame_counter == 0) {
+					difference.at<uchar>(i, j) = 0;
+				} else {
+					difference.at<uchar>(i, j) = abs(frame.at<uchar>(i, j) - frame_past.at<uchar>(i, j));
+				}
+				difference_total_value += difference.at<uchar>(i, j);
+			}
+		}
+
+		frame_past = frame;
+		frame_counter++;
+
+		cout << "frame: " << frame_counter << " difference = " << difference_total_value << endl;
+
+		if (difference_total_value > 150000) {
+			cout << "THERE'S MOVEMENT!" << endl;
+		}
+
+		namedWindow("Difference", WINDOW_AUTOSIZE);
+		imshow("Difference", difference);
+		if (waitKey(30) >= 0) break;
+	}
+	return 0;
+}
+				</code>
+			</pre>
+		</p>
+		<p>
+			Para nós, a parte mais importante do código a ser entendida é a parte em que ele calcula a diferença entre os frames e gera uma imagem
+			representando esta diferença. No código, existe um loop que varre todos os píxeis do frame e caso o frame_counter (contador de frames)
+			esteja em 0, ele simplesmente atribui 0 ao valor da diferença pois nós não possuímos nenhum frame passado ainda e estamos em nossa primeira
+			iteração. Caso frame_counter seja maior do que 0, o código procede fazendo um módulo da subtração entre os valores atual e passado de um píxel, e o 
+			resultado é guardado na matrix de diferença. Ao término do calculo da diferença de cada píxel, esse valor é somado ao montante da diferença que literalmente é um
+			somatório de todas as diferenças. 
+		</p>
+		<p>
+			Abaixo podemos ver a seção de código explicada acima:
+		</p>
+		<p>
+			<pre class="prettyprint">
+				<code>
+difference_total_value = 0;
+for (int i = 0; i < frame.rows; i++) {
+	for (int j = 0; j < frame.cols; j++) {
+		if (frame_counter == 0) {
+			difference.at<uchar>(i, j) = 0;
+		} else {
+			difference.at<uchar>(i, j) = abs(frame.at<uchar>(i, j) - frame_past.at<uchar>(i, j));
+		}
+		difference_total_value += difference.at<uchar>(i, j);
+	}
+}
+				</code>
+			</pre>
+		</p>
+		<p>
+			E abaixo um exemplo do terminal de fato mostrando que houve movimento:
+		</p>
+		<p>
+			<img width="960" height="451" src="./images/motion_detection/parachute.png" alt="Violet in her parachute" class="center">
+		</p>
+		<p>
+			Na imagem acima vemos uma paraquedista, o fundo da imagem (o céu) basicamente se mantêm constante e logo é mostrado como preto. A paraquedista, que está se movendo na imagem
+			aparece em tons de cinza mais claros. 
+		</p>
+		<p>
+			Rodando o algoritmo com um vídeo como sua entrada podemos ver o funcionamento do mesmo. Neste exemplo o threshold utilizado entre a falta de movimento 
+			e a existência do mesmo foi de um somatório total de 150000.
+		</p>
+		<p>
+			<video width="960" height="600" controls>
+				<source src="./video/motion_detection.mp4" type="video/mp4">
+				I'm sorry; your browser doesn't support HTML5 video in MP4 with H.264.
+			</video>
+		</p>
+		<p>
+			O programa mostra no terminal o número do frame atual e o valor da diferença total entre ele e o frame passado, e avisa que houve um movimento quando essa diferença
+			ultrapassa 150000. Na janela do vídeo, vemos valores escuros próximos do preto quando não há uma diferença significativa entre o frame atual e o frame passado naquela 
+			posição, e valores mais claros (mais próximos do branco) significam que houve uma diferença de valor naquela posição entre o frame atual e o frame passado. Valores que não
+			são próximos do preto significam que houve movimento no vídeo.
+		</p>
+		<br>
+			<br>
+			<nav>
+				<menu>
+					<a href="./index.html">Home</a>
+					<a href="#atividades">Atividades</a>
+					<a href="https://github.com/artoriuz">GitHub</a>
+				</menu>
+			</nav>
+			<br>
+			<br>
+		</section>
+
+
+
+		<footer>
+
+		</footer>
+</body>
+
+</html>
