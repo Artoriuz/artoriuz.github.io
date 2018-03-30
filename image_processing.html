@@ -587,11 +587,11 @@ int main(int argc, char** argv) {
 		for (int i = 0; i < frame.rows; i++) {
 			for (int j = 0; j < frame.cols; j++) {
 				if (frame_counter == 0) {
-					difference.at<uchar>(i, j) = 0;
+					difference.at&#60;uchar&#62;(i, j) = 0;
 				} else {
-					difference.at<uchar>(i, j) = abs(frame.at<uchar>(i, j) - frame_past.at<uchar>(i, j));
+					difference.at&#60;uchar&#62;(i, j) = abs(frame.at&#60;uchar&#62;(i, j) - frame_past.at&#60;uchar&#62;(i, j));
 				}
-				difference_total_value += difference.at<uchar>(i, j);
+				difference_total_value += difference.at&#60;uchar&#62;(i, j);
 			}
 		}
 
