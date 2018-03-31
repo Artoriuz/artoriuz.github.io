@@ -32,8 +32,8 @@
 			<a href=#contagem><li><h4>Contagem de objetos</h4></li></a>
 			<a href=#equalização><li><h4>Equalização de histogramas</h4></li></a>
 			<a href=#movimentos><li><h4>Detecção de movimentos</h4></li></a>
-			<a href=#lapgauss><li><h4>Filtros Laplaciano e Gaussiano</h4></li></a>
-			<a href=#lapgauss><li><h4>Tilt-shift</h4></li></a>
+			<a href=#lapgauss><li><h4>Filtragem no domínio espacial</h4></li></a>
+			<a href=#tiltshift><li><h4>Tilt-shift</h4></li></a>
 		</section>
 		<section id="posts">
 			<br>
@@ -678,6 +678,248 @@ for (int i = 0; i < frame.rows; i++) {
 			</nav>
 			<br>
 			<br>
+			<h3 id="lapgauss">Filtragem no domínio espacial</h3>
+			<p>
+				Para efetuarmos a filtragem no domínio espacial, utilizamos-se de uma propriedade da convolução que nos diz que uma convolução no domínio do tempo (no nosso caso,
+				no domínio espacial pois possuímos 2 eixos e valores que variam no plano formado por eles) equivale á multiplicação no domínio da frequência e dessa forma
+				conseguimos fazer a filtragem sem necessariamente trabalhar diretamente no domínio da frequência.
+			</p>
+			<p>
+				O programa, por definição da atividade, deve alternar entre diferentes filtros dependendo da tecla pressionada pelo usuário. Baseiando-se no programa 
+				<a href="http://agostinhobritojr.github.io/tutoriais/pdi/exemplos/filtroespacial.cpp">filtroespacial.cpp</a>, o objetiro é de adicionar a opção de se fazer uma filtragem
+				com o filtro laplaciano após primeiramente fazer uma filtragem com o filtro gaussiano.
+			</p>
+			<p>
+				Abaixo podemos ver o código do programa:
+			</p>
+			<p>
+				<pre class="prettyprint">
+					<code>
+#include &#60;opencv2/opencv.hpp&#62;
+#include &#60;iostream&#62;
+using namespace cv;
+using namespace std;
+
+void printmask(Mat &m) {
+	for (int i = 0; i&#60;m.rows; i++) {
+		for (int j = 0; j&#60;m.cols; j++) {
+			cout << m.at&#60;float&#62;(i, j) << ",";
+		}
+		cout << endl;
+	}
+}
+
+void menu() {
+	cout << "\npressione a tecla para ativar o filtro: \n"
+		"a - calcular modulo\n"
+		"m - media\n"
+		"g - gauss\n"
+		"v - vertical\n"
+		"h - horizontal\n"
+		"l - laplaciano\n"
+		"esc - sair\n";
+}
+
+int main(int argvc, char** argv) {
+	VideoCapture video(argv[1]); //use this for videos
+	//cap = imread(argv[1]); //use this for images
+	
+	float media[] = { 1,1,1,1,1,1,1,1,1 };
+	float gauss[] = { 1,2,1,2,4,2,1,2,1 };
+	float horizontal[] = { -1,0,1,-2,0,2,-1,0,1 };
+	float vertical[] = { -1,-2,-1,0,0,0,1,2,1 };
+	float laplacian[] = { 0,-1,0,-1,4,-1,0,-1,0 };
+
+	Mat cap, frame, frame32f, frameFiltered, frameFiltered2;
+	Mat mask(3, 3, CV_32F), mask_gauss(3, 3, CV_32F), mask_lap(3, 3, CV_32F);
+	Mat result, result1, result_lapgauss;
+	double width, height, min, max;
+	bool lap_gauss_aux = false, absolut = true;
+	char key;
+
+	width = video.get(CV_CAP_PROP_FRAME_WIDTH); //use this for videos
+	height = video.get(CV_CAP_PROP_FRAME_HEIGHT); //use this for videos
+	//width = cap.cols; //use this for images
+	//height = cap.rows; //use this for images
+
+	std::cout << "width = " << width << "\n";;
+	std::cout << "height = " << height << "\n";;
+
+	namedWindow("spacialfilter", 1);
+
+	mask_gauss = Mat(3, 3, CV_32F, gauss);
+	scaleAdd(mask_gauss, 1 / 16.0, Mat::zeros(3, 3, CV_32F), mask_gauss);
+	mask_lap = Mat(3, 3, CV_32F, laplacian);
+
+	mask = Mat(3, 3, CV_32F, media);
+	scaleAdd(mask, 1 / 9.0, Mat::zeros(3, 3, CV_32F), mask);
+	swap(mask, mask);
+
+	menu();
+	
+	while (1) {
+		video >> cap; //comment this when using images as input
+		cvtColor(cap, frame, CV_BGR2GRAY);
+		imshow("original", frame);
+		frame.convertTo(frame32f, CV_32F);
+		
+		key = (char)waitKey(10);
+
+		if (lap_gauss_aux) {
+			filter2D(frame32f, frameFiltered, frame32f.depth(), mask_gauss, Point(1, 1), 0);
+			filter2D(frameFiltered, frameFiltered2, frameFiltered.depth(), mask_lap, Point(1, 1), 0);
+
+			frameFiltered2 = abs(frameFiltered2);
+			frameFiltered2.convertTo(result_lapgauss, CV_8U);
+
+			imshow("spacialfilter", result_lapgauss);
+
+		} else {
+			filter2D(frame32f, frameFiltered, frame32f.depth(), mask, Point(1, 1), 0);
+			if (absolut) {
+				frameFiltered = abs(frameFiltered);
+			}
+			frameFiltered.convertTo(result, CV_8U);
+			imshow("spacialfilter", result);
+		}
+			
+		if (key == 27) break; // esc pressed!
+
+		switch (key) {
+		case 'a':
+			menu();
+			absolut = !absolut;
+			lap_gauss_aux = false;
+			break;
+		case 'm':
+			menu();
+			mask = Mat(3, 3, CV_32F, media);
+			scaleAdd(mask, 1 / 9.0, Mat::zeros(3, 3, CV_32F), mask);
+			printmask(mask);
+			lap_gauss_aux = false;
+			break;
+		case 'g':
+			menu();
+			mask = mask_gauss;
+			printmask(mask_gauss);
+			lap_gauss_aux = false;
+			break;
+		case 'h':
+			menu();
+			mask = Mat(3, 3, CV_32F, horizontal);
+			printmask(mask);
+			lap_gauss_aux = false;
+			break;
+		case 'v':
+			menu();
+			mask = Mat(3, 3, CV_32F, vertical);
+			printmask(mask);
+			lap_gauss_aux = false;
+			break;
+		case 'l':
+			menu();
+			mask = Mat(3, 3, CV_32F, laplacian);
+			printmask(mask);
+			lap_gauss_aux = false;
+			break;
+		case 'q':
+			lap_gauss_aux = true;
+			break;
+		default:
+			break;
+		}
+	}
+	return 0;
+}							
+					</code>
+				</pre>
+			</p>
+			<p>
+				O programa pode ser usado para imagens ou vídeos, a partir de poucas alterações já sinalizadas no próprio código. Abaixo podemos ver a imagem utilizada para 
+				demonstração:
+			</p>
+			<p>
+				<img src="./images/lapgauss/erika_original.png" alt="Original Erika" class="center">	
+			</p>
+			<p>
+				O programa trabalha em um espaço de cores de tons de cinza, então a entrada deve ser convertida para tons de cinza caso a mesma possua cores:
+			</p>
+			<p>
+				<img src="./images/lapgauss/erika_original_greyscale.png" alt="Original Erika" class="center">	
+			</p>
+			<p>
+				A partir da tecla pressionada, o programa irá mostrar na tela o resultado de diferentes filtragens. As opções disponíveis são:
+			</p>
+			<p>
+				<li>a - modulo</li>
+				<li>m - media</li>
+				<li>g - gauss</li>
+				<li>v - vertical</li>
+				<li>h - horizontal</li>
+				<li>l - laplaciano</li>
+				<li>q - gauss + laplaciano</li>
+			</p>
+			<p>
+				Abaixo podemos ver nossos resultados:
+			</p>
+			<p>
+				Modulo:
+			</p>
+			<p>
+				<img src="./images/lapgauss/erika_original_greyscale.png" alt="Original Erika" class="center">	
+			</p>
+			<p>
+				Media:
+			</p>
+			<p>
+				<img src="./images/lapgauss/erika_median.png" alt="Original Erika" class="center">	
+			</p>
+			<p>
+				Gauss:
+			</p>
+			<p>
+				<img src="./images/lapgauss/erika_gauss.png" alt="Original Erika" class="center">	
+			</p>
+			<p>
+				Vertical:
+			</p>
+			<p>
+				<img src="./images/lapgauss/erika_vertical.png" alt="Original Erika" class="center">	
+			</p>
+			<p>
+				Horizontal:
+			</p>
+			<p>
+				<img src="./images/lapgauss/erika_horizontal.png" alt="Original Erika" class="center">	
+			</p>
+			<p>
+				Laplaciano:
+			</p>
+			<p>
+				<img src="./images/lapgauss/erika_laplacian.png" alt="Original Erika" class="center">	
+			</p>
+			<p>
+				Guass + laplaciano:
+			</p>
+			<p>
+				<img src="./images/lapgauss/erika_lapgauss.png" alt="Original Erika" class="center">	
+			</p>
+			<p>
+				Podemos ver que, a inserção de uma pré-filtragem gaussiana antes de se aplicar a filtragem laplaciana resultou num resultado mais limpo e mais suave
+				quando comparado ao resultado da filtragem apenas com a máscara laplaciana. Isso se dá pois o gaussiano funciona como um filtro de borramento ponderado.
+			</p>
+			<br>
+			<br>
+			<nav>
+				<menu>
+					<a href="./index.html">Home</a>
+					<a href="#atividades">Atividades</a>
+					<a href="https://github.com/artoriuz">GitHub</a>
+				</menu>
+			</nav>
+			<br>
+			<br>
+
 		</section>
 
 
