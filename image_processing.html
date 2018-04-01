@@ -919,7 +919,142 @@ int main(int argvc, char** argv) {
 			</nav>
 			<br>
 			<br>
+			<h3 id="tiltshift">Tilt-shift</h3>
+			<p>
+				Nesta seção, faremo um efeito de foco na imagem gerando um resultado similar ou de como se estiversimos utilizando lentes focais especiais em fotografias ou gravações.
+			</p>
+			<p>
+				Abaixo o código do programa:
+			</p>
+			<p>
+				<pre class="prettyprint">
+					<code>
+#include &#60;iostream&#62;
+#include &#60;opencv2/opencv.hpp&#62;
+#include &#60;math.h&#62;
+using namespace cv;
+using namespace std;
 
+int main(int argvc, char** argv) {
+	Mat img_in = imread(argv[1]);
+	Mat img_blurred = Mat::zeros(img_in.rows, img_in.cols, CV_32FC3);
+	Mat img_out = Mat::zeros(img_in.rows, img_in.cols, CV_32FC3);
+	Mat img_focused = Mat::zeros(img_in.rows, img_in.cols, CV_32FC3);
+	Mat img_unfocused = Mat::zeros(img_in.rows, img_in.cols, CV_32FC3);
+	Mat mask_focus = Mat(img_in.rows, img_in.cols, CV_32FC3, Scalar(0, 0, 0));
+	Mat mask_unfocus = Mat(img_in.rows, img_in.cols, CV_32FC3, Scalar(1, 1, 1));
+
+	imshow("input", img_in);
+	waitKey();
+
+	float unfocus_aux = 0.35; //Edit this to change how much of the original image will stay focused
+	int pos_i = unfocus_aux*img_in.rows;
+	int pos_f = img_in.rows - unfocus_aux*img_in.rows;
+	int decay = 60; //Edit this to change how fast it'll decay
+
+	Vec3f mask_function_value;
+	for (int i = 0; i &#60; img_in.rows; i++) {
+		for (int j = 0; j &#60; img_in.cols; j++) {
+			mask_function_value[0] = (tanh((float(i - pos_i) / decay)) - tanh((float(i - pos_f) / decay))) / 2;
+			mask_function_value[1] = (tanh((float(i - pos_i) / decay)) - tanh((float(i - pos_f) / decay))) / 2;
+			mask_function_value[2] = (tanh((float(i - pos_i) / decay)) - tanh((float(i - pos_f) / decay))) / 2;
+			mask_focus.at&#60;Vec3f&#62;(i, j) = mask_function_value;
+		}
+	}
+	mask_unfocus = mask_unfocus - mask_focus;
+	
+	//This section shows the masks
+	imshow("focus mask", mask_focus);
+	imshow("unfocus mask", mask_unfocus);
+	waitKey();
+	
+	
+	img_in.convertTo(img_in, CV_32FC3);
+	GaussianBlur(img_in, img_blurred, Size(7, 7), 0, 0);
+
+	img_focused = img_in.mul(mask_focus);
+	img_unfocused = img_blurred.mul(mask_unfocus);
+	
+	//This section only shows the blurred image
+	img_blurred.convertTo(img_blurred, CV_8UC3);
+	imshow("img_blurred", img_blurred);
+	waitKey();
+	
+	
+	img_out = img_focused + img_unfocused;
+	img_out.convertTo(img_out, CV_8UC3);
+	
+	//This section only shows the components of the final image
+	img_focused.convertTo(img_focused, CV_8UC3);
+	img_unfocused.convertTo(img_unfocused, CV_8UC3);
+	imshow("img_focused", img_focused);
+	imshow("img_unfocused", img_unfocused);
+	waitKey();
+	
+	imshow("output", img_out);
+	waitKey();
+	return 0;
+}
+
+					</code>
+				</pre>
+			</p>
+			<p>
+				A seguir, iremos entender o funcionamento do programa e seu princípio de funcionamento. Primeiramente, o programa parte de uma imagem de entrada
+				e se utiliza de suas propriedades de altura e largura para alocar matrizes que serão utilizadas ao decorrer do programa. 
+			</p>
+			<p>
+				A seguir a imagem de entrada utilizada no exemplo:
+			</p>
+			<p>
+				<img src="./images/tiltshift/img_in.png" alt="Original image" class="center">
+			</p>
+			<p>
+				Então, o programa gera uma imagem auxiliar a partir de senos hiperbólicos. Esta imagem será utilizada como peso, posteriormente em uma multiplicação de imagens.
+				Abaixo podemos ver a imagem gerada: 
+			</p>
+			<p>
+				<img src="./images/tiltshift/mask_focus.png" alt="focus mask" class="center">
+			</p>
+			<p>
+				Partindo da imagem mostrada logo acima, o inverso da mesma é gerado a partir de uma subtração simples entre uma imagem que originalmente era completamente branca e ela:
+			</p>
+			<p>
+				<img src="./images/tiltshift/mask_unfocus.png" alt="unfocus mask" class="center">
+			</p>
+			<p>
+				Então, uma versão borrada da imagem original é gerada a partir de um borramento gaussiano. Utilizaremos esta imagem em conjunto com a imagem original para 
+				criar a sensação de foco:
+			</p>
+			<p>
+				<img src="./images/tiltshift/img_blurred.png" alt="blurred image" class="center">
+			</p>
+			<p>
+				Então, é feito uma multiplicação da imagem original pela imagem da máscara de foco:
+			</p>
+			<p>
+				<img src="./images/tiltshift/img_focused.png" alt="focused image" class="center">
+			</p>
+			<p>
+				E uma multiplicação da imagem borrada pela imagem que possui o inverso da máscara de foco:
+			</p>
+			<p>
+				<img src="./images/tiltshift/img_unfocused.png" alt="unfocused image" class="center">
+			</p>
+			<p>
+				Agora, para chegar no resultado desejado, apenas somamos as duas imagens acima:
+			</p>
+			<p>
+				<img src="./images/tiltshift/img_out.png" alt="output image" class="center">
+			</p>
+			<p>
+				Podemos ver que quando comparada a imagem original, a imagem de saída possui suas extremidades verticais borradas. Entretanto, a mesma manteve a nitidez original
+				no centro da imagem, gerando uma noção de foco. A animação abaixo facilita a vizualisação da diferença:
+			</p>
+			<video loop autoplay>
+				<source src="./video/tiltshift.mp4" type="video/mp4">
+				Your browser does not support the video tag.
+			</video> 
 		</section>
 
 
