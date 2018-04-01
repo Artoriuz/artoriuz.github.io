@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="en">
 
 <head>
-	<title>Processamento digital de imagens</title>
+	<title>Digital Image Processing</title>
 	<meta charset="utf-8" />
 	<link rel="stylesheet" type="text/css" href="./css/default.css" />
 	<link rel="stylesheet" type="text/css" href="./css/syntax.css" />
@@ -13,7 +13,7 @@
 	<header>
 		<hgroup>
 			<h1>
-				<a href="./image_processing.html">Processamento digital de imagens</a>
+				<a href="./image_processing.html">Digital Image Processing</a>
 			</h1>
 			<h2>João Vitor Rafael Chrisóstomo</h2>
 		</hgroup>
@@ -21,40 +21,47 @@
 	<nav>
 		<menu>
 			<a href="./index.html">Home</a>
-			<a href="https://github.com/artoriuz">GitHub</a>
+            <a href="https://github.com/artoriuz">GitHub</a>
+            <a href="./image_processing_pt.html">Versão em português</a>
 		</menu>
 	</nav>
 	<section>
 		<section id="atividades">
-			<h2>Atividades</h2>
-			<a href="#negativo"><li><h4>Negativo</h4></li></a>
-			<a href=#quadrantes><li><h4>Quadrantes</h4></li></a>
-			<a href=#contagem><li><h4>Contagem de objetos</h4></li></a>
-			<a href=#equalização><li><h4>Equalização de histogramas</h4></li></a>
-			<a href=#movimentos><li><h4>Detecção de movimentos</h4></li></a>
-			<a href=#lapgauss><li><h4>Filtragem no domínio espacial</h4></li></a>
+			<h2>Algorithms</h2>
+			<a href="#negativo"><li><h4>Inverse</h4></li></a>
+			<a href=#quadrantes><li><h4>Quadrants</h4></li></a>
+			<a href=#contagem><li><h4>Object Counting</h4></li></a>
+			<a href=#equalização><li><h4>Histogram Equalisation</h4></li></a>
+			<a href=#movimentos><li><h4>Movement Detection</h4></li></a>
+			<a href=#lapgauss><li><h4>Spacial-domain filtering</h4></li></a>
 			<a href=#tiltshift><li><h4>Tilt-shift</h4></li></a>
 		</section>
 		<section id="posts">
 			<br>
 			<br>
 			<h3 id="negativo">Negativo</h3>
-			<p>A primeira atividade da disciplina consiste em inverter as cores de uma imagem. Para realizar esta atividade, é necessário
-				primeiro entender que em imagens digitais representadas em uma matriz de cores RGB, há 3 canais (vermelho, verde e azul),
-				e todas as outras cores são representadas por um conjunto destas 3. </p>
-			<p>Embora existam diversos padrões e quantidades diferentes de bits por canal possam ser usadas dependendo da aplicação e
-				de quanta precisão ou alcance seja necessário, imagens digitais em sua grande maioria possuem canais de 8 bits onde cada
-				canal pode assumir qualquer valor inteiro entre 0 e 255, totalizando 24 bits por pixel ou 16777216 possíveis cores distintas.</p>
-			<p>O branco é representado por uma combinação dos 3 canais de cores em seus níveis máximos (255, 255, 255), ou #FFFFFF, e
-				sabemos que o "negativo" de uma cor é o resultado da diferença entre o branco e a própria cor. Podemos então simplesmente
-				fazer uma simples subtração para conseguir o negativo de uma imagem, ou melhor ainda, uma operação lógica NOT com os
-				bits que representam os 3 canais de cores.</p>
-			<p>Abaixo vemos a nossa imagem inicial:</p>
+            <p>
+                The first algorithm simply performs a colour inversion in a given area and outputs the result. To understand the procedure it's important to understand 
+                how RGB digital images store colour information. When the sub-pixel matrix consists of 3 different independent colour channels (red, blue and green), 
+                a combination of intensity of those channels results in the perceived output colour.     
+            </p>
+            <p>
+                Multiple different pixel format standards exist, but if your image is targetting the web it's sane to assume we have 8 bits of precision per colour channel.
+                Which gives us 24 bits per pixel or 16777216 different possible colours.
+            </p>
+            <p>
+                The colour "white" is an equal combination of all colours, so in our system to output white we need maximum intensity in all three of our colour channels,
+                which means white is (255, 255, 255) in decimal, or #FFFFFF in hexadecimal. 
+            </p>
+			<p>
+                The inverse of a colour is simply the difference between absolute white and the colour itself, and since the pixel data is stored in binary we can perform
+                a bitwise_not in order to invert the value of all the bits (equivalent of subtracting their original value from 255).
+            </p>
+			<p>Here we can see our original image:</p>
 			<p>
 				<img src="./images/inverse/reina.png" alt="Original Reina" class="center">
 			</p>
-			<p>O seguinte programa pergunta ao usuário as coordenadas que o mesmo deseja inverter, e então mostra a imagem resultante
-				com a área invertida:</p>
+			<p>The following program receives the coordinates from the user, and then performs the inversion:</p>
 			<pre class="prettyprint">
 	<code>
 #include &#60;opencv2/opencv.hpp&#62;
@@ -111,7 +118,7 @@ int main(int argc, char** argv) {
     </code>
 	</pre>
 	<a href="https://github.com/Artoriuz/OpenCV-Examples/blob/master/inverse.cpp">inverse.cpp</a>
-			<p>Abaixo podemos ver a imagem resultante:</p>
+			<p>We can see the resulting image here:</p>
 			<p>
 				<img src="./images/inverse/inverted_reina.png" alt="Inverted Reina" class="center">
 			</p>
@@ -120,24 +127,25 @@ int main(int argc, char** argv) {
 			<nav>
 				<menu>
 					<a href="./index.html">Home</a>
-					<a href="#atividades">Atividades</a>
+					<a href="#atividades">Activities</a>
 					<a href="https://github.com/artoriuz">GitHub</a>
 				</menu>
 			</nav>
 			<br>
 			<br>
-			<h3 id="quadrantes">Quadrantes</h3>
-			<p>A segunda atividade da disciplina consistem em inverter os quadrantes de uma imagem. Podemos entender que qualquer imagem
-				digital pode ser dividida em 4 quadrantes onde cada um deles forma uma sub-matriz com 1/4 da informação da imagem.</p>
-			<p>Abaixo podemos ver a configuração dos quadrantes na imagem original:</p>
+			<h3 id="quadrantes">Quadrants</h3>
+			<p>
+                An image can be divided into 4 quadrants, the following example aims to swap the position of those quadrants maintaining the original pixel values.  
+            </p>
+			<p>Here we can see the original quadrant configuration of any image:</p>
 			<p>
 				<img src="./images/quadrants/correct.png" alt="Original Quadrants" class="center">
 			</p>
-			<p>A inversão dos quadrantes, como pedida, deve ser feita da seguinte forma:</p>
+			<p>As requested, the inversion of quadrants should be done in the following manner:</p>
 			<p>
 				<img src="./images/quadrants/inverted.png" alt="Inverted Quadrants" class="center">
 			</p>
-			<p>O programa que realiza a inversão dos quandrantes é o seguinte:</p>
+			<p>And finally, we can see the program that does that for us:</p>
 			<pre class="prettyprint">
 	<code>
 #include &#60;opencv2/opencv.hpp&#62;
@@ -188,11 +196,11 @@ int main(int argc, char** argv) {
 	</code>
 	</pre>
 	<a href="https://github.com/Artoriuz/OpenCV-Examples/blob/master/quadrants.cpp">quadrants.cpp</a>
-			<p>Abaixo podemos ver a imagem original:</p>
+			<p>First let's see how the original image looked like:</p>
 			<p>
 				<img src="./images/quadrants/rin_correct.png" alt="Correct Rin" class="center">
 			</p>
-			<p>E abaixo, a imagem após ser processada pelo programa:</p>
+			<p>And how it looks now after we swapped its quadrants:</p>
 			<p>
 				<img src="./images/quadrants/rin_inverted.png" alt="Inverted Rin" class="center">
 			</p>
@@ -201,28 +209,30 @@ int main(int argc, char** argv) {
 			<nav>
 				<menu>
 					<a href="./index.html">Home</a>
-					<a href="#atividades">Atividades</a>
+					<a href="#atividades">Activities</a>
 					<a href="https://github.com/artoriuz">GitHub</a>
 				</menu>
 			</nav>
 			<br>
 			<br>
-			<h3 id="contagem">Contagem de objetos</h3>
-			<p>A próxima tarefa consiste em uma contagem de objetos, sendo importante diferenciar os objetos com bolhas e os objetos
-				sem bolhas na cena.</p>
-			<p>Abaixo podemos ver a imagem a ser processada:</p>
+			<h3 id="contagem">Object counting</h3>
+			<p>Now we'll learn how to count objects, in order to increase the complexity of the algorithm and its accuracy, 
+                it's important to differentiate objects with holes and objects without.</p>
+			<p>The following image will be the input of the program:</p>
 			<p>
 				<img src="./images/count/bolhas.png" alt="Original image" class="center">
 			</p>
-			<p>O programa funciona de maneira relativamente simples, primeiramente todos os objetos que se encontram nas bordas são deletados
-				da cena. Após isto, o fundo é pintado de uma cor que o identifique como fundo, diferente da cor das "bolhas", ou dos
-				"buracos" como são chamados no código. Em seguida, o programa irá procurar por pixeis brancos e então utulizar a posição
-				do mesmo como seed de um algoritmo que "pinta" todo o aglomerado de pixeis brancos em sua redondeza de uma cor, cor que
-				é incrementada cada vez que o mesmo encontra novo aglomerado de pixeis brancos.</p>
-			<p>Após isto, o programa irá procurar por buracos, checar a cor do pixel logo imediatamente a esquerda do primeiro pixel
-				encontrado pertencente ao buraco, e caso esta já não tenha sido encontrada, incrementar o número de objetos com bolhas/buracos.</p>
-			<p>Isto precisa ser feito para que um objeto com mais de um buraco não seja detectado como mais de um objeto.</p>
-			<p>A seguir o código fonte deste programa:</p>
+            <p>
+                The very first thing the program does is delete all the objects that are touching the borders of the image. After that, the background 
+                is "painted" in a certain colour of choice in order to differentiate it from the holes. Then, the program will search for white pixels 
+                and paint the entire agglomerate of white pixels with a given colour. This colour changes each time the program finds another agglomerate of
+                white pixels, which are the objects.  
+            </p>
+            <p>
+                After all the objects are found and painted with a corresponding colour, the program will search for holes and paint those holes with the same
+                colour it used to paint the object which this hole is inside of, which prevents the program from counting objects with 2 holes wrongly.
+            </p>
+			<p>The program can be seen here:</p>
 			<pre class="prettyprint">
 	<code>
 #include &#60;opencv2/opencv.hpp&#62;
@@ -316,37 +326,34 @@ int main(int argc, char** argv) {
 	</code>
 	</pre>
 	<a href="https://github.com/Artoriuz/OpenCV-Examples/blob/master/counting.cpp">counting.cpp</a>
-			<p>Seguindo a lógica do programa, logo após deletarmos todos os elementos que encostam na borda, temos a seguinte imagem:</p>
+			<p>Following the program, first we delete all the objects that touch the border:</p>
 			<p>
 				<img src="./images/count/bolhas_no_border_obj.png" alt="Border elements were removed" class="center">
 			</p>
-			<p>Então, contamos a quantidade total de objetos incrementando a cor com que estes são pintados na cena:</p>
+			<p>Then, we count the total number of objects while painting them:</p>
 			<p>
 				<img src="./images/count/bolhas_count_1.png" alt="Objects were found" class="center">
 			</p>
-			<p>E então, contamos as bolhas levando em consideração a cor de seu objeto para que não haja equívoco na quantidade de objetos
-				com bolhas:</p>
+			<p>And then, we count the holes taking into consideration to colour of the object:</p>
 			<p>
 				<img src="./images/count/bolhas_count_2.png" alt="Objects with holes were found" class="center">
 			</p>
-			<p>E então podemos ver o resultado do programa na saída do terminal:</p>
+			<p>Finally, we can see the end result in our terminal:</p>
 			<p>
 				<img src="./images/count/bolhas_result.png" alt="Terminal text output" class="center">
 			</p>
-			<p>Para averiguar que o programa de fato funcionaria para uma imagem com objetos que contém mais de uma bolha, editei a imagem
-				original e incluí um objeto com 2 bolhas:</p>
+			<p>To make sure the program wouldn't count objects with multiple holes wrongly, a modification was done in the input image:</p>
 			<p>
 				<img src="./images/count/bolhas2.png" alt="Edited image" class="center">
 			</p>
-			<p>A seguir, a mesma sequência de imagens já explanada. Primeiro os objetos são contados e depois os objetos com bolhas são
-				identificados:</p>
+			<p>And then we can go through the same sequence of images following the code again:</p>
 			<p>
 				<img src="./images/count/bolhas2_count_1.png" alt="Objects were found" class="center">
 			</p>
 			<p>
 				<img src="./images/count/bolhas2_count_2.png" alt="Objects with holes were found" class="center">
 			</p>
-			<p>E logo a seguir, a saída de texto no terminal:</p>
+			<p>We can check how many objects and objects with holes were counted in our terminal output, it's important to notice the numbers didn't change:</p>
 			<p>
 				<img src="./images/count/bolhas_result.png" alt="Terminal text output" class="center">
 			</p>
@@ -355,31 +362,28 @@ int main(int argc, char** argv) {
 			<nav>
 				<menu>
 					<a href="./index.html">Home</a>
-					<a href="#atividades">Atividades</a>
+					<a href="#atividades">Activities</a>
 					<a href="https://github.com/artoriuz">GitHub</a>
 				</menu>
 			</nav>
 			<br>
 			<br>
-			<h3 id="equalização">Equalização de histogramas</h3>
-			<p>Esta tarefa consiste em uma equalização dos níveis de cinza de uma imagem, isto é, dar a esta imagem o maior nível de contraste possível utilizando
-				os níveis já existentes da mesma como entrada de uma função. 
+			<h3 id="equalização">Histogram Equalisation</h3>
+			<p>Our aim is to equalise the histogram of a greyscale image, maximising its dynamic range to the highest possible value using the existing greyscale values.
 			</p>
-			<p>Abaixo podemos ver a imagem original utilizada:
+			<p>This will be our input image:
 			</p>
 			<p>
 				<img src="./images/equalisation/charlotte_original.png" alt="Original image" class="center">
 			</p>
 			<p>
-				Como queremos fazer uma equalização em tons de cinza, temos que carregar a imagem como uma imagem em greyscale utilizando o próprio OpenCV.
-				Abaixo podemos ver a imagem em tons de cinza:
+				The first thing we need to do is to load the image as a greyscale image, using a property of OpenCV itself to do it:
 			</p>
 			<p>
 				<img src="./images/equalisation/charlotte_greyscale.png" alt="Greyscale image" class="center">
 			</p>
 			<p>
-				Nosso objetivo é equalizar os tons de cinza da imagem, e mostrar na tela o histograma representativo da mesma. Segue abaixo o código do programa que mostra
-				o histograma da imagem original, a equaliza, e também mostra o novo histograma da imagem de saída equalizada:
+				The program that calculates and plots the histograms of both the input image and its equalised output is shown below:
 			</p>
 			<p>
 				<pre class="prettyprint">
@@ -443,25 +447,24 @@ int main(int argc, char** argv) {
 			</p>
 			<a href="https://github.com/Artoriuz/OpenCV-Examples/blob/master/equalise.cpp">equalise.cpp</a>
 			<p>
-				Abaixo podemos ver o primeiro plot do programa, o plot da imagem original em tons de cinza com seu histograma no lado superior esquerdo:
+				The first plot is simply the original image in greyscale plus its histogram:
 			</p>
 			<p>
 				<img src="./images/equalisation/charlotte_greyscale_histogram.png" alt="Greyscale image with its histogram" class="center">
 			</p>
 			<p>
-				E abaixo podemos ver o mesmo plot, porém da imagem equalizada:
+				And now we can see the same plot, but for the equalised image:
 			</p>
 			<p>
 				<img src="./images/equalisation/charlotte_greyscale_equalised_histogram.png" alt="Greyscale image with its histogram" class="center">
 			</p>
 			<p>
-				Uma deficiência do código acima é que ele é feito para ser utilizados com imagens, entretando poderíamos muito bem fazer uma adaptação simples para que o mesmo 
-				seja utilizado com cameras ou vídeos. 
+				The code was originally designed to be used with still images, however with some modifications it can be used for videos (or camera inputs, which are also video streams). 
 			</p>
-			<p>
-				No exemplo abaixo, foi utilizado um vídeo para demonstração pois não possuo uma webcam que posso utilizar para testes. Para utilizar com uma camera basta trocar "argv[1]" em "VideoCapture cap()" para "0" de forma
-				com que fique VideoCapture cap(0). 
-			</p>
+            <p>
+                In the following example, a video was used intead of a camera input because of technical limitations (lack of a camera). It can be used with a camera
+                swapping "argv[1]" in "VideoCapture" to "0". "0" opens the camera instead.
+            </p>
 			<p>
 				<pre class="prettyprint">
 					<code>
@@ -526,7 +529,7 @@ int main(int argc, char** argv) {
 			</p>
 			<a href="https://github.com/Artoriuz/OpenCV-Examples/blob/master/equalise_video.cpp">equalise_video.cpp</a>
 			<p>
-			Abaixo um vídeo para demonstrar o funcionamento do programa:
+			A video can better demonstrate how the program works when it has a video stream as an input:
 		</p>
 		<p>
 			<video width="960" height="293" controls>
@@ -539,32 +542,36 @@ int main(int argc, char** argv) {
 		<nav>
 			<menu>
 				<a href="./index.html">Home</a>
-				<a href="#atividades">Atividades</a>
+				<a href="#atividades">Activities</a>
 				<a href="https://github.com/artoriuz">GitHub</a>
 			</menu>
 		</nav>
 		<br>
 		<br>
-		<h3 id="movimentos">Detecção de movimentos</h3>
+		<h3 id="movimentos">Movement Detection</h3>
 		<p>
-			Como já sabemos, uma imagem nada mais é do que uma matriz de píxeis que podem assumir valores diferentes. Um vídeo por sua vez, nada mais é que um array temporal de imagens
-			onde os valores dos píxeis são atualizados a cada frame. 
+            As we know, an image is a matrix of pixels, which are arrays of subpixels containing information. A greyscale image only has a single subpixel per 
+            pixel, and can only assume values between black and white. A RGB or a YUV image however, has 3 channels per pixel (3 sub-pixels) and can assume 
+            different colours. In either case, an image is a matrix.
+		</p>
+        <p>
+            A video, then, is simply a sequence of matrices. Each matrix in the sequence represents a frame, and the temporal change in values is perceived as motion. 
+        </p>
+        <p>
+            Our objective is to be able to detect movements in a video stream, and we'll use our knowledge of what a video is in order to achieve it. Since a video is a series 
+            of matrices, in order to detect movement we can compare those matrices and see if their values differ in a significant way. If they do, it's evident that there was 
+            movement. If they don't, it's obvious that the image stayed still.
+        </p>
+        <p>
+            The program simply finds the difference between the pixels of the current frame and the previous frame, creating a summation of all those values and deciding whether 
+            there was movement or not depending on how high this value is. 
 		</p>
 		<p>
-			Nosso objetivo é fazer uma detecção de movimentos, e como sabemos que um vídeo é composto por uma série de frames podemos comparar estes frames e decidir se houve ou não um
-			movimento. A comparação implementada no algorítmo é simples, ela simplesmente faz um somatório do módulo da subtração entre os valores de todos os píxeis do frame atual
-			e seus respectivos valores no frame imediatamente passado.
+            The program also displays the difference between frames in the screen, and it's very easy to interpret the image since black values mean that the values of the frames 
+            didn't change and white values mean that those values indeed changed significantly (remember the difference between frame N and frame N - 1 is what's being displayed).
 		</p>
 		<p>
-			O programa também mostra na tela a diferença entre o frame atual e o passado, como forma de vídeo. Valores próximos do preto significam que não houve mudança 
-			significativa nos valores deste píxel entre o frame passado e o frame atual, e valores próximos do branco significam que a diferença entre eles foi muito significativa.
-		</p>
-		<p>
-			A conclusão é que, na diferença entre o frame atual e o frame imediatamente passado, valores próximos do preto significam que não houve movimentos significativos no vídeo.
-			E valores próximos do branco significam que de fato houve movimento significativo no vídeo. 
-		</p>
-		<p>
-			Abaixo a implementação do algoritmo:
+			Without further ado, here is the program that detects movement:
 		</p>
 		<p>
 			<pre class="prettyprint">
@@ -619,16 +626,16 @@ int main(int argc, char** argv) {
 			</pre>
 		</p>
 		<a href="https://github.com/Artoriuz/OpenCV-Examples/blob/master/movement.cpp">movement.cpp</a>
+        <p>
+            For the reader, the most important part to understand here is how the difference summation is calculated. 
+        </p>
+        <p>
+            Inside a loop, the program simply makes the difference between the current frame and the previous frame, if the frame_counter is still 0 the difference 
+            is also 0 since we don't have any previous frame yet. When frame_counter is higher than 0 though, the program will calculate the difference between each pixel in
+            the current frame and its counterpart in the previous frame, and then it'll add this difference into a difference summation.
+        </p>
 		<p>
-			Para nós, a parte mais importante do código a ser entendida é a parte em que ele calcula a diferença entre os frames e gera uma imagem
-			representando esta diferença. No código, existe um loop que varre todos os píxeis do frame e caso o frame_counter (contador de frames)
-			esteja em 0, ele simplesmente atribui 0 ao valor da diferença pois nós não possuímos nenhum frame passado ainda e estamos em nossa primeira
-			iteração. Caso frame_counter seja maior do que 0, o código procede fazendo um módulo da subtração entre os valores atual e passado de um píxel, e o 
-			resultado é guardado na matrix de diferença. Ao término do calculo da diferença de cada píxel, esse valor é somado ao montante da diferença que literalmente é um
-			somatório de todas as diferenças. 
-		</p>
-		<p>
-			Abaixo podemos ver a seção de código explicada acima:
+			Here we can see what was just explained above:
 		</p>
 		<p>
 			<pre class="prettyprint">
@@ -648,18 +655,18 @@ for (int i = 0; i < frame.rows; i++) {
 			</pre>
 		</p>
 		<p>
-			E abaixo um exemplo do terminal de fato mostrando que houve movimento:
+			And now an example of the program running, and the terminal shouting that there was movement:
 		</p>
 		<p>
 			<img width="960" height="451" src="./images/motion_detection/parachute.png" alt="Violet in her parachute" class="center">
 		</p>
 		<p>
-			Na imagem acima vemos uma paraquedista, o fundo da imagem (o céu) basicamente se mantêm constante e logo é mostrado como preto. A paraquedista, que está se movendo na imagem,
-			aparece em tons de cinza mais claros. 
+            We can see a grey parachutist in the image, while its background remains almost completely black. This happens because while the parachutist is moving in the original video, 
+            the sky (which is our background) remains still. 
 		</p>
 		<p>
-			Rodando o algoritmo com um vídeo como sua entrada podemos ver o funcionamento do mesmo. Neste exemplo o threshold utilizado entre a falta de movimento 
-			e a existência do mesmo foi de um somatório total de 150000.
+            In this example the threshold between "no movement" and "movement" was a 
+            total difference summation of 150000. The video below shows how the program works when running:
 		</p>
 		<p>
 			<video width="960" height="600" controls>
@@ -668,35 +675,33 @@ for (int i = 0; i < frame.rows; i++) {
 			</video>
 		</p>
 		<p>
-			O programa mostra no terminal o número do frame atual e o valor da diferença total entre ele e o frame passado, e avisa que houve um movimento quando essa diferença
-			ultrapassa 150000. Na janela do vídeo, vemos valores escuros próximos do preto quando não há uma diferença significativa entre o frame atual e o frame passado naquela 
-			posição, e valores mais claros (mais próximos do branco) significam que houve uma diferença de valor naquela posição entre o frame atual e o frame passado. Valores que não
-			são próximos do preto significam que houve movimento no vídeo.
+            The number of the current frame is printed at the terminal, and the total difference summation value between it and the previous frame is as well. 
+            If this value is higher than our threshold, the program also prints that there was movement.
+            As already explained, what we see closer to black means that there wasn't movement in that area. And what we see closer to white, means that it's moving.
 		</p>
 		<br>
 			<br>
 			<nav>
 				<menu>
 					<a href="./index.html">Home</a>
-					<a href="#atividades">Atividades</a>
+					<a href="#atividades">Activities</a>
 					<a href="https://github.com/artoriuz">GitHub</a>
 				</menu>
 			</nav>
 			<br>
 			<br>
-			<h3 id="lapgauss">Filtragem no domínio espacial</h3>
+			<h3 id="lapgauss">Spacial-domain Filtering</h3>
 			<p>
-				Para efetuarmos a filtragem no domínio espacial, utilizamos-se de uma propriedade da convolução que nos diz que uma convolução no domínio do tempo (no nosso caso,
-				no domínio espacial pois possuímos 2 eixos e valores que variam no plano formado por eles) equivale á multiplicação no domínio da frequência e dessa forma
-				conseguimos fazer a filtragem sem necessariamente trabalhar diretamente no domínio da frequência.
+                To filter in the spacial domain, we appropriate ourselves from a convolution property. The property tells us that a product in the frequency domain is the equivalent
+                of a convolution in the time domain. In our case "time" is simply the value variation across an axis, and we have 2 axis creating a plane.
 			</p>
 			<p>
-				O programa, por definição da atividade, deve alternar entre diferentes filtros dependendo da tecla pressionada pelo usuário. Baseiando-se no programa 
-				<a href="http://agostinhobritojr.github.io/tutoriais/pdi/exemplos/filtroespacial.cpp">filtroespacial.cpp</a>, o objetiro é de adicionar a opção de se fazer uma filtragem
-				com o filtro laplaciano após primeiramente fazer uma filtragem com o filtro gaussiano.
+				The program, as requested in the assignment should alternate between certain masks depending on the key pressed during execution. Starting from our original program  
+                <a href="http://agostinhobritojr.github.io/tutoriais/pdi/exemplos/filtroespacial.cpp">filtroespacial.cpp</a>, the objective is to add the option of doing a gaussian
+                filtering before applying the laplacian one. 
 			</p>
 			<p>
-				Abaixo podemos ver o código do programa:
+				The modified program is shown below:
 			</p>
 			<p>
 				<pre class="prettyprint">
@@ -842,41 +847,41 @@ int main(int argvc, char** argv) {
 			</p>
 			<a href="https://github.com/Artoriuz/OpenCV-Examples/blob/master/spacialfilters.cpp">spacialfilters.cpp</a>
 			<p>
-				O programa pode ser usado para imagens ou vídeos, a partir de poucas alterações já sinalizadas no próprio código. Abaixo podemos ver a imagem utilizada para 
-				demonstração:
+                The program can be used with images or videos, simply alternating between a few set of lines already commented in the cold itself. The image 
+                used as input is shown below:
 			</p>
 			<p>
 				<img src="./images/lapgauss/erika_original.png" alt="Original Erika" class="center">	
 			</p>
 			<p>
-				O programa trabalha em um espaço de cores de tons de cinza, então a entrada deve ser convertida para tons de cinza caso a mesma possua cores:
+				The first thing done is the convertion of the original image to greyscale: 
 			</p>
 			<p>
 				<img src="./images/lapgauss/erika_original_greyscale.png" alt="Original Erika" class="center">	
 			</p>
 			<p>
-				A partir da tecla pressionada, o programa irá mostrar na tela o resultado de diferentes filtragens. As opções disponíveis são:
+				The user can alternate between different masks using the keyboard, the following list of options are available:
 			</p>
 			<p>
-				<li>a - modulo</li>
-				<li>m - media</li>
+				<li>a - module</li>
+				<li>m - median</li>
 				<li>g - gauss</li>
 				<li>v - vertical</li>
 				<li>h - horizontal</li>
-				<li>l - laplaciano</li>
-				<li>q - gauss + laplaciano</li>
+				<li>l - laplacian</li>
+				<li>q - gauss + laplacian</li>
 			</p>
 			<p>
-				Abaixo podemos ver nossos resultados:
+				And we can see the result of all the filters:
 			</p>
 			<p>
-				Modulo:
+				Module:
 			</p>
 			<p>
 				<img src="./images/lapgauss/erika_original_greyscale.png" alt="Original Erika" class="center">	
 			</p>
 			<p>
-				Media:
+				Median:
 			</p>
 			<p>
 				<img src="./images/lapgauss/erika_median.png" alt="Original Erika" class="center">	
@@ -900,27 +905,26 @@ int main(int argvc, char** argv) {
 				<img src="./images/lapgauss/erika_horizontal.png" alt="Original Erika" class="center">	
 			</p>
 			<p>
-				Laplaciano:
+				Laplacian:
 			</p>
 			<p>
 				<img src="./images/lapgauss/erika_laplacian.png" alt="Original Erika" class="center">	
 			</p>
 			<p>
-				Gauss + laplaciano:
+				Gauss + laplacian:
 			</p>
 			<p>
 				<img src="./images/lapgauss/erika_lapgauss.png" alt="Original Erika" class="center">	
 			</p>
 			<p>
-				Podemos ver que, a inserção de uma pré-filtragem gaussiana antes de se aplicar a filtragem laplaciana resultou num resultado mais limpo e mais suave
-				quando comparado ao resultado da filtragem apenas com a máscara laplaciana. Isso se dá pois o gaussiano funciona como um filtro de borramento ponderado.
+				It's easy to see that applying a gaussian blur before applying the laplacian filter makes the output cleaner and smoother.
 			</p>
 			<br>
 			<br>
 			<nav>
 				<menu>
 					<a href="./index.html">Home</a>
-					<a href="#atividades">Atividades</a>
+					<a href="#atividades">Activities</a>
 					<a href="https://github.com/artoriuz">GitHub</a>
 				</menu>
 			</nav>
@@ -928,10 +932,10 @@ int main(int argvc, char** argv) {
 			<br>
 			<h3 id="tiltshift">Tilt-shift</h3>
 			<p>
-				Nesta seção, faremo um efeito de foco na imagem gerando um resultado similar ou de como se estiversimos utilizando lentes focais especiais em fotografias ou gravações.
+				In this section we'll do a selective focus algorithm, as if we were filming with special lenses.
 			</p>
 			<p>
-				Abaixo o código do programa:
+				Let me first show the code, and then we'll learn what it does:
 			</p>
 			<p>
 				<pre class="prettyprint">
@@ -1008,67 +1012,63 @@ int main(int argvc, char** argv) {
 			</p>
 			<a href="https://github.com/Artoriuz/OpenCV-Examples/blob/master/tiltshift.cpp">tiltshift.cpp</a>
 			<p>
-				A seguir, iremos entender o funcionamento do programa e seu princípio de funcionamento. Primeiramente, o programa parte de uma imagem de entrada
-				e se utiliza de suas propriedades de altura e largura para alocar matrizes que serão utilizadas ao decorrer do programa. 
+				Now let's understand what the program does. First it simply reads its input and creates matrices that will be used later.
 			</p>
 			<p>
-				A seguir a imagem de entrada utilizada no exemplo:
+				The input image used is shown below:
 			</p>
 			<p>
 				<img src="./images/tiltshift/img_in.png" alt="Original image" class="center">
 			</p>
 			<p>
-				Então, o programa gera uma imagem auxiliar a partir de senos hiperbólicos. Esta imagem será utilizada como peso, posteriormente em uma multiplicação de imagens.
-				Abaixo podemos ver a imagem gerada: 
+				The program then, generates an auxiliar image with hyperbolic sines with the same size as the input image, we'll call this the focus mask: 
 			</p>
 			<p>
 				<img src="./images/tiltshift/mask_focus.png" alt="focus mask" class="center">
 			</p>
 			<p>
-				Partindo da imagem mostrada logo acima, o inverso da mesma é gerado a partir de uma subtração simples entre uma imagem que originalmente era completamente branca e ela:
+				Using the image previously generated, we generate its inverse (the "unfocus mask") with a simple subtraction from a white matrix:
 			</p>
 			<p>
 				<img src="./images/tiltshift/mask_unfocus.png" alt="unfocus mask" class="center">
 			</p>
 			<p>
-				Então, uma versão borrada da imagem original é gerada a partir de um borramento gaussiano. Utilizaremos esta imagem em conjunto com a imagem original para 
-				criar a sensação de foco:
+				We then create a blurred version of the original image through a gaussian blur filter, this image will be used as our unfocused version of the original image: 
 			</p>
 			<p>
 				<img src="./images/tiltshift/img_blurred.png" alt="blurred image" class="center">
 			</p>
 			<p>
-				Então, é feito uma multiplicação da imagem original pela imagem da máscara de foco:
+				The focus mask then multiplies the original image, and we get the focused portion of our final image:
 			</p>
 			<p>
 				<img src="./images/tiltshift/img_focused.png" alt="focused image" class="center">
 			</p>
 			<p>
-				E uma multiplicação da imagem borrada pela imagem que possui o inverso da máscara de foco:
+				The same is done with the blurred version and the unfocus mask:
 			</p>
 			<p>
 				<img src="./images/tiltshift/img_unfocused.png" alt="unfocused image" class="center">
 			</p>
 			<p>
-				Agora, para chegar no resultado desejado, apenas somamos as duas imagens acima:
+				Finally, to arrive at our intended result, we simply sum the focused image and the unfocused one:
 			</p>
 			<p>
 				<img src="./images/tiltshift/img_out.png" alt="output image" class="center">
 			</p>
 			<p>
-				Podemos ver que quando comparada a imagem original, a imagem de saída possui suas extremidades verticais borradas. Entretanto, a mesma manteve a nitidez original
-				no centro da imagem, gerando uma noção de foco. A animação abaixo facilita a vizualisação da diferença:
+				We can see that, when compared to the original image, the output image's vertical extremities seem to be out of focus. However, the centre of it stayed sharp and clear.
 			</p>
 			<video loop autoplay>
 				<source src="./video/tiltshift.mp4" type="video/mp4">
 				Your browser does not support the video tag.
 			</video> 
 			<p>
-				Podemos tamnbém, utilizar o mesmo princípio para dar a impressão de que um vídeo foi filmado a partir de uma miniatura ou maquete. Aplicando
-				o efeito de tilt-shift e um efeito de frame-skip (isto é, fazer um borramento de uma porção do frame e pular alguns desses frames). 
+                We can utilise the same effect to create a video that looks like it was filmed from a miniature, and make it more convincing including a frame skip effect
+                which is common on those videos to fake motion.
 			</p>
 			<p>
-				O programa deve então ser adaptado para que possa ser utilizado com vídeos. Podemos ver o código adaptado abaixo: 
+				In order to be used with videos the code needs to be modified, and we can see the modified version below:
 			</p>
 			<p>
 				<pre class="prettyprint">
@@ -1161,11 +1161,11 @@ int main(int argvc, char** argv) {
 			</p>
 			<a href="https://github.com/Artoriuz/OpenCV-Examples/blob/master/tiltshift_video.cpp">tiltshift_video.cpp</a>
 			<p>
-				Como podemos ver, o esqueleto do código continua o mesmo. E todas as modificações feitas estão relacionadas á adquirir frames a partir de um vídeo e 
-				passar este frame ao resto do programa para que possa ser feito o tilt-shift e também o frame-skip.
+                As we can see the skeleton of the code remains the same, and the divergence to the original code is related to acquiring frames and passing those frames to 
+                the matrices that will process the information and generate our intended result.
 			</p>
 			<p>
-				Abaixo podemos ver o vídeo original utilizado:
+				Since we'll now run the program with a video as its input, it's important to know how the original video looks like:
 			</p>
 			<p>
 				<video controls>
@@ -1174,11 +1174,13 @@ int main(int argvc, char** argv) {
 				</video> 
 			</p>
 			<p>
-				Neste exemplo foi utilizado a mesma janela de foco do exemplo anterior, e ambas as máscaras são exatamente iguais. Para fazer o efeito de frame-skip, foi utilizado
-				um valor frame_skip = 2 para que 2 frames sejam descartados a cada frame que é de fato utilizado e processado.
+                In this example, since the video's resolution is the same as the image's resolution in the previous example, our masks will look identical 
+                to those already shown before. The frame skipping logic was set to skip 2 frames every frame that's passed to the algorithm. This number needs to be tweaked 
+                in order to create a better miniature effect.
 			</p>
 			<p>
-				Abaixo podemos ver o vídeo resultante, como estamos jogando fora 2 frames a cada frame utilizado, o vídeo aparenta ser mais "lento" que o vídeo original:
+                We can see the output video below. Due to the fact that we're throwing 2/3 of the frames away, but holdind the already passed
+                frames until a new frame can be passed, it looks slower than the original: 
 			</p>
 			<p>
 				<video controls>
@@ -1187,7 +1189,7 @@ int main(int argvc, char** argv) {
 				</video> 
 			</p>
 			<p>
-				Podemos entretanto aproximar o vídeo de saída da taxa de movimento do vídeo original simplesmente fazendo o encode do mesmo com uma persistência de frame menor:
+				We can however, "fix" the motion speed problem by encoding the video with a lower frame persistance time:
 			</p>
 			<p>
 				<video controls>
@@ -1200,7 +1202,7 @@ int main(int argvc, char** argv) {
 			<nav>
 				<menu>
 					<a href="./index.html">Home</a>
-					<a href="#atividades">Atividades</a>
+					<a href="#atividades">Activities</a>
 					<a href="https://github.com/artoriuz">GitHub</a>
 				</menu>
 			</nav>
