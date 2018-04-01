@@ -469,7 +469,7 @@ using namespace std;
 int main(int argc, char** argv) {
 	Mat img, img_eql, hist, hist_eql;
 	VideoCapture cap(argv[1]);
-	while (1) {
+	while (true) {
 		cap >> img;
 		cvtColor(img, img, CV_BGR2GRAY);
 		equalizeHist(img, img_eql);
@@ -579,7 +579,7 @@ int main(int argc, char** argv) {
 	
 	difference = Mat::zeros(height, width, CV_8UC1);
 
-	while (1) {
+	while (true) {
 		cap >> frame;
 		cvtColor(frame, frame, CV_BGR2GRAY);
 		
@@ -757,7 +757,7 @@ int main(int argvc, char** argv) {
 
 	menu();
 	
-	while (1) {
+	while (true) {
 		video >> cap; //comment this when using images as input
 		cvtColor(cap, frame, CV_BGR2GRAY);
 		imshow("original", frame);
@@ -1055,6 +1055,148 @@ int main(int argvc, char** argv) {
 				<source src="./video/tiltshift.mp4" type="video/mp4">
 				Your browser does not support the video tag.
 			</video> 
+			<p>
+				Podemos tamnbém, utilizar o mesmo princípio para dar a impressão de que um vídeo foi filmado a partir de uma miniatura ou maquete. Aplicando
+				o efeito de tilt-shift e um efeito de frame-skip (isto é, fazer um borramento de uma porção do frame e pular alguns desses frames). 
+			</p>
+			<p>
+				O programa deve então ser adaptado para que possa ser utilizado com vídeos. Podemos ver o código adaptado abaixo: 
+			</p>
+			<p>
+				<pre class="prettyprint">
+					<code>
+#include &#60;iostream&#62;
+#include &#60;opencv2/opencv.hpp&#62;
+#include &#60;math.h&#62;
+using namespace cv;
+using namespace std;
+
+int main(int argvc, char** argv) {
+	VideoCapture video(argv[1]);
+	Mat img_in, img_discard;
+	int cols = video.get(CV_CAP_PROP_FRAME_WIDTH);
+	int rows = video.get(CV_CAP_PROP_FRAME_HEIGHT);
+
+	Mat img_blurred = Mat::zeros(rows, cols, CV_32FC3);
+	Mat img_out = Mat::zeros(rows, cols, CV_32FC3);
+	Mat img_focused = Mat::zeros(rows, cols, CV_32FC3);
+	Mat img_unfocused = Mat::zeros(rows, cols, CV_32FC3);
+	Mat mask_focus = Mat(rows, cols, CV_32FC3, Scalar(0, 0, 0));
+	Mat mask_unfocus = Mat(rows, cols, CV_32FC3, Scalar(1, 1, 1));
+
+	int frame_skip = 2; //Sets how many frames to skip between frames
+	int pass_frame = 0;
+
+	float unfocus_aux = 0.35; //Edit this to change how much of the original image will stay focused
+	int pos_i = unfocus_aux*rows;
+	int pos_f = rows - unfocus_aux*rows;
+	int decay = 60; //Edit this to change how fast it'll decay
+
+	Vec3f mask_function_value;
+
+	for (int i = 0; i &#60; rows; i++) {
+		for (int j = 0; j &#60; cols; j++) {
+			mask_function_value[0] = (tanh((float(i - pos_i) / decay)) - tanh((float(i - pos_f) / decay))) / 2;
+			mask_function_value[1] = (tanh((float(i - pos_i) / decay)) - tanh((float(i - pos_f) / decay))) / 2;
+			mask_function_value[2] = (tanh((float(i - pos_i) / decay)) - tanh((float(i - pos_f) / decay))) / 2;
+			mask_focus.at&#60;Vec3f&#62;(i, j) = mask_function_value;
+		}
+	}
+	mask_unfocus = mask_unfocus - mask_focus;
+
+	//This section shows the masks
+	imshow("focus mask", mask_focus);
+	imshow("unfocus mask", mask_unfocus);
+	
+	while (true) {
+		if (pass_frame == 0) {
+			video &#62;&#62; img_in;
+		} else {
+			video &#62;&#62; img_discard;
+		}
+		
+		img_in.convertTo(img_in, CV_32FC3);
+		GaussianBlur(img_in, img_blurred, Size(7, 7), 0, 0);
+
+		img_focused = img_in.mul(mask_focus);
+		img_unfocused = img_blurred.mul(mask_unfocus);
+
+		//This section only shows the blurred image
+		img_blurred.convertTo(img_blurred, CV_8UC3);
+		imshow("img_blurred", img_blurred);
+		//waitKey();
+
+		img_out = img_focused + img_unfocused;
+		img_out.convertTo(img_out, CV_8UC3);
+
+		//This section only shows the components of the final image
+		img_focused.convertTo(img_focused, CV_8UC3);
+		img_unfocused.convertTo(img_unfocused, CV_8UC3);
+		imshow("img_focused", img_focused);
+		imshow("img_unfocused", img_unfocused);
+		//waitKey();
+
+		if (pass_frame == 0) {
+			pass_frame = frame_skip;
+		}
+		else {
+			pass_frame -= 1;
+		}
+
+		imshow("output", img_out);
+		if (waitKey(30) &#62;= 0) break;
+	}
+	return 0;
+}
+					</code>
+				</pre>
+			</p>
+			<p>
+				Como podemos ver, o esqueleto do código continua o mesmo. E todas as modificações feitas estão relacionadas á adquirir frames a partir de um vídeo e 
+				passar este frame ao resto do programa para que possa ser feito o tilt-shift e também o frame-skip.
+			</p>
+			<p>
+				Abaixo podemos ver o vídeo original utilizado:
+			</p>
+			<p>
+				<video controls>
+					<source src="./video/tilt_shift_video_original.mp4" type="video/mp4">
+					Your browser does not support the video tag.
+				</video> 
+			</p>
+			<p>
+				Neste exemplo foi utilizado a mesma janela de foco do exemplo anterior, e ambas as máscaras são exatamente iguais. Para fazer o efeito de frame-skip, foi utilizado
+				um valor frame_skip = 2 para que 2 frames sejam descartados a cada frame que é de fato utilizado e processado.
+			</p>
+			<p>
+				Abaixo podemos ver o vídeo resultante, como estamos jogando fora 2 frames a cada frame utilizado, o vídeo aparenta ser mais "lento" que o vídeo original:
+			</p>
+			<p>
+				<video controls>
+					<source src="./video/tilt_shift_video_output.mp4" type="video/mp4">
+					Your browser does not support the video tag.
+				</video> 
+			</p>
+			<p>
+				Podemos entretanto aproximar o vídeo de saída da taxa de movimento do vídeo original simplesmente fazendo o encode do mesmo com uma persistência de frame menor:
+			</p>
+			<p>
+				<video controls>
+					<source src="./video/tilt_shift_video_original_accelerated.mp4" type="video/mp4">
+					Your browser does not support the video tag.
+				</video> 
+			</p>
+			<br>
+			<br>
+			<nav>
+				<menu>
+					<a href="./index.html">Home</a>
+					<a href="#atividades">Atividades</a>
+					<a href="https://github.com/artoriuz">GitHub</a>
+				</menu>
+			</nav>
+			<br>
+			<br>
 		</section>
 
 
