@@ -456,6 +456,11 @@ int main(int argc, char** argv) {
 				<img src="./images/equalisation/charlotte_greyscale_equalised_histogram.png" alt="Greyscale image with its histogram" class="center">
 			</p>
 			<p>
+				É importante notar que o histograma plotado têm sua origem no canto superior esquerdo da imagem. Seu eixo de intensidade de valores vai deste ponto e cresce para baixo,
+				enquanto o eixo que representa diferentes valores cresce da esquerda para a direita. É o mesmo sistema de coordenadas utilizado pelas matrizes do OpenCV. No histograma, 
+				o fundo é branco. E o histograma plotado em cima deste fundo branco possui cor preta.
+			</p>
+			<p>
 				Uma deficiência do código acima é que ele é feito para ser utilizados com imagens, entretando poderíamos muito bem fazer uma adaptação simples para que o mesmo 
 				seja utilizado com cameras ou vídeos. 
 			</p>
