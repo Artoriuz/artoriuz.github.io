@@ -149,7 +149,7 @@ using namespace cv;
 int main(int argc, char** argv) {
 
 	Mat img = imread(argv[1]);
-	if (!image.data) {
+	if (!img.data) {
 		cout << "imagem nao carregou corretamente" << endl;
 		return(-1);
 	}
