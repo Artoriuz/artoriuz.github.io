@@ -35,6 +35,11 @@
 			<a href=#movimentos><li><h4>Movement Detection</h4></li></a>
 			<a href=#lapgauss><li><h4>Spacial-domain filtering</h4></li></a>
 			<a href=#tiltshift><li><h4>Tilt-shift</h4></li></a>
+			<a href=#homomorphic><li><h4>Homomorphic Filter</h4></li></a>
+			<a href=#cannypoints><li><h4>Enhanced pointillism with canny edge detector</h4></li></a>
+			<a href=#kmeans><li><h4>K-means art</h4></li></a>
+		
+		
 		</section>
 		<section id="posts">
 			<br>
@@ -1200,6 +1205,115 @@ int main(int argvc, char** argv) {
 					<source src="./video/tilt_shift_video_output_accelerated.mp4" type="video/mp4">
 					Your browser does not support the video tag.
 				</video> 
+			</p>
+			<br>
+			<br>
+			<nav>
+				<menu>
+					<a href="./index.html">Home</a>
+					<a href="#atividades">Algorithms</a>
+					<a href="https://github.com/artoriuz">GitHub</a>
+				</menu>
+			</nav>
+			<br>
+			<br>
+			<h3 id="homomorphic">Homomorphic Filter</h3>
+			<p>
+				The input image is shown below:
+			</p>
+			<p>
+				<img src="./images/homomorphic/homomorphic_input.png" alt="input image" class="center">
+			</p>
+			<p>
+				And its greyscale version:
+			</p>
+			<p>
+				<img src="./images/homomorphic/homomorphic_input_greyscale.png" alt="greyscale input image" class="center">
+			</p>
+			<p>
+				We can see how the output image differs from the input below:
+			</p>
+			<p>
+				<img src="./images/homomorphic/homomorphic_filtered.png" alt="filtered image" class="center">
+			</p>
+			<p>
+				If we set our result as the original image's luma plane in a YUV colour-system, then equalise it, we arrive at this result:
+			</p>
+			<p>
+				<img src="./images/homomorphic/homomorphic_output_as_gamma_equalised.png" alt="output image" class="center">
+			</p>
+			<p>
+				The result of the filtering can be obvious when compared to the equalised version of the original image:
+			</p>
+			<p>
+				<img src="./images/homomorphic/homomorphic_input_equalised.png" alt="equalised input image" class="center">
+			</p>
+			<p>
+				We can clearly see that in the last image, the equalised version of the original image, the details and luminance deviations aren't 
+				as clearly visible as in the previous image, which was filtered, then used as luma plane, then equalised.
+			</p>
+			<br>
+			<br>
+			<nav>
+				<menu>
+					<a href="./index.html">Home</a>
+					<a href="#atividades">Algorithms</a>
+					<a href="https://github.com/artoriuz">GitHub</a>
+				</menu>
+			</nav>
+			<br>
+			<br>
+			<h3 id="cannypoints">Enhanced pointillism with canny edge detector</h3>
+			<p>
+				The input image can be seen below:
+			</p>
+			<p>
+				<img src="./images/canny_points/fate_input.png" alt="input image" class="center">
+			</p>
+			<p>
+				The original pointillism art can be seen below:
+			</p>
+			<p>
+				<img src="./images/canny_points/fate_points.jpg" alt="pointillism art" class="center">
+			</p>
+			<p>
+				We apply the canny edge detector in order to find edges in the original image, which then allows us to use the extra
+				information to better reconstruct its characteristics in our pointillism art:
+			</p>
+			<p>
+				<img src="./images/canny_points/fate_canny.png" alt="canny image" class="center">
+			</p>
+			<p>
+				The following image used the location of the edges found by canny's algorithm to draw preliminary points, which are then smoothed 
+				by the following points that will stay on top of them. The objective is to better represent the original image by filling in more points 
+				and therefore better draw lines and surfaces. 
+			</p>
+			<p>
+				<img src="./images/canny_points/fate_cannypoints.png" alt="canny points image" class="center">
+			</p>
+			<br>
+			<br>
+			<nav>
+				<menu>
+					<a href="./index.html">Home</a>
+					<a href="#atividades">Algorithms</a>
+					<a href="https://github.com/artoriuz">GitHub</a>
+				</menu>
+			</nav>
+			<br>
+			<br><h3 id="kmeans">K-means art</h3>
+			<p>
+				We can see the input image below:
+			</p>
+			<p>
+				<img src="./images/kmeans/gbf_input.png" alt="input image" class="center">
+			</p>
+			<p>
+				Since the k-means machine learning algorithm has a random centroid starting location, each run will reach a relatively different result.
+				We can see 10 runs of the program below: 
+			</p>
+			<p>
+				<img src="./images/kmeans/output_variance.gif" alt="output images" class="center">
 			</p>
 			<br>
 			<br>
