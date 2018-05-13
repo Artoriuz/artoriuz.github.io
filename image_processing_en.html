@@ -1219,6 +1219,146 @@ int main(int argvc, char** argv) {
 			<br>
 			<h3 id="homomorphic">Homomorphic Filter</h3>
 			<p>
+				The homomorphic filtering simultaneously normalises brightness across an image and increases contrast, since illumination and reflectance 
+				combine multiplicatively, we can make those components additive by taking the logarithm of the image and then we can separate those in 
+				the frequency domain. Illumination variations can be seen as as multiplicative noise, which we can reduce through filtering.
+			</p>
+			<p>
+				In order to improve the image by making its illumination more even, the high-frequency components are increased and low-frequency components are decreased, 
+				because the high-frequency components are assumed to represent mostly the reflectance in the scene (the amount of light reflected off 
+				the object in the scene), whereas the low-frequency components are assumed to represent mostly the illumination in the scene. 
+				That is, high-pass filtering is used to suppress low frequencies and amplify high frequencies, in the log-intensity domain.
+			</p>
+			<p>
+				<pre class = "prettyprint">
+					<code>
+#include &#60;iostream&#62;
+#include &#60;opencv2/opencv.hpp&#62;
+
+#define RADIUS 20
+
+using namespace cv;
+using namespace std;
+
+void deslocaDFT(Mat &image){
+	Mat tmp, A, B, C, D;
+
+	image = image(Rect(0, 0, image.cols & -2, image.rows & -2));
+	int cx = image.cols / 2;
+	int cy = image.rows / 2;
+
+	A = image(Rect(0, 0, cx, cy));
+	B = image(Rect(cx, 0, cx, cy));
+	C = image(Rect(0, cy, cx, cy));
+	D = image(Rect(cx, cy, cx, cy));
+
+	A.copyTo(tmp);
+	D.copyTo(A);
+	tmp.copyTo(D);
+
+	C.copyTo(tmp);
+	B.copyTo(C);
+	tmp.copyTo(B);
+}
+
+int main(int argc, char **argv){
+	Mat imaginaryInput, complexImage, multsp;
+	Mat padded, filter, mag;
+	Mat image, imagegray, tmp;
+	Mat_&#60;float&#62; realInput, zeros;
+	vector&#60;Mat&#62; planos;
+
+	image = imread(argv[1]);
+
+	float mean;
+
+	int dft_M, dft_N;
+
+	dft_M = getOptimalDFTSize(image.rows);
+	dft_N = getOptimalDFTSize(image.cols);
+
+	copyMakeBorder(image, padded, 0,
+					dft_M - image.rows, 0,
+					dft_N - image.cols,
+					BORDER_CONSTANT, Scalar::all(0));
+
+
+	zeros = Mat_&#60;float&#62;::zeros(padded.size());
+
+
+	complexImage = Mat(padded.size(), CV_32FC2, Scalar(0));
+
+	filter = complexImage.clone();
+
+	tmp = Mat(dft_M, dft_N, CV_32F);
+
+	float gama_h = 100;
+	float gama_l = 510;
+	float c = 10;
+	float D_0 = 10;
+
+	for (int i = 0; i &#60; dft_M; i++){
+		for (int j = 0; j &#60; dft_N; j++){
+			tmp.at&#60;float&#62;(i, j) = (gama_h - gama_l) * 
+			(1.0 - exp(-1.0 * (float)c * ((((float)i - dft_M / 2.0) * 
+			((float)i - dft_M / 2.0) + ((float)j - dft_N / 2.0) * 
+			((float)j - dft_N / 2.0)) / (D_0 * D_0)))) + gama_l;
+		}
+	}
+
+	Mat comps[] = {tmp, tmp};
+	merge(comps, 2, filter);
+
+	cvtColor(image, imagegray, CV_BGR2GRAY);
+	imshow("original", imagegray);
+
+	copyMakeBorder(imagegray, padded, 0,
+					dft_M - image.rows, 0,
+					dft_N - image.cols,
+					BORDER_CONSTANT, Scalar::all(0));
+
+	planos.clear();
+
+	realInput = Mat_&#60;float&#62;(padded);
+
+	planos.push_back(realInput);
+	planos.push_back(zeros);
+
+	merge(planos, complexImage);
+
+	dft(complexImage, complexImage);
+
+	deslocaDFT(complexImage);
+
+	mulSpectrums(complexImage, filter, complexImage, 0);
+
+	planos.clear();
+	split(complexImage, planos);
+
+	mean = abs(planos[0].at&#60;float&#62;(dft_M / 2, dft_N / 2));
+
+	merge(planos, complexImage);
+
+	deslocaDFT(complexImage);
+
+	cout &#60;&#60; complexImage.size().height &#60;&#60; endl;
+
+	idft(complexImage, complexImage);
+
+	planos.clear();
+
+	split(complexImage, planos);
+
+	normalize(planos[0], planos[0], 0, 1, CV_MINMAX);
+	imshow("filtrada", planos[0]);
+	waitKey();
+
+	return 0;
+}
+					</code>
+				</pre>
+			</p>
+			<p>
 				The input image is shown below:
 			</p>
 			<p>
@@ -1274,22 +1414,167 @@ int main(int argvc, char** argv) {
 				The original pointillism art can be seen below:
 			</p>
 			<p>
-				<img src="./images/canny_points/fate_points.jpg" alt="pointillism art" class="center">
+				<img src="./images/canny_points/fate_points.png" alt="pointillism art" class="center">
 			</p>
 			<p>
 				We apply the canny edge detector in order to find edges in the original image, which then allows us to use the extra
-				information to better reconstruct its characteristics in our pointillism art:
+				information to better reconstruct its characteristics in our pointillism art.
 			</p>
 			<p>
-				<img src="./images/canny_points/fate_canny.png" alt="canny image" class="center">
+				You can see the code below:
 			</p>
 			<p>
-				The following image used the location of the edges found by canny's algorithm to draw preliminary points, which are then smoothed 
-				by the following points that will stay on top of them. The objective is to better represent the original image by filling in more points 
-				and therefore better draw lines and surfaces. 
+					<pre class = "prettyprint">
+							<code>
+#include &#60;iostream&#62;
+#include &#60;opencv2/opencv.hpp&#62;
+#include &#60;fstream&#62;
+#include &#60;iomanip&#62;
+#include &#60;vector&#62;
+#include &#60;algorithm&#62;
+#include &#60;numeric&#62;
+#include &#60;ctime&#62;
+#include &#60;cstdlib&#62;
+
+using namespace std;
+using namespace cv;
+
+#define STEP 5
+#define JITTER 3
+#define RAIO 3
+
+int top_slider = 10;
+int top_slider_max = 200;
+
+char TrackbarName[50];
+
+Mat image, border, frame, points, tmp, result;
+
+void on_trackbar_canny(int, void *){
+	Canny(image, border, top_slider, 3 * top_slider);
+	imshow("canny", border);
+}
+
+int main(int argc, char **argv){
+	vector&#60;int&#62; yrange;
+	vector&#60;int&#62; xrange;
+
+	int width, height;
+	int x, y;
+	int r, g, b;
+
+	image = imread(argv[1]);
+
+	srand(time(0));
+
+	if (!image.data){
+		cout &#60;&#60; "nao abriu" &#60;&#60; argv[1] &#60;&#60; endl;
+		cout &#60;&#60; argv[0] &#60;&#60; " imagem.jpg";
+		exit(0);
+	}
+
+	width = image.size().width;
+	height = image.size().height;
+
+	xrange.resize(height / STEP);
+	yrange.resize(width / STEP);
+
+	iota(xrange.begin(), xrange.end(), 0);
+	iota(yrange.begin(), yrange.end(), 0);
+
+	for (uint i = 0; i &#60; xrange.size(); i++){
+		xrange[i] = xrange[i] * STEP + STEP / 2;
+	}
+
+	for (uint i = 0; i &#60; yrange.size(); i++){
+		yrange[i] = yrange[i] * STEP + STEP / 2;
+	}
+
+	random_shuffle(xrange.begin(), xrange.end());
+	points = Mat(height, width, CV_8UC3, Scalar(CV_RGB(255, 255, 255)));
+	for (auto i : xrange){
+		random_shuffle(yrange.begin(), yrange.end());
+		for (auto j : yrange){
+			x = i + rand() % (2 * JITTER) - JITTER + 1;
+			y = j + rand() % (2 * JITTER) - JITTER + 1;
+			r = image.at&#60;Vec3b&#62;(x, y)[2];
+			g = image.at&#60;Vec3b&#62;(x, y)[1];
+			b = image.at&#60;Vec3b&#62;(x, y)[0];
+			circle(points, cv::Point(y, x), RAIO, CV_RGB(r, g, b), -1, CV_AA);
+		}
+	}
+	namedWindow("pontos");
+	imshow("pontos", points);
+
+	for (int round = 0; round &#60; 2; round++){
+		sprintf(TrackbarName, "Threshold inferior", top_slider_max);
+
+		namedWindow("canny");
+		createTrackbar(TrackbarName, "canny",
+						&top_slider,
+						top_slider_max,
+						on_trackbar_canny);
+
+		on_trackbar_canny(top_slider, 0);
+		waitKey();
+		Mat aux = Mat(height, width, CV_8U, Scalar(0));
+		for (int i = 0; i &#60; height; i++){
+			for (int j = 0; j &#60; width; j++){
+				if (border.at&#60;uchar&#62;(i, j) &#62; 0 && aux.at&#60;uchar&#62;(i, j) == 0){
+					r = image.at&#60;cv::Vec3b&#62;(i, j)[2];
+					g = image.at&#60;cv::Vec3b&#62;(i, j)[1];
+					b = image.at&#60;cv::Vec3b&#62;(i, j)[0];
+					circle(points, cv::Point(j, i), RAIO - round, CV_RGB(r, g, b), -1, CV_AA);
+					circle(aux, cv::Point(j, i), 2 * (RAIO - round), CV_RGB(255, 255, 255), -1, CV_AA);
+				}
+			}
+		}
+
+		namedWindow("pontos");
+		imshow("pontos", points);
+		waitKey();
+	}
+	return 0;
+}
+							</code>
+						</pre>
 			</p>
 			<p>
-				<img src="./images/canny_points/fate_cannypoints.png" alt="canny points image" class="center">
+				The algorithm follows a very simple logic, starting from the already shown previous pointillism art, it'll paint new circles 2 aqdditional times as the 
+				user chooses 2 canny thresholds. The original circle radius is decreased by 1 each time, and the idea is that we choose a higher threshold in the second 
+				run so we can paint smaller circles for more important lines, which will make those lines more visible. 
+			</p>
+			<p>
+				To prevent the algorithm from paiting circles on top of one another inside an interation (note that it can, and should, paint new circles on top
+				of circles painted on previous interations), we also paint doubled radius circles on an auxiliary matrix and use it as a rule that prevents new circles
+				from being painted if the equivalent position in it has been painted before. A doubled radius is used to prevent overlapping.
+			</p>
+			<p>
+				You can see the first threshold used, and the art after the new circles were painted:
+			</p>
+			<p>
+				<img src="./images/canny_points/fate_canny_th1.png" alt="canny image" class="center">
+				<br>
+				<img src="./images/canny_points/fate_cannypoints_th1.png" alt="canny image" class="center">
+			</p>
+			<p>
+				And you can also see the second threshold used, and the even smaller circles:
+			</p>
+			<p>
+				<img src="./images/canny_points/fate_canny_th2.png" alt="canny image" class="center">
+				<br>
+				<img src="./images/canny_points/fate_cannypoints_th2.png" alt="canny image" class="center">
+			</p>
+			<p>
+				The end result is a pointillism art that better shows transitions and more accurately draw the original lines. Note that the result can be 
+				controlled with the thresholds chosen. Since the first threshold was fairly generous, the end result looks incredibly filled with almost no 
+				blank white-space.
+			</p>
+			<p>
+				You can see all the steps done to the original image in order in the following GIF:
+			</p>
+			<p>
+				<img src="./images/canny_points/canny_points_animation.gif" alt="canny image" class="center">
 			</p>
 			<br>
 			<br>
@@ -1303,7 +1588,96 @@ int main(int argvc, char** argv) {
 			<br>
 			<br><h3 id="kmeans">K-means art</h3>
 			<p>
-				We can see the input image below:
+				K-means clustering is a unsurpervised data-mining machine learning algorithm used to classify elements. The algorithm has several characteristics, 
+				the first of them is that it'll always find the specified number of classes regardless of the topography of the data-set (the optimal number of classes
+				can be discovered through the elbow method). The second prominent characteristic, and the most important one for us in this demonstration, is that since
+				our centroids (which classify elements) have their starting locations randomised, each run will tend to result in slightly different final centroid locations 
+				and therefore slightly different element classifications.   
+			</p>
+			<p>
+				With this brief introduction, now we can start learning how the algorithm actually works. The first thing done is the creation of the initial centroids, 
+				the most common starting method is to simply randomly throw them anywhere (we'll understand why later) and simply let the algorithm itself converge to a 
+				sane state in the end. Usually, you'll want to run the program multiple times and pick your best run though. 
+				<br>
+				Since the initialisation is important, there are multiple different initialisation methods that aim to be more accurate than simply throwing the centroids anywhere 
+				randomly. In this demonstration our aim is to show how different our results can be, so we'll randomly initialise our centroids.
+			</p>
+			<p>
+				With the creation of the centroids done, now we need to understand what centroids even are and what they do. This is very simple and straightforward, a centroid 
+				is simply a point in our data-set which all the elements will get their distances measured against and classified with a label that identifies which of the centroids
+				is closer to it. So, in other words, we classify each element in the class represented by the closest centroid.
+			</p>
+			<p>
+				Once we finish classifying all the elements, for each centroid we calculate the summation of all the distances between this given centroid and all the elements 
+				that were classified in its class. This median will result in a vector that points exactly to the middle of all the elements classified by a given centroid.
+				<br>
+				Then, we move each centroid to the new calculated position (in the middle of the elements that were classified by the centroid), and redo all the classification 
+				process all over again. We repeat this step until it reaches the iteration count limit, or when there aren't any classification differences between consecutive 
+				iterations anymore.   
+			</p>
+			<p>
+				All those steps can be easily seen in the following GIF:
+			</p>
+			<p>
+				<img src="./images/kmeans/k_means.gif" alt="k_means" class="center">
+			</p>
+			<p>
+				The code can be seen below:
+			</p>
+			<p>
+					<pre class = "prettyprint">
+							<code>
+#include &#60;opencv2/opencv.hpp&#62;
+#include &#60;cstdlib&#62;
+
+using namespace cv;
+
+int main(int argc, char **argv) {
+	int nClusters = 12;
+	Mat rotulos;
+	int nRodadas = 1;
+	Mat centros;
+	Mat img = imread(argv[1]);
+	Mat samples(img.rows * img.cols, 3, CV_32F);
+
+	for (int i = 0; i &#60; 10; i++) {
+		for (int y = 0; y &#60; img.rows; y++) {
+			for (int x = 0; x &#60; img.cols; x++) {
+				for (int z = 0; z &#60; 3; z++) {
+					samples.at&#60;float&#62;(y + x * img.rows, z) = img.at&#60;Vec3b&#62;(y, x)[z];
+				}
+			}
+		}
+
+		kmeans(samples,
+			nClusters,
+			rotulos,
+			TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 10000, 0.0001),
+			nRodadas,
+			KMEANS_RANDOM_CENTERS,
+			centros);
+
+
+		Mat rotulada(img.size(), img.type());
+		for (int y = 0; y &#60; img.rows; y++) {
+			for (int x = 0; x &#60; img.cols; x++) {
+				int indice = rotulos.at&#60;int&#62;(y + x * img.rows, 0);
+				rotulada.at&#60;Vec3b&#62;(y, x)[0] = (uchar)centros.at&#60;float&#62;(indice, 0);
+				rotulada.at&#60;Vec3b&#62;(y, x)[1] = (uchar)centros.at&#60;float&#62;(indice, 1);
+				rotulada.at&#60;Vec3b&#62;(y, x)[2] = (uchar)centros.at&#60;float&#62;(indice, 2);
+			}
+		}
+		imshow("clustered image", rotulada);
+		waitKey();
+	}
+return 0;
+}
+							</code>
+						</pre>
+			</p>
+			<p>
+				Without further ado, we'll run the k-means algorithm in an image and switch all the colour values to their final classifications. You can see the 
+				input image used below:
 			</p>
 			<p>
 				<img src="./images/kmeans/gbf_input.png" alt="input image" class="center">
