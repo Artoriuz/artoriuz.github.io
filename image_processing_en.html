@@ -1550,8 +1550,8 @@ int main(int argc, char **argv){
 				run so we can paint smaller circles for more important lines, which will make those lines more visible. 
 			</p>
 			<p>
-				To prevent the algorithm from paiting circles on top of one another inside an interation (note that it can, and should, paint new circles on top
-				of circles painted on previous interations), we also paint doubled radius circles on an auxiliary matrix and use it as a rule that prevents new circles
+				To prevent the algorithm from paiting circles on top of one another inside an iteration (note that it can, and should, paint new circles on top
+				of circles painted on previous iterations), we also paint doubled radius circles on an auxiliary matrix and use it as a rule that prevents new circles
 				from being painted if the equivalent position in it has been painted before. A doubled radius is used to prevent overlapping.
 			</p>
 			<p>
