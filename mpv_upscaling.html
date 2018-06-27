@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Evaluating mpv's upscaling algorithms - A study of performance and quality</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="./css/default.css" />
+    <link rel="stylesheet" type="text/css" href="./css/syntax.css" />
+    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?skin=doxy"></script>
+</head>
+
+<body>
+    <header>
+        <hgroup>
+            <h1>
+                <a href="./index.html">Evaluating mpv's upscaling algorithms</a>
+            </h1>
+            <h2>A study of performance and quality</h2>
+        </hgroup>
+    </header>
+    <nav>
+        <menu>
+            <a href="./index.html">Home</a>
+            <a href="https://github.com/artoriuz">GitHub</a>
+            <!--<a href="./index_pt.html">Versão em português</a>-->
+        </menu>
+    </nav>
+    <section>
+        <h3 id="upscaling">What is upscaling?</h3>
+        <p>
+            Like its name implies, upscaling is simply increasing the scale of something. More specifically, taking discrete information
+            in a given scale and finding values between the existing samples. The easiest and most classic way of doing this
+            is through simple linear interpolation, if you want to find a value between two points you can simply draw a
+            line between them and linearly find any value in this line. If you wanted to find the value that's placed exactly
+            in the middle of those 2 discrete points, you could simply do an arithmetic mean with their values to find your
+            answer.
+        </p>
+        <p>
+            Linear interpolation can be done in a plane, through both axis, creating what we call "bilinear" interpolation. Bilinear
+            interpolation is the simplest interpolation algorithm, easiest to calculate and also unironically the most used
+            one in the industry due to the fact that it's extremely simple to implement.
+        </p>
+        <p>
+            But can something as simple as just drawing a line between 2 known discrete points give us good results? It depends entirely
+            on how the original information looked like. We can however, increase the complexity of our upscaling algorithm
+            by increase the amount of information it takes into consideration in order to find values between our discrete
+            points. In this post we'll evaluate what we can do differently, how much better our results can get and how it
+            affects our performance.
+        </p>
+        <h3 id="polynomial">Polynomial interpolation</h3>
+        <p>
+            <img src="./images/mpv_upscaling/interpolation.png" alt="upscaling" class="center">
+            <br>
+            A relatively simple way of taking more information into consideration when finding values between discrete points is to use
+            more than just the information of 2 points to calculate a function that connects them. We can trace a polynomial
+            curve between points if we take into account the information of neighbouring elements, calculating the gradients
+            and therefore becoming able to connect them with curves instead of lines. The shape of the curve connecting points
+            depends on the windowing and scaling functions used.
+        </p>
+        <h3 id="SSSR">Structural Similarity Upscaling</h3>
+        <img src="./images/mpv_upscaling/sssr_bilinear.png" alt="upscaling" class="center">
+        <br>
+        <img src="./images/mpv_upscaling/sssr_sssr.png" alt="upscaling" class="center">
+        <p>
+            We can more precisely upscale something if we try to reconstruct strucutures, the most evident problem with linear or polynomial
+            scalers is the thickening of border areas where the interpolated result doesn't transit between values as sharply,
+            resulting in a blurrier image with "lost" detail in the strucutures if you're downscaling and then upscaling
+            it back.
+        </p>
+        <h3 id="neural">Convolutional Neural Networks</h3>
+        <p>
+            Another way of trying to "recover" lost information through upscaling is using neural networks that firstly go through a
+            training phase so it can "learn" how to upscale. The training phase consists of analysing a set of images, and
+            then setting parameters that will be used when upscaling. Note that upscaling isn't exactly recovering information, 
+            all we're doing is coming up with "new" information based on what we already have.
+        </p>
+        <p>
+            There are multiple different ways of using neural networks to upscale images, and there are multiple different algorithms
+            that aim to do pretty much the same thing. To make it more practical, we'll stick to algorithms that can be easily
+            tested as user-shaders using mpv, with the sole adition of the extremely popular Waifu2X, which will be used
+            as our state of the art algorithm.
+        </p>
+        <p>
+            We'll test the following algorithms:
+            <li>RAVU</li>
+            <li>NNEDI3</li>
+            <li>FSRCNNX</li>
+            <li>Waifu2x</li>
+        </p>
+        <p>
+            <h5>
+                <a href="https://github.com/bjin/mpv-prescalers">RAVU</a>
+            </h5>
+            <p>
+                Based on Google's RAISR, RAVU utilises its upscaling ideas but doesn't apply its post-processing. The algorithm learns convolution
+                kernels from gradients and value intensities so it can interpolate the data more accurately than doing it
+                using the same convolution kernel in every single window.
+            </p>
+            <p>
+                We can choose the radius of the upscaling window, a larger radius means that we take more information into account when learning
+                our convolution kernels, and also that we take more information into account when upscaling each part of
+                the image.
+            </p>
+            <h5>
+                <a href="http://avisynth.nl/index.php/Nnedi3">NNEDI3</a>
+            </h5>
+            <p>
+                NNEDI3 is the direct evolution of NNEDI2, and it was originally an intra-field only deinterlacing algorithm. It can however,
+                upscale images utilising the same logic. We can vary the size of the window (a larger window takes more information
+                into account) and the number of nerons (more neurons mean we learn things better, but the extra information
+                makes upscaling slower).
+            </p>
+            <h5>
+                <a href="https://github.com/igv/FSRCNN-TensorFlow">FSRCNNX</a>
+            </h5>
+            <p>
+                Based on SRCNN, FRSCNN focus on being able to be used in real time without sacrificing quality. We can set the feature dimension,
+                the number of shrinking filters and the mapping depth. Increasing the feature dimension increases quality,
+                but decreases speed. Increasing the number of shrinking filters will increase performance, but will also
+                potentially decrease quality.
+            </p>
+            <h5>
+                <a href="https://github.com/nagadomi/waifu2x">Waifu2x</a>
+            </h5>
+            <p>
+                Inspired by SRCNN, this algorithm is too slow to be used in real time but it outputs results with high fidelity.
+            </p>
+        </p>
+        <h3 id="methodology">Testing methodology</h3>
+        <p>
+            Performance measurements were done upscaling an animation video encoded into AVC from 1280x720 to 2560x1440. Utilising mpv
+            with a benchmarking profile, always scaling chroma with spline36 (all settings from profile=gpu-hq), fixing scalers
+            that do half-pixel shifts, with Vulkan as the renderer and hardware decoding turned off. The machine used has
+            an Ivy Bridge i5 3470, a Polaris RX 470 and user shaders were always compute shaders when possible.
+        </p>
+        <p>
+            Quality measurements were done in 2 test images, one from animation and another one from live action.
+        </p>
+        <a href="./images/mpv_upscaling/violet/reference.png">
+            <img src="./images/mpv_upscaling/violet/reference.png" alt="Reference Violet" class="center" width="960" height="540">
+        </a>
+        <br>
+        <a href="./images/mpv_upscaling/shuri/reference.png">
+            <img src="./images/mpv_upscaling/shuri/reference.png" alt="Reference Shuri" class="center" width="960" height="404">
+        </a>
+        <p>
+            The reasoning behind this comes from the fact that the live action image has more high frequency components that are harder
+            to "restore". In order to measure how "good" each algorithm is, firstly the test images were bicubic downscaled
+            to a quarter of their original resolutions (0.5x scaling factor in both axes), and then upscaled back to their
+            original resolutions with a direct 2x upscaling factor which prescalers usually are used for (2x in both axes
+            creates a resolution that's 4x larger in pixels). Due to the fact that some scalers only work with YUV sources,
+            to make it fair a relatively high quality YUV444 JPEG source was used for every single scaler. Note that using
+            RGB24 PNGs with the algorithms that accept RGB sources would've been better, but also unfair.
+        </p>
+        <p>
+            Performance was evaluated simply in frames per second, while quality was evaluated in both SSIM and PSNR.
+
+        </p>
+        <h5>
+            PSNR
+        </h5>
+        <a href="https://www.researchgate.net/publication/268807675_A_Novel_Approach_for_Image_Steganography_
+        Using_Dynamic_Substitution_and_Secret_Key?_sg=UcleQYPeDrMccdHGfADAogEwPirAYzRsjWqpa37H1fnxlgoQqeSa0wxefy-RF_-v_DVanmt-
+        xoJDolbt9Xcf8sogvN8ECUF6LA"><img src="./images/mpv_upscaling/psnr.png" alt="PSNR" class="center"></a>
+        <p>
+            Simply the peark-signal-to-noise ratio given in dB. We can measure how much noise there's in an image looking at this number.
+        </p>
+        <h5>
+            SSIM
+        </h5>
+        <a href="http://scikit-image.org/docs/dev/auto_examples/transform/plot_ssim.html">
+            <img src="./images/mpv_upscaling/ssim.png" alt="PSNR" class="center">
+        </a>
+        <br>
+        <a href="http://mubeta06.github.io/python/sp/ssim.html">
+            <img src="./images/mpv_upscaling/ssim_map.png" alt="PSNR" class="center">
+        </a>
+        <p>
+            The structural similarity index tells us how close an image is to the reference giving more importance to how well structures
+            are preserved, so it can represent better how humans perceive said images. Its practical difference when compared
+            to measurements like MSE and PSNR is that contrast, colouring and luminance disparities don't affect the scoring
+            as much as noise in the high frequency components.
+        </p>
+        <p>
+            Given our specific scenario, where noise is only added through upscaling, we expect a strong correlation between PSRN and
+            SSIM.
+        </p>
+        <h3 id="results">Testing and results</h3>
+        <p>The following image was used for the animation upscaling testing:</p>
+        <img src="./images/mpv_upscaling/violet/downscaled-yuv444p.jpg" alt="Downscaled Violet" class="center">
+        <br>
+        <p>We can see the results below:</p>
+        <img src="./images/mpv_upscaling/tables/violet-fps-ssim.png" alt="Violet results FPS SSIM" class="center">
+        <br>
+        <img src="./images/mpv_upscaling/tables/violet-fps-psnr.png" alt="Violet results FPS PSNR" class="center">
+        <br>
+        <img src="./images/mpv_upscaling/tables/violet-percentuals.png" alt="Violet Percentuals" class="center">
+        <br>
+        <p>Or in a table format, for those who prefer to just look at the numbers:</p>
+        <div w3-include-html="./html/violet.htm"></div>
+        <p>
+            We can also see how much closer to the reference our best tested scaler is compared to the worst scaler by looking at their SSIM maps:
+        </p>
+        <p>
+            <img src="./images/mpv_upscaling/violet/ssim_map_bilinear.png" alt="Violet SSIM map bilinear" class="center" width="960" height="540">
+        </p>
+        <p>
+            <img src="./images/mpv_upscaling/violet/ssim_map_waifu2x.png" alt="Violet SSIM map waifu2x" class="center" width="960" height="540">
+        </p>
+        <p>The following image was used for the live-action upscaling testing:</p>
+        <img src="./images/mpv_upscaling/shuri/downscaled-yuv444p.jpg" alt="Downscaled Shuri" class="center">
+        <br>
+        <p>We can see the results below:</p>
+        <img src="./images/mpv_upscaling/tables/shuri-fps-ssim.png" alt="Shuri results FPS SSIM" class="center">
+        <br>
+        <img src="./images/mpv_upscaling/tables/shuri-fps-psnr.png" alt="Shuri results FPS PSNR" class="center">
+        <br>
+        <img src="./images/mpv_upscaling/tables/shuri-percentuals.png" alt="Shuri Percentuals" class="center">
+        <p>And again, a table:</p>
+        <div w3-include-html="./html/shuri.htm"></div>
+        <p>The same beheviour can be seen in Shuri's SSIM maps, Waifu2x was much closer to the reference than bilinear:</p>
+        <p>
+            <img src="./images/mpv_upscaling/shuri/ssim_map_bilinear.png" alt="Shuri SSIM map bilinear" class="center" width="960" height="404">
+        </p>
+        <p>
+            <img src="./images/mpv_upscaling/shuri/ssim_map_waifu2x.png" alt="Shuri SSIM map waifu2x" class="center" width="960" height="404">
+        </p>
+        <p>
+            We can clearly see that in general, neural network based scalers tend to give better quality, though they're also more computationally
+            expensive. SSSR however, does better than RAVU or NEEDI3, and only really gets beaten by FSRCNNX and Waifu2x.
+        </p>
+        <p>
+            We can also see that the performance drop from increasing the parameters in the neural network based scalers doesn't give us an equivalent 
+            quality increase, which was always to be expected. What's surprising though, is that according to the test spline36 appears to be more efficient 
+            than even bilinear itself (efficiency was measured by the framerate ration compared to bilinear times the relative quality increase over bilinear), though bilinear was 
+            probably bound by decoding speed. Still, we can clearly see that FSRCNNX_x2_8-0-4-1 is also extremely efficient for the image quality it outputs. 
+        </p>
+    </section>
+
+
+    <footer>
+
+    </footer>
+</body>
+<script>
+    function includeHTML() {
+        var z, i, elmnt, file, xhttp;
+        /*loop through a collection of all HTML elements:*/
+        z = document.getElementsByTagName("*");
+        for (i = 0; i < z.length; i++) {
+            elmnt = z[i];
+            /*search for elements with a certain atrribute:*/
+            file = elmnt.getAttribute("w3-include-html");
+            if (file) {
+                /*make an HTTP request using the attribute value as the file name:*/
+                xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function () {
+                    if (this.readyState == 4) {
+                        if (this.status == 200) { elmnt.innerHTML = this.responseText; }
+                        if (this.status == 404) { elmnt.innerHTML = "Page not found."; }
+                        /*remove the attribute, and call this function once more:*/
+                        elmnt.removeAttribute("w3-include-html");
+                        includeHTML();
+                    }
+                }
+                xhttp.open("GET", file, true);
+                xhttp.send();
+                /*exit the function:*/
+                return;
+            }
+        }
+    }
+</script>
+ <script>
+        includeHTML();
+</script> 
+</html>
