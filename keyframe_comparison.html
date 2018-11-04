@@ -47,7 +47,7 @@
                 <li>Every image was encoded at every format at the respective filesizes: 30KB, 75KB, 160KB, 250KB, 360KB, 550KB, 950KB.</li>
                 <li>Every encoder was configured with their respective "highest quality" preset, which means "-deadline best" for libvpx and "-preset placebo" for x264/x265.</li>
                 <li>Every encode was yuv444p, and contained in a MKV to simplify comparisons.</li>
-                <li>PSNR and SSIM measurements were done against the source PNGs by simply transcoding the encodes into PNGs (lossless).</li>
+                <li>PSNR, SSIM and PSNR-HVS-M measurements were done against the source PNGs by simply transcoding the encodes into PNGs (lossless).</li>
               </ol>                
         </p>
         <p>
@@ -117,7 +117,7 @@
             The first image, YUNA, is a good representation of what we can expect from high quality anime frames. It's clear that we have more low-frequency components than high-frequency 
             components, but the sharp lines and details need to be preserved otherwise it's extremely easy to spot blurring, which might not always be the case for live-action frames. We see 
             that the number of different colour tones and high-frequency details has a high correlation with how efficient the encoders can be, the hardest image to encode was clearly ROOM due 
-            to the ridiculous amount of detail, and both the PSNR and SSIM measurements agree with it.   
+            to the ridiculous amount of detail, and all measurements agree with it.   
         </p>
         <p>
             We can see an average of the 4 tests in the graphs below:
@@ -132,7 +132,7 @@
             <img src="./images/keyframe_comparison/average_psnrhvsm.png" alt="AVERAGE_PSNRHVSM" class="center">
         </p>
         <p>
-            It's extremely surprising to see libvpx beating x265 in SSIM/PSNR on most filesizes, but keep those encoders do have PSNR/SSIM affecting features that theoretically should improve 
+            It's extremely surprising to see libvpx beating x265 on most filesizes, but keep those encoders do have PSNR/SSIM affecting features that theoretically should improve 
             perceived image quality despite the lower measurements. Those features, called psycho-visual optimisations, can be turned off with flags, which might improve 
             the encoder's performance on said metrics. Since I was using default (with the high quality presets) settings, psycho-visual optimisations were turned on. 
         </p>
