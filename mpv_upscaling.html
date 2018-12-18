@@ -15,7 +15,7 @@
             <h1>
                 <a href="./index.html">Evaluating mpv's upscaling algorithms</a>
             </h1>
-            <h2>A study of performance and quality by João Vitor Chrisóstomo and Vitor Fassanaro</h2>
+            <h2>A study of performance and quality by João Vitor Chrisóstomo</h2>
         </hgroup>
     </header>
     <nav>
@@ -35,8 +35,11 @@
             the shaders from <a href="https://github.com/bjin/mpv-prescalers">bjin</a> and <a href="https://github.com/igv/FSRCNN-TensorFlow/releases">igv (FSRCNNX)</a>/<a href="https://gist.github.com/igv">igv (SSSR)</a>.
         </p>
         <p>
-            Keep in mind the results here were obtained during June, 2018. While I don't believe the quality measurements will change drastically in the near future, FSRCNNX can be trained 
-            differently which does in fact cause different outputs.
+            UPDATE - 18/12/2018: Violet measurements have been updated with latest versions of FSRCNNX and Waifu2x. On top of that, I've included MS-SSIM and PSNR-HVS-M measurements. 
+            I've also included all NGU algorithms from <a href="http://madvr.com/">MadVR</a> due to demand, though NGU-AA performs poorly due to half-pixel shifts.  
+        </p>
+        <p>
+            I've not finished everything yet, Shuri's section will be updated soon. 
         </p>
         <p>
             If all you want is to look at the results, <a href=#results>follow this link.</a> 
@@ -59,7 +62,7 @@
             But can something as simple as just drawing a line between 2 known discrete points give us good results? It depends entirely
             on how the original information looked like. We can however, increase the complexity of our upscaling algorithm
             by increase the amount of information it takes into consideration in order to find values between our discrete
-            points. In this post we'll evaluate what we can do differently, how much better our results can get and how it
+            points. In this page we'll evaluate what we can do differently, how much better our results can get and how it
             affects our performance.
         </p>
         <h3 id="polynomial">Polynomial interpolation</h3>
@@ -92,64 +95,28 @@
         <p>
             There are multiple different ways of using neural networks to upscale images, and there are multiple different algorithms
             that aim to do pretty much the same thing. To make it more practical, we'll stick to algorithms that can be easily
-            tested as user-shaders using mpv, with the sole adition of the extremely popular Waifu2X, which will be used
-            as our state of the art algorithm.
+            tested as user-shaders using mpv, with the adition of the extremely popular Waifu2X and NGU from MadVR. 
         </p>
         <p>
             We'll test the following algorithms:
-            <li>RAVU</li>
-            <li>NNEDI3</li>
-            <li>FSRCNNX</li>
-            <li>Waifu2x</li>
+            <li><a href="https://github.com/bjin/mpv-prescalers">RAVU</a></li>
+            <li><a href="http://avisynth.nl/index.php/Nnedi3">NNEDI3</a></li>
+            <li><a href="https://github.com/igv/FSRCNN-TensorFlow">FSRCNNX</a></li>
+            <li><a href = "http://madvr.com/">NGU(AA/SOFT/STANDARD/SHARP)</a></li>
+            <li><a href="https://github.com/nagadomi/waifu2x">Waifu2x</a></li>
         </p>
-        <p>
-            <h5>
-                <a href="https://github.com/bjin/mpv-prescalers">RAVU</a>
-            </h5>
-            <p>
-                Based on Google's RAISR, RAVU utilises its upscaling ideas but doesn't apply its post-processing. The algorithm learns convolution
-                kernels from gradients and value intensities so it can interpolate the data more accurately than doing it
-                using the same convolution kernel in every single window.
-            </p>
-            <p>
-                We can choose the radius of the upscaling window, a larger radius means that we take more information into account when learning
-                our convolution kernels, and also that we take more information into account when upscaling each part of
-                the image.
-            </p>
-            <h5>
-                <a href="http://avisynth.nl/index.php/Nnedi3">NNEDI3</a>
-            </h5>
-            <p>
-                NNEDI3 is the direct evolution of NNEDI2, and it was originally an intra-field only deinterlacing algorithm. It can however,
-                upscale images utilising the same logic. We can vary the size of the window (a larger window takes more information
-                into account) and the number of nerons (more neurons mean we learn things better, but the extra information
-                makes upscaling slower).
-            </p>
-            <h5>
-                <a href="https://github.com/igv/FSRCNN-TensorFlow">FSRCNNX</a>
-            </h5>
-            <p>
-                Based on SRCNN, FRSCNN focus on being able to be used in real time without sacrificing quality. We can set the feature dimension,
-                the number of shrinking filters and the mapping depth. Increasing the feature dimension increases quality,
-                but decreases speed. Increasing the number of shrinking filters will increase performance, but will also
-                potentially decrease quality.
-            </p>
-            <h5>
-                <a href="https://github.com/nagadomi/waifu2x">Waifu2x</a>
-            </h5>
-            <p>
-                Inspired by SRCNN, this algorithm is too slow to be used in real time but it outputs results with high fidelity.
-            </p>
-        </p>
+        
         <h3 id="methodology">Testing methodology</h3>
         <p>
-            Performance measurements were done upscaling an animation video encoded into AVC from 1280x720 to 2560x1440. Utilising mpv
+            Performance measurements were done upscaling an animation video encoded into 8bit AVC from 1280x720 to 2560x1440. Utilising mpv
             with a benchmarking profile, always scaling chroma with spline36 (all settings from profile=gpu-hq), fixing scalers
-            that do half-pixel shifts, with Vulkan as the renderer and hardware decoding turned off. The machine used has
+            that do half-pixel shifts (with the exception of NGU-AA, since as far as I know there's no option to fix it in MadVR), 
+            with Vulkan as the renderer and hardware decoding turned off. The machine used has
             an Ivy Bridge i5 3470, a Polaris RX 470 and user shaders were always compute shaders when possible.
         </p>
         <p>
-            Quality measurements were done in 2 test images, one from animation and another one from live action.
+            Quality measurements were done in 2 test images, one from animation and another one from live action. Though keep in mind the live-action 
+            results are currently outdated.
         </p>
         <a href="./images/mpv_upscaling/violet/reference.png">
             <img src="./images/mpv_upscaling/violet/reference.png" alt="Reference Violet" class="center" width="960" height="540">
@@ -160,46 +127,22 @@
         </a>
         <p>
             The reasoning behind this comes from the fact that the live action image has more high frequency components that are harder
-            to "restore". In order to measure how "good" each algorithm is, firstly the test images were bicubic downscaled
+            to "restore". In order to measure how "good" each algorithm is, the test images were previously bicubic downscaled
             to a quarter of their original resolutions (0.5x scaling factor in both axes), and then upscaled back to their
-            original resolutions with a direct 2x upscaling factor which prescalers usually are used for (2x in both axes
-            creates a resolution that's 4x larger in pixels). Due to the fact that some scalers only work with YUV sources,
+            original resolutions with a direct 2x upscaling factor (2x in both axes outputs a resolution that's 4x larger in pixels). 
+            Due to the fact that some scalers only work with YUV sources,
             to make it fair a relatively high quality YUV444 JPEG source was used for every single scaler. Note that using
             RGB24 PNGs with the algorithms that accept RGB sources would've been better, but also unfair.
         </p>
         <p>
-            Performance was evaluated simply in frames per second, while quality was evaluated in both SSIM and PSNR.
-
+            Performance was evaluated simply in frames per second, while quality was evaluated in 
+            <a href="https://en.wikipedia.org/wiki/Peak_signal-to-noise_ratio">PSNR</a>, 
+            <a href="https://en.wikipedia.org/wiki/Structural_similarity">SSIM</a>, 
+            <a href="http://mrim.imag.fr/yubing.tong/Files_YubingTong/JIST4516-Accepted.pdf">PSNR-HVS-M</a> and 
+            <a href="https://ece.uwaterloo.ca/~z70wang/publications/msssim.html">MS-SSIM</a>.
         </p>
-        <h5>
-            PSNR
-        </h5>
-        <a href="https://www.researchgate.net/publication/268807675_A_Novel_Approach_for_Image_Steganography_
-        Using_Dynamic_Substitution_and_Secret_Key?_sg=UcleQYPeDrMccdHGfADAogEwPirAYzRsjWqpa37H1fnxlgoQqeSa0wxefy-RF_-v_DVanmt-
-        xoJDolbt9Xcf8sogvN8ECUF6LA"><img src="./images/mpv_upscaling/psnr.png" alt="PSNR" class="center"></a>
-        <p>
-            Simply the peark-signal-to-noise ratio given in dB. We can measure how much noise there's in an image looking at this number.
-        </p>
-        <h5>
-            SSIM
-        </h5>
-        <a href="http://scikit-image.org/docs/dev/auto_examples/transform/plot_ssim.html">
-            <img src="./images/mpv_upscaling/ssim.png" alt="PSNR" class="center">
-        </a>
-        <br>
-        <a href="http://mubeta06.github.io/python/sp/ssim.html">
-            <img src="./images/mpv_upscaling/ssim_map.png" alt="PSNR" class="center">
-        </a>
-        <p>
-            The structural similarity index tells us how close an image is to the reference giving more importance to how well structures
-            are preserved, so it can represent better how humans perceive said images. Its practical difference when compared
-            to measurements like MSE and PSNR is that contrast, colouring and luminance disparities don't affect the scoring
-            as much as noise in the high frequency components.
-        </p>
-        <p>
-            Given our specific scenario, where noise is only added through upscaling, we expect a strong correlation between PSRN and
-            SSIM.
-        </p>
+        
+        
         <h3 id="results">Testing and results</h3>
         <p>The following image was used for the animation upscaling testing:</p>
         <img src="./images/mpv_upscaling/violet/downscaled-yuv444p.jpg" alt="Downscaled Violet" class="center">
@@ -208,23 +151,27 @@
             Before we continue to the results, you can find all the scaled images in <a href="https://github.com/Artoriuz/artoriuz.github.io/tree/master/images/mpv_upscaling/violet">this repository.</a>
         </p>
         <p>We can see the results below:</p>
-        <img src="./images/mpv_upscaling/tables/violet-fps-ssim.png" alt="Violet results FPS SSIM" class="center">
-        <br>
-        <img src="./images/mpv_upscaling/tables/violet-fps-psnr.png" alt="Violet results FPS PSNR" class="center">
-        <br>
-        <img src="./images/mpv_upscaling/tables/violet-percentuals.png" alt="Violet Percentuals" class="center">
-        <br>
+        <div class="row">
+            <div class="column">
+                <img src="./images/mpv_upscaling/tables/violet-fps.png" alt="Violet results FPS" width="450" height="638">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/tables/violet-ssim.png" alt="Violet results SSIM" width="450" height="638">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/tables/violet-psnr.png" alt="Violet results PSNR" width="450" height="638">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/tables/violet-msssim.png" alt="Violet results MS-SSIM" width="450" height="638">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/tables/violet-psnrhvsm.png" alt="Violet results PSNR-HVS-M" width="450" height="638">
+            </div>
+          </div>
+    
         <p>Or in a table format, for those who prefer to just look at the numbers:</p>
         <div w3-include-html="./html/violet.htm"></div>
-        <p>
-            We can also see how much closer to the reference our best tested scaler is compared to the worst scaler by looking at their SSIM maps:
-        </p>
-        <p>
-            <img src="./images/mpv_upscaling/violet/ssim_map_bilinear.png" alt="Violet SSIM map bilinear" class="center" width="960" height="540">
-        </p>
-        <p>
-            <img src="./images/mpv_upscaling/violet/ssim_map_waifu2x.png" alt="Violet SSIM map waifu2x" class="center" width="960" height="540">
-        </p>
+        
         <p>The following image was used for the live-action upscaling testing:</p>
         <img src="./images/mpv_upscaling/shuri/downscaled-yuv444p.jpg" alt="Downscaled Shuri" class="center">
         <br>
@@ -248,13 +195,20 @@
         </p>
         <p>
             We can clearly see that in general, neural network based scalers tend to give better quality, though they're also more computationally
-            expensive. SSSR however, does better than RAVU or NEEDI3, and only really gets beaten by FSRCNNX and Waifu2x.
+            expensive. SSSR however, does better than expected and sometimes can even beat FSRCNNX on the objective mathematical tests due to the fact that its output is generally "cleaner".
         </p>
         <p>
-            We can also see that the performance drop from increasing the parameters in the neural network based scalers doesn't give us an equivalent 
-            quality increase, which was always to be expected. What's surprising though, is that according to the test spline36 appears to be more efficient 
-            than even bilinear itself (efficiency was measured by the framerate ratio compared to bilinear times the relative quality increase over bilinear), though bilinear was 
-            probably bound by decoding speed. Still, we can clearly see that FSRCNNX_x2_8-0-4-1 is also extremely efficient for the image quality it outputs. 
+            NGU-AA performed horribly on the quality measurements due to half-pixel shifts, but all the other NGU algorithms were actually decent. NGU-STANDARD and NGU-SHARP are consistently 
+            better than FRSCNNX and only really get beaten by Waifu2x, which is on its own league.  
+        </p>
+        <p>
+            It would be amazing to be able to use Waifu2x in real-time, but it's impossible. Taking performance into consideration, at least on mpv FSRCNNX-8-0-4-1 seems to be the best 
+            all-around option when you take into consideration objetive quality scores, my own subjective perception of it being visibly clearer than SSSR (but perhaps slightly dirtier 
+            with more artifacts) and also because it performs amazingly well for the quality it gives. Ravu is visibly blurrier, NNEDI3 is beaten in everything, and FSRCCNX-16-0-4-1 isn't 
+            worth the performance difference.  
+        </p>
+        <p>
+            If you're using MadVR, I think both NGU-STANDARD and NGU-SHARP look awesome and you can choose whichever you like the most.
         </p>
     </section>
 

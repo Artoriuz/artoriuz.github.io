@@ -87,4 +87,13 @@ body {
     font-weight:bold;
     content:">> "
    }
+   .row {
+    display: flex;
+    overflow: scroll;
+    overflow-y: hidden;
+  }
+   .column {
+    flex: 33.33%;
+    padding: 5px;
+  }
    
