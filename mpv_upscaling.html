@@ -39,9 +39,6 @@
             I've also included all NGU algorithms from <a href="http://madvr.com/">MadVR</a> due to demand, though NGU-AA performs poorly due to half-pixel shifts.  
         </p>
         <p>
-            I've not finished everything yet, Shuri's section will be updated soon. 
-        </p>
-        <p>
             If all you want is to look at the results, <a href=#results>follow this link.</a> 
         </p>
         <h3 id="upscaling">What is upscaling?</h3>
@@ -115,8 +112,7 @@
             an Ivy Bridge i5 3470, a Polaris RX 470 and user shaders were always compute shaders when possible.
         </p>
         <p>
-            Quality measurements were done in 2 test images, one from animation and another one from live action. Though keep in mind the live-action 
-            results are currently outdated.
+            Quality measurements were done in 2 test images, one from animation and another one from live action.
         </p>
         <a href="./images/mpv_upscaling/violet/reference.png">
             <img src="./images/mpv_upscaling/violet/reference.png" alt="Reference Violet" class="center" width="960" height="540">
@@ -179,20 +175,26 @@
             Again, you can find all the scaled images in <a href="https://github.com/Artoriuz/artoriuz.github.io/tree/master/images/mpv_upscaling/shuri">this repository.</a>
         </p>
         <p>We can see the results below:</p>
-        <img src="./images/mpv_upscaling/tables/shuri-fps-ssim.png" alt="Shuri results FPS SSIM" class="center">
-        <br>
-        <img src="./images/mpv_upscaling/tables/shuri-fps-psnr.png" alt="Shuri results FPS PSNR" class="center">
-        <br>
-        <img src="./images/mpv_upscaling/tables/shuri-percentuals.png" alt="Shuri Percentuals" class="center">
+        <div class="row">
+            <div class="column">
+                <img src="./images/mpv_upscaling/tables/fps.png" alt="shuri results FPS" width="450" height="638">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/tables/shuri-ssim.png" alt="shuri results SSIM" width="450" height="638">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/tables/shuri-psnr.png" alt="shuri results PSNR" width="450" height="638">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/tables/shuri-msssim.png" alt="shuri results MS-SSIM" width="450" height="638">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/tables/shuri-psnrhvsm.png" alt="shuri results PSNR-HVS-M" width="450" height="638">
+            </div>
+          </div>
         <p>And again, a table:</p>
         <div w3-include-html="./html/shuri.htm"></div>
-        <p>The same beheviour can be seen in Shuri's SSIM maps, Waifu2x was much closer to the reference than bilinear:</p>
-        <p>
-            <img src="./images/mpv_upscaling/shuri/ssim_map_bilinear.png" alt="Shuri SSIM map bilinear" class="center" width="960" height="404">
-        </p>
-        <p>
-            <img src="./images/mpv_upscaling/shuri/ssim_map_waifu2x.png" alt="Shuri SSIM map waifu2x" class="center" width="960" height="404">
-        </p>
+
         <p>
             We can clearly see that in general, neural network based scalers tend to give better quality, though they're also more computationally
             expensive. SSSR however, does better than expected and sometimes can even beat FSRCNNX on the objective mathematical tests due to the fact that its output is generally "cleaner".
@@ -203,7 +205,7 @@
         </p>
         <p>
             It would be amazing to be able to use Waifu2x in real-time, but it's impossible. Taking performance into consideration, at least on mpv FSRCNNX-8-0-4-1 seems to be the best 
-            all-around option when you take into consideration objetive quality scores, my own subjective perception of it being visibly clearer than SSSR (but perhaps slightly dirtier 
+            all-around option when you take into consideration objetive quality scores, my own subjective perception of it being visibly sharper than SSSR (but perhaps slightly dirtier 
             with more artifacts) and also because it performs amazingly well for the quality it gives. Ravu is visibly blurrier, NNEDI3 is beaten in everything, and FSRCCNX-16-0-4-1 isn't 
             worth the performance difference.  
         </p>
