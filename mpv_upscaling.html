@@ -106,7 +106,7 @@
         <h3 id="methodology">Testing methodology</h3>
         <p>
             Performance measurements were done upscaling an animation video encoded into 8bit AVC from 1280x720 to 2560x1440. Utilising mpv
-            with a benchmarking profile, always scaling chroma with spline36 (all settings from profile=gpu-hq), fixing scalers
+            with a benchmarking profile, all settings from profile=gpu-hq, fixing scalers
             that do half-pixel shifts (with the exception of NGU-AA, since as far as I know there's no option to fix it in MadVR), 
             with Vulkan as the renderer and hardware decoding turned off. The machine used has
             an Ivy Bridge i5 3470, a Polaris RX 470 and user shaders were always compute shaders when possible.
