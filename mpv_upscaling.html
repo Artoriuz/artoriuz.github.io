@@ -35,6 +35,15 @@
             the shaders from <a href="https://github.com/bjin/mpv-prescalers">bjin</a> and <a href="https://github.com/igv/FSRCNN-TensorFlow/releases">igv (FSRCNNX)</a>/<a href="https://gist.github.com/igv">igv (SSSR)</a>.
         </p>
         <p>
+            UPDATE - 22/12/2018: I found out a mistake in previous results, and have once again updated all quality comparison results.
+            <br>
+            The problem was that mpv's PNG screenshots are filtered by default, and I was unaware of it. SSSR's results were higher than expected, and I assume that's because I 
+            didn't screenshot it using mpv's built-in functionality for whatever reason.
+            <br>
+            Well, since I had to redo everything, I took this opportunity to improve the testing methodology, debanding was turned off to prevent loss of detail, and I used a lossless 
+            YUV444P AVC encode as upscaling source instead of a YUV444P JPEG.  
+        </p>
+        <p>
             UPDATE - 18/12/2018: Results have been updated with latest versions of FSRCNNX and Waifu2x. On top of that, I've included MS-SSIM and PSNR-HVS-M measurements. 
             I've also included all NGU algorithms from <a href="http://madvr.com/">MadVR</a> since people are interested on them, though NGU-AA performs poorly due to half-pixel shifts.  
         </p>
@@ -112,7 +121,8 @@
             an Ivy Bridge i5 3470, a Polaris RX 470 and user shaders were always compute shaders when possible.
         </p>
         <p>
-            Quality measurements were done in 2 test images, one from animation and another one from live action.
+            Quality measurements were done in 2 test images, one from animation and another one from live action. Debanding was turned off to prevent loss of fine detail, and so was 
+            mpv's PNG screenshot filtering. 
         </p>
         <a href="./images/mpv_upscaling/violet/reference.png">
             <img src="./images/mpv_upscaling/violet/reference.png" alt="Reference Violet" class="center" width="960" height="540">
@@ -126,9 +136,7 @@
             to "restore". In order to measure how "good" each algorithm is, the test images were previously bicubic downscaled
             to a quarter of their original resolutions (0.5x scaling factor in both axes), and then upscaled back to their
             original resolutions with a direct 2x upscaling factor (2x in both axes outputs a resolution that's 4x larger in pixels). 
-            Due to the fact that some scalers only work with YUV sources,
-            to make it fair a relatively high quality YUV444 JPEG source was used for every single scaler. Note that using
-            RGB24 PNGs with the algorithms that accept RGB sources would've been better, but also unfair.
+            Every single scaler was tested on an YUV444P lossless AVC encode, which can be found on the repository. 
         </p>
         <p>
             Performance was evaluated simply in frames per second, while quality was evaluated in 
@@ -144,7 +152,7 @@
         <img src="./images/mpv_upscaling/violet/downscaled-yuv444p.jpg" alt="Downscaled Violet" class="center">
         <br>
         <p>
-            Before we continue to the results, you can find all the scaled images in <a href="https://github.com/Artoriuz/artoriuz.github.io/tree/master/images/mpv_upscaling/violet">this repository.</a>
+            Before we continue to the results, you can find all images in <a href="https://github.com/Artoriuz/artoriuz.github.io/tree/master/images/mpv_upscaling/violet">this repository.</a>
         </p>
         <p>We can see the results below:</p>
         <div class="row">
@@ -172,7 +180,7 @@
         <img src="./images/mpv_upscaling/shuri/downscaled-yuv444p.jpg" alt="Downscaled Shuri" class="center">
         <br>
         <p>
-            Again, you can find all the scaled images in <a href="https://github.com/Artoriuz/artoriuz.github.io/tree/master/images/mpv_upscaling/shuri">this repository.</a>
+            Again, you can find all the images in <a href="https://github.com/Artoriuz/artoriuz.github.io/tree/master/images/mpv_upscaling/shuri">this repository.</a>
         </p>
         <p>We can see the results below:</p>
         <div class="row">
@@ -197,17 +205,16 @@
 
         <p>
             We can clearly see that in general, neural network based scalers tend to give better quality, though they're also more computationally
-            expensive. SSSR however, does better than expected and sometimes can even beat FSRCNNX on the objective mathematical tests due to the fact that its output is generally "cleaner".
+            expensive. We can see that FSRCNNX is clearly the best scaler you can use on mpv when it comes to quality, and NGU from MadVR performs very similarly, though FSRCNNX seems to 
+            have an edge.  
         </p>
         <p>
-            NGU-AA performed horribly on the quality measurements due to half-pixel shifts, but all the other NGU algorithms were actually decent. NGU-STANDARD and NGU-SHARP are consistently 
-            better than FRSCNNX on their very high quality settings, and only really get beaten by Waifu2x, which is on its own league.  
+            All NGU algorithms were tested on their highest quality presets (Very High), which was still fine on the RX470 but way more computationally expensive than FSRCNNX-8-0-4-1. 
+            Performance of FSRCNNX-16-0-4-1 is also relatively okay, but the quality difference over its lighter variant is small. FSRCNNX-56-16-4-1 and FSRCNNX-GAN-FORSCIENCE-56-16-4-1 
+            are not worth it. 
         </p>
         <p>
-            It would be amazing to be able to use Waifu2x in real-time, but it's impossible. Taking performance into consideration, at least on mpv FSRCNNX-8-0-4-1 seems to be the best 
-            all-around option when you take into consideration objetive quality scores, my own subjective perception of it being visibly sharper than SSSR (but perhaps slightly dirtier 
-            with more artifacts) and also because it performs amazingly well for the quality it gives. Ravu is visibly blurrier, NNEDI3 is beaten in everything, and FSRCCNX-16-0-4-1 isn't 
-            worth the performance difference.  
+            NNEDI3, Ravu and SSSR are mostly pointless, FSRCNNX-8-0-4-1 is better and performs extremely well. 
         </p>
         <p>
             If you're using MadVR, I think both NGU-STANDARD and NGU-SHARP look awesome as long as your system can handle them, and you can choose whichever you like the most.
