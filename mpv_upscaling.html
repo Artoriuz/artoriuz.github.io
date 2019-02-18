@@ -35,7 +35,7 @@
             the shaders from <a href="https://github.com/bjin/mpv-prescalers">bjin</a> and <a href="https://github.com/igv/FSRCNN-TensorFlow/releases">igv (FSRCNNX)</a>/<a href="https://gist.github.com/igv">igv (SSSR)</a>.
         </p>
         <p>
-            UPDATE - 15/02/2019: Other EWA scalers were added.
+            UPDATE - 16/02/2019: Other EWA scalers and Lanczos were added.
         </p>
         <p>
             UPDATE - 22/12/2018: I found out a mistake in previous results, and have once again updated all quality comparison results.
@@ -204,9 +204,8 @@
         -->
 
         <p>
-            We can clearly see that in general, neural network based scalers tend to give better quality, though they're also more computationally
-            expensive. We can see that FSRCNNX is clearly the best scaler you can use on mpv when it comes to quality, and NGU from MadVR performs very similarly, though FSRCNNX seems to 
-            have an edge.  
+            We can clearly see that in general, neural network based scalers tend to give better quality, though as expected they're also more computationally
+            expensive. We can see that FSRCNNX is clearly the best scaler you can use on mpv when it comes to quality, and MadVR's NGU displays similar results.
         </p>
         <p>
             All NGU algorithms were tested on their highest quality presets (Very High), which was still fine on the RX470 but way more computationally expensive than FSRCNNX-8-0-4-1. 
@@ -214,10 +213,14 @@
             are not worth it. 
         </p>
         <p>
-            NNEDI3, Ravu and SSSR are mostly pointless, FSRCNNX-8-0-4-1 is better and performs extremely well. 
+            NNEDI3, Ravu and SSSR are mostly pointless, in my opinion FSRCNNX-8-0-4-1 looks better, or sharper if you prefer to use this term, while performing extremely well. 
         </p>
         <p>
-            If you're using MadVR, I think both NGU-STANDARD and NGU-SHARP look awesome as long as your system can handle them, and you can choose whichever you like the most.
+            If you're using MadVR, I think both NGU-STANDARD and NGU-SHARP look great as long as your system can handle them, and you can choose whichever you like the most.
+        </p>
+        <p>
+            While I'm providing numerical test results to mathematically evaluate how those different algorithms perform, I strongly advise to take a look on how the upscaled images actually end up looking like. The viewer has his/her own preference regarding 
+            different drawbacks like aliasing, ringing or blurring for example. Some people might prefer an algorithm that scores relatively poorly, but you should please yourself while consuming your media.  
         </p>
     </section>
 
