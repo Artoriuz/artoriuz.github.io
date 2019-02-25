@@ -33,6 +33,9 @@
         <p>
             Before attempting to reproduce, make sure to grab the latest version of <a href="https://mpv.io/">mpv</a> and updated user shaders. You can get 
             the shaders from <a href="https://github.com/bjin/mpv-prescalers">bjin</a> and <a href="https://github.com/igv/FSRCNN-TensorFlow/releases">igv (FSRCNNX)</a>/<a href="https://gist.github.com/igv">igv (SSSR)</a>.
+        <p>
+            UPDATE - 25/02/2019: Initial version of the Chroma section is added. I'll take some time to slowly polish it with more information and different tests, and I'm also probably going to add PSNR-HMA to the RGB tests soon.
+        </p>
         </p>
             UPDATE - 20/02/2019: IW-SSIM tables added.
         <p>
@@ -236,6 +239,103 @@
             different drawbacks like aliasing, ringing or blurring for example. Some people might prefer an algorithm that scores relatively poorly when compared to sharper choices, but you should please yourself while consuming your media.  
         </p>
     </section>
+    <section>
+        <h3 id="chroma">Chroma Upscaling</h3>
+        <p>
+            Chroma subsampling is a technique utilised to save bitrate/filesize without strongly sacrificing perceived quality, by taking into account how our eyes biologically work and how our brains interpret the information they're receiving. 
+        </p>
+        <p>
+            With the rise of television broadcasting the recurring problem of bandwidth-heavy innovations rapidly making the electromagnetic spectrum "crowded" started to become problematic, the practical bands of low long-range attenuation 
+            were becoming scarce and that would undoubteadly limit the amount of things we could have "over the air", which then lead the way to new bandwidth-saving techniques that aimed to reduce the required bandwidth as much as reasonably possible 
+            without affecting the perceived quality of the service to the same extent.     
+        </p>
+        <p>
+            Since we're more likely to perceive contrast/luminosity differecens than chromatic details, chroma-subsampling is simply the most basic way of throwing away some colouring information without sacrificing on luminosity resolution.
+        </p>
+        <p>To make this simple to understand, we can see a normal image below alongside its RGB planes:</p>
+        <div class="row">
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/explanation/reference.png" alt="Rosetta Ref" width="600" height="800">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/explanation/reference_RGB_R.png" alt="Rosetta R" width="600" height="800">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/explanation/reference_RGB_G.png" alt="Rosetta G" width="600" height="800">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/explanation/reference_RGB_b.png" alt="Rosetta B" width="600" height="800">
+          </div>
+        </div>
+        <p>Now, the same image alongside its YUV/YCbCr planes:</p>
+        <div class="row">
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/explanation/reference.png" alt="Rosetta Ref" width="600" height="800">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/explanation/reference_YUV_Y.png" alt="Rosetta Y" width="600" height="800">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/explanation/reference_YUV_Cb.png" alt="Rosetta Cb" width="600" height="800">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/explanation/reference_YUV_Cr.png" alt="Rosetta Cr" width="600" height="800">
+            </div>
+        </div>
+        <p>
+            We can easily simulate how it would look like if it didn't have its entirely chromatic information available by simply downscaling the chroma planes to 1/4 of their original resolution (0.5x scaling factor) and then upscaling them back (2x scaling factor).
+        </p>
+        <p>
+            It's important to see how much "blurrier" the chromatic planes look after this process, in other words, how much high frequency information they lost. 
+        </p>
+        <div class="row">
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/explanation/reference_YUV420p.png" alt="Rosetta Chroma subsampled" width="600" height="800">
+            </div>    
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/explanation/reference_YUV_Y.png" alt="Rosetta Y" width="600" height="800">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/explanation/cb_upscaled.png" alt="Rosetta upscaled Cb" width="600" height="800">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/explanation/cr_upscaled.png" alt="Rosetta upscaled Cr" width="600" height="800">
+            </div>
+        </div>
+
+        <p>Can't notice the difference when you put it back to RGB? Well, that's the point. In any case, to make it possible for us to see, you can look at the image below, which is simply 128 plus the difference between the reference and the chroma subsampled version:</p>
+       
+        <img src="./images/mpv_upscaling/chroma/explanation/chroma_subsampling_difference.png" alt="Rosetta chroma subsampling difference" width="600" height="800" class="center">
+        
+        <p>From this simulation it's probably reasonable to understand why chroma upscaling isn't usually a big concern, it's just that you're unlikely to notice the difference on real content.</p>
+        <p>
+            With that in mind, we can proceed with the actual comparison. SSIM measurements can be ignored this time since the luma plane remains intact and therefore there are no significant gains to be made in structural similarity from switching the scaler.  
+        </p>
+        <div class="row">
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/tables/rosetta-psnr.png" alt="rosetta results PSNR" width="454" height="756">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/tables/rosetta-psnrhvsm.png" alt="Rosetta results PSNR-HVS-M" width="454" height="756">
+            </div>
+        </div>
+        <p>
+            It's important to notice how the numerical difference between the scalers is much smaller when doing chroma measurements, and this is precisely why using a heavier scaler is usually not warranted unless the performance impact is negligible.
+        </p>
+        <p>
+            On my system, running KrigBilateral on Vulkan makes no difference whatsoever since I have a CPU decoding bottleneck at around ~1200 FPS with or without it on a 720p 8bit AVC file. Running on ra_d3d11 with d3d11va hardware decoding, I go from ~1800 FPS to ~1150 FPS going from 
+            lanczos to KrigBilateral. Running both FSRCNNX-8-0-4-1 and KrigBilateral at the same time gives me ~260 FPS on both d3d11 and Vulkan, with or without hwdec. 
+        </p>
+        <p>
+            My personnal recommendation is that you should test it yourself to see if you can notice KrigBilateral's difference during playback, and use it if it doesn't really matter resource-wise (in the case your GPU is fine either way). Another sensible decision would be to 
+            use it when you don't need luma upscaling, since then the only gains you can make are in chroma upscaling. 
+        </p>
+        <p>
+            This section is a WIP and I expect to add more tests and test-images in the future.
+        </p>
+    </section>
+
+    
 
 
     <footer>
