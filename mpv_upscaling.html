@@ -119,24 +119,20 @@
             resulting in a blurrier image with "lost" detail in the strucutures if you're downscaling and then upscaling
             it back.
         </p>
-        <h3 id="neural">Convolutional Neural Networks</h3>
+        <h3 id="machine">Machine Learning</h3>
         <p>
-            Another way of trying to "recover" lost information through upscaling is using neural networks that firstly go through a
-            training phase so it can "learn" how to upscale. The training phase consists of analysing a set of images, and
-            then setting parameters that will be used when upscaling. Note that upscaling isn't exactly recovering information, 
-            all we're doing is coming up with "new" information based on what we already have.
+            Machine learning comes as a powerful successor to classical methods due to the fact that you do not need to rely solely on what you can currently retrieve 
+            from the image, but also on a set of trained parameters generated from analysing multiple images and coming up with an upscaling model.
         </p>
         <p>
-            There are multiple different ways of using neural networks to upscale images, and there are multiple different algorithms
-            that aim to do pretty much the same thing. To make it more practical, we'll stick to algorithms that can be easily
-            tested as user-shaders using mpv, with the adition of the extremely popular Waifu2X and NGU from MadVR. 
+            There are multiple different machine learning based image upscalers, we'll stick to those that are easily testable as mpv user shaders, MadVR's NGU and finally Waifu2x as our state of the art representation. 
         </p>
         <p>
             We'll test the following algorithms:
             <li><a href="https://github.com/bjin/mpv-prescalers">RAVU</a></li>
             <li><a href="http://avisynth.nl/index.php/Nnedi3">NNEDI3</a></li>
             <li><a href="https://github.com/igv/FSRCNN-TensorFlow">FSRCNNX</a></li>
-            <li><a href = "http://madvr.com/">NGU(AA/SOFT/STANDARD/SHARP)</a></li>
+            <li><a href = "http://madvr.com/">NGU</a></li>
             <li><a href="https://github.com/nagadomi/waifu2x">Waifu2x</a></li>
         </p>
         
@@ -149,8 +145,7 @@
             an Ivy Bridge i5 3470, a Polaris RX 470 and user shaders were always compute shaders when possible.
         </p>
         <p>
-            Quality measurements were done in 2 test images, one from animation and another one from live action. Debanding was turned off to prevent loss of fine detail, and so was 
-            mpv's PNG screenshot filtering. 
+            Quality measurements were done in 2 test images, one from animation and another one from live action. Debanding was turned off to prevent loss of fine detail.
         </p>
         <p>
             The reasoning behind this comes from the fact that the live action image has more high frequency components that are harder
@@ -251,7 +246,7 @@
         -->
 
         <p>
-            We can clearly see that in general, neural network based scalers tend to give better quality, though as expected they're also more computationally
+            We can clearly see that in general, machine learning based scalers tend to give better quality, though as expected they're also more computationally
             expensive. We can see that FSRCNNX is clearly the best scaler you can use on mpv when it comes to quality, and MadVR's NGU displays similar results.
         </p>
         <p>
