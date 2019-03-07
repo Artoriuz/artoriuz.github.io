@@ -76,7 +76,7 @@
         </p>
         <p>
             UPDATE - 18/12/2018: Results have been updated with latest versions of FSRCNNX and Waifu2x. On top of that, I've included MS-SSIM and PSNR-HVS-M measurements. 
-            I've also included all NGU algorithms from <a href="http://madvr.com/">MadVR</a> since people are interested in them, though NGU-AA performs poorly due to half-pixel shifts.  
+            I've also included all NGU algorithms from <a href="http://madvr.com/">MadVR</a> since people are interested in them.
         </p>
         <p>
             If all you want is to look at the results, <a href=#results>follow this link.</a> 
@@ -143,8 +143,7 @@
         <p>
             Performance measurements were done upscaling an animation video encoded into 8bit AVC from 1280x720 to 2560x1440. Utilising mpv
             with a benchmarking profile, all settings from profile=gpu-hq, fixing scalers
-            that do half-pixel shifts (with the exception of NGU-AA, since as far as I know there's no option to fix it in MadVR), 
-            with Vulkan as the renderer and hardware decoding turned off. The machine used has
+            that do half-pixel shifts, with Vulkan as the renderer and hardware decoding turned off. The machine used has
             an Ivy Bridge i5 3470, a Polaris RX 470 and user shaders were always compute shaders when possible.
         </p>
         <p>
