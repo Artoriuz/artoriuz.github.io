@@ -43,6 +43,10 @@
         <p>
             Before attempting to reproduce, make sure to grab the latest version of <a href="https://mpv.io/">mpv</a> and updated user shaders. You can get 
             the shaders from <a href="https://github.com/bjin/mpv-prescalers">bjin</a> and <a href="https://github.com/igv/FSRCNN-TensorFlow/releases">igv (FSRCNNX)</a>/<a href="https://gist.github.com/igv">igv (SSSR)</a>.
+        </p>
+        <p>
+            UPDATE - 08/03/2019: Adding another test image for chroma, and changed all chroma tests to upscale from a lossless (CRF 0) YUV420p AVC encode which makes me more confident they're accurate.
+        </p>
         <p>
             UPDATE - 07/03/2019: Adding Ravu-lite and fixing NGU-AA's half pixel shift. Huge thanks for Bjin for providing a user-shader to accomplish the later =). FPS chart should be updated soon.
         </p>
@@ -72,7 +76,7 @@
             I'm not certain about what was causing the problems, but turning off PNG filtering and debanding seems to have fixed it. I'll investigate which of the two was the culprit once I have the time. 
             <br>
             Well, since I had to redo everything, I took this opportunity to improve the testing methodology, debanding was turned off to prevent loss of detail, and I used a lossless 
-            YUV444P AVC encode as upscaling source instead of a YUV444P JPEG.  
+            YUV444p AVC encode as upscaling source instead of a YUV444p JPEG.  
         </p>
         <p>
             UPDATE - 18/12/2018: Results have been updated with latest versions of FSRCNNX and Waifu2x. On top of that, I've included MS-SSIM and PSNR-HVS-M measurements. 
@@ -354,6 +358,27 @@
             </div>
         </div>
         <p>
+            Rosetta served as a somewhat unfaithful representation of what you should expect from anime, since usually speaking actual anime footage is far from being as detailed and therefore the scalers would score even closer overall. We can proceed 
+            with a live action example. 
+        </p>
+        <p>
+            <img src="./images/mpv_upscaling/chroma/dog/reference.png" alt="dog" width="960" height="540">
+        </p>
+        <div class="row">
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/tables/dog-psnr.png" alt="Dog results PSNR" width="454" height="756">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/tables/dog-psnrhvsm.png" alt="Dog results PSNR-HVS-M" width="454" height="756">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/tables/dog-psnrhma.png" alt="Dog results PSNR-HMA" width="454" height="756">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/tables/dog-psnrha.png" alt="Dog results PSNR-HA" width="454" height="756">
+            </div>
+        </div>
+        <p>
             It's important to notice how the numerical difference between the scalers is much smaller when doing chroma measurements, and this is precisely why using a heavier scaler is usually not warranted unless the performance impact is negligible.
         </p>
         <p>
@@ -363,9 +388,6 @@
         <p>
             My personnal recommendation is that you should test it yourself to see if you can notice KrigBilateral's difference during playback, and use it if it doesn't really matter resource-wise (in the case your GPU is fine either way). Another sensible decision would be to 
             use it when you don't need luma upscaling, since then the only gains you can make are in chroma. 
-        </p>
-        <p>
-            This section is a WIP and I expect to add more tests and test-images in the future.
         </p>
     </section>
         <br>
