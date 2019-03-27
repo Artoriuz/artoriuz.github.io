@@ -44,6 +44,9 @@
             Before attempting to reproduce, make sure to grab the latest version of <a href="https://mpv.io/">mpv</a> and updated user shaders. You can get 
             the shaders from <a href="https://github.com/bjin/mpv-prescalers">bjin</a> and <a href="https://github.com/igv/FSRCNN-TensorFlow/releases">igv (FSRCNNX)</a>/<a href="https://gist.github.com/igv">igv (SSSR)</a>.
         <p>
+            UPDATE - 27/03/2019: Updated PSNR-HA/HMA, you can expect to see ravu-ar and ravu-zoom soon. PSNR-HVS-M was removed since it's deprecated by the insertion of PSNR-HA.
+        </p>
+        <p>
             UPDATE - 15/03/2019: New versions of FSRCNNX. 
         </p>
         </p>
@@ -167,10 +170,9 @@
             Performance was evaluated simply in frames per second, while quality was evaluated in 
             <a href="https://en.wikipedia.org/wiki/Peak_signal-to-noise_ratio">PSNR</a>, 
             <a href="https://en.wikipedia.org/wiki/Structural_similarity">SSIM</a>, 
-            <a href="http://mrim.imag.fr/yubing.tong/Files_YubingTong/JIST4516-Accepted.pdf">PSNR-HVS-M</a> and 
-            <a href="https://ece.uwaterloo.ca/~z70wang/publications/msssim.html">MS-SSIM</a>.
-            <a href="https://ece.uwaterloo.ca/~z70wang/research/iwssim/">IW-SSIM</a>.
-            <a href="http://www.ponomarenko.info/psnrhma.htm">PSNR-HMA</a>.
+            <a href="https://ece.uwaterloo.ca/~z70wang/publications/msssim.html">MS-SSIM</a>,
+            <a href="https://ece.uwaterloo.ca/~z70wang/research/iwssim/">IW-SSIM</a>,
+            <a href="http://www.ponomarenko.info/psnrhma.htm">PSNR-HMA</a> and 
             <a href="http://www.ponomarenko.info/psnrhma.htm">PSNR-HA</a>.
         </p>
         
@@ -195,9 +197,6 @@
             </div>
             <div class="column">
                 <img src="./images/mpv_upscaling/tables/violet-msssim.png" alt="Violet results MS-SSIM" width="454" height="756">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-psnrhvsm.png" alt="Violet results PSNR-HVS-M" width="454" height="756">
             </div>
             <div class="column">
                 <img src="./images/mpv_upscaling/tables/violet-iwssim.png" alt="Violet results IW-SSIM" width="454" height="756">
@@ -234,9 +233,6 @@
             </div>
             <div class="column">
                 <img src="./images/mpv_upscaling/tables/shuri-msssim.png" alt="shuri results MS-SSIM" width="454" height="756">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/tables/shuri-psnrhvsm.png" alt="shuri results PSNR-HVS-M" width="454" height="756">
             </div>
             <div class="column">
                 <img src="./images/mpv_upscaling/tables/shuri-iwssim.png" alt="shuri results IW-SSIM" width="454" height="756">
@@ -351,9 +347,6 @@
                 <img src="./images/mpv_upscaling/chroma/tables/rosetta-psnr.png" alt="rosetta results PSNR" width="454" height="756">
             </div>
             <div class="column">
-                <img src="./images/mpv_upscaling/chroma/tables/rosetta-psnrhvsm.png" alt="Rosetta results PSNR-HVS-M" width="454" height="756">
-            </div>
-            <div class="column">
                 <img src="./images/mpv_upscaling/chroma/tables/rosetta-psnrhma.png" alt="rosetta results PSNR-HMA" width="454" height="756">
             </div>
             <div class="column">
@@ -370,9 +363,6 @@
         <div class="row">
             <div class="column">
                 <img src="./images/mpv_upscaling/chroma/tables/dog-psnr.png" alt="Dog results PSNR" width="454" height="756">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/chroma/tables/dog-psnrhvsm.png" alt="Dog results PSNR-HVS-M" width="454" height="756">
             </div>
             <div class="column">
                 <img src="./images/mpv_upscaling/chroma/tables/dog-psnrhma.png" alt="Dog results PSNR-HMA" width="454" height="756">
