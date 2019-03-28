@@ -164,7 +164,9 @@
             to "restore". In order to measure how "good" each algorithm is, the test images were previously bicubic downscaled
             to a quarter of their original resolutions (0.5x scaling factor in both axes), and then upscaled back to their
             original resolutions with a direct 2x upscaling factor (2x in both axes outputs a resolution that's 4x larger in pixels). 
-            Every single scaler was tested on an YUV444P lossless AVC encode, which can be found on the repository. 
+            Every single scaler was tested on an YUV444p lossless AVC encode, which can be found on the repository. It's important to keep in mind though 
+            that while the encode itself is lossless, the colour conversion from the PNG's RGB24 isn't and therefore the resulting file is only almost lossless. The 
+            same behaviour can be seen using yuv4mpegpipe.  
         </p>
         <p>
             Performance was evaluated simply in frames per second, while quality was evaluated in 
