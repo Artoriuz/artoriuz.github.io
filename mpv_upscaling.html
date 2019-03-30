@@ -44,6 +44,14 @@
             Before attempting to reproduce, make sure to grab the latest version of <a href="https://mpv.io/">mpv</a> and updated user shaders. You can get 
             the shaders from <a href="https://github.com/bjin/mpv-prescalers">bjin</a> and <a href="https://github.com/igv/FSRCNN-TensorFlow/releases">igv (FSRCNNX)</a>/<a href="https://gist.github.com/igv">igv (SSSR)</a>.
         <p>
+            UPDATE - 30/03/2019: MS-SSIM tables were removed. IW-SSIM, PSNR-HMA and PSNR-HA tables were updated. Previous IW-SSIM results were done with uint8 BT.601 RGB->Greyscale conversion which lead to rounding errors, and 
+            PSNR-HMA/HA performs BT.601 RGB->YCbCr which also leads to rounding errors with uint8 input images.
+            <br>
+            Now both RGB->Greyscale and RGB->YCbCr are done in double precision, and the formulas used can be found <a href="https://en.wikipedia.org/wiki/YCbCr">here under ITU-T BT.601 conversion.</a>
+            <br>
+            The only remaining problem is FFMpeg's non-reversible RGB24->YUV444p colour conversion, which is required in order to make the upscaling image compatible with a few scalers (FSRCNNX, for example).
+        </p>
+        <p>
             UPDATE - 27/03/2019: Updated PSNR-HA/HMA, you can expect to see ravu-ar and ravu-zoom soon. PSNR-HVS-M was removed since it's deprecated by the insertion of PSNR-HA.
         </p>
         <p>
@@ -172,7 +180,6 @@
             Performance was evaluated simply in frames per second, while quality was evaluated in 
             <a href="https://en.wikipedia.org/wiki/Peak_signal-to-noise_ratio">PSNR</a>, 
             <a href="https://en.wikipedia.org/wiki/Structural_similarity">SSIM</a>, 
-            <a href="https://ece.uwaterloo.ca/~z70wang/publications/msssim.html">MS-SSIM</a>,
             <a href="https://ece.uwaterloo.ca/~z70wang/research/iwssim/">IW-SSIM</a>,
             <a href="http://www.ponomarenko.info/psnrhma.htm">PSNR-HMA</a> and 
             <a href="http://www.ponomarenko.info/psnrhma.htm">PSNR-HA</a>.
@@ -196,9 +203,6 @@
             </div>
             <div class="column">
                 <img src="./images/mpv_upscaling/tables/violet-psnr.png" alt="Violet results PSNR" width="454" height="756">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-msssim.png" alt="Violet results MS-SSIM" width="454" height="756">
             </div>
             <div class="column">
                 <img src="./images/mpv_upscaling/tables/violet-iwssim.png" alt="Violet results IW-SSIM" width="454" height="756">
@@ -232,9 +236,6 @@
             </div>
             <div class="column">
                 <img src="./images/mpv_upscaling/tables/shuri-psnr.png" alt="shuri results PSNR" width="454" height="756">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/tables/shuri-msssim.png" alt="shuri results MS-SSIM" width="454" height="756">
             </div>
             <div class="column">
                 <img src="./images/mpv_upscaling/tables/shuri-iwssim.png" alt="shuri results IW-SSIM" width="454" height="756">
