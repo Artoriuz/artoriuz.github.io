@@ -44,12 +44,8 @@
             Before attempting to reproduce, make sure to grab the latest version of <a href="https://mpv.io/">mpv</a> and updated user shaders. You can get 
             the shaders from <a href="https://github.com/bjin/mpv-prescalers">bjin</a> and <a href="https://github.com/igv/FSRCNN-TensorFlow/releases">igv (FSRCNNX)</a>/<a href="https://gist.github.com/igv">igv (SSSR)</a>.
         <p>
-            UPDATE - 30/03/2019: MS-SSIM tables were removed. IW-SSIM, PSNR-HMA and PSNR-HA tables were updated. Previous IW-SSIM results were done with uint8 BT.601 RGB->Greyscale conversion which lead to rounding errors, and 
-            PSNR-HMA/HA performs BT.601 RGB->YCbCr which also leads to rounding errors with uint8 input images.
-            <br>
-            Now both RGB->Greyscale and RGB->YCbCr are done in double precision, and the formulas used can be found <a href="https://en.wikipedia.org/wiki/YCbCr">here under ITU-T BT.601 conversion.</a>
-            <br>
-            The only remaining problem is FFMpeg's non-reversible RGB24->YUV444p colour conversion, which is required in order to make the upscaling image compatible with a few scalers (FSRCNNX, for example).
+            UPDATE - 31/03/2019: MS-SSIM tables were removed. All remaining luma related tables were updated. New methodology consists of basically utilising a full-range greyscale PNG as input (which results in lower quantisation errors 
+            when compared to using limited range YCbCr). Ravu-zoom was added, FSRCNNX_x2_16-0-4-1 and Ravu-lite were updated. 
         </p>
         <p>
             UPDATE - 27/03/2019: Updated PSNR-HA/HMA, you can expect to see ravu-ar and ravu-zoom soon. PSNR-HVS-M was removed since it's deprecated by the insertion of PSNR-HA.
@@ -172,9 +168,7 @@
             to "restore". In order to measure how "good" each algorithm is, the test images were previously bicubic downscaled
             to a quarter of their original resolutions (0.5x scaling factor in both axes), and then upscaled back to their
             original resolutions with a direct 2x upscaling factor (2x in both axes outputs a resolution that's 4x larger in pixels). 
-            Every single scaler was tested on an YUV444p lossless AVC encode, which can be found on the repository. It's important to keep in mind though 
-            that while the encode itself is lossless, the colour conversion from the PNG's RGB24 isn't and therefore the resulting file is only almost lossless. The 
-            same behaviour can be seen using yuv4mpegpipe.  
+            Every single scaler was tested on a full range greyscale PNG, which can be found on the repository.
         </p>
         <p>
             Performance was evaluated simply in frames per second, while quality was evaluated in 
