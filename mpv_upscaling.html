@@ -44,6 +44,9 @@
             Before attempting to reproduce, make sure to grab the latest version of <a href="https://mpv.io/">mpv</a> and updated user shaders. You can get 
             the shaders from <a href="https://github.com/bjin/mpv-prescalers">bjin</a> and <a href="https://github.com/igv/FSRCNN-TensorFlow/releases">igv (FSRCNNX)</a>/<a href="https://gist.github.com/igv">igv (SSSR)</a>.
         <p>
+            UPDATE - 17/04/2019: PSNR-HA/HMA measurements are now done with wstep = 7 as recommended by igv.
+        </p>
+        <p>
             UPDATE - 16/04/2019: New FPS measurement methodology, files now play for 4 seconds and then I calculate how many frames were displayed based on which frame it stopped at after the time-frame has elapsed. 
             --scalers-resizes-only was also removed since the half pixel shift is not noticeable during playback. Previous results had different numbers, but the order didn't exactly significantly change. 
         </p>
