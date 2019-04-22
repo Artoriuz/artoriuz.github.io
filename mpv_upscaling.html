@@ -315,6 +315,98 @@
         </p>
     </section>
     <section>
+        <h3 id="downscaling">Luma Downscaling</h3>
+        <p>
+            While most people are likely to be consuming content utilising displays with resolutions that are equal or higher than what the media was encoded at, the anime industry is notoriously convoluted when it comes to scaling and most shows 
+            end up going through multiple scaling steps before actually reaching the viewer.
+            <br>
+            <ol>
+                <li>The characters are usually at a higher resolution than the backgrounds, which means that they might need to scale things before compositing the final frame.</li>
+                <li>Studios deliver their shows anywhere between 720p and 1080p. Popular choices are: 720p, 810p, 837p, 873p, 900p and 1080p.</li>
+                <li>The TV Channel / Streaming platform scales it before releasing to the public.</li>
+                <li>Your player needs to scale it once again to fit it in your display's resolution.</li>
+             </ol>
+             The point is, by the time the consumer can actually consume the media, it has already been through other scaling steps and trying to figure out the best possible individual solution for every single show is honestly futile. 
+        </p>
+        <p>
+            With that said, we can at least try to figure out which downscaling algorithm we should be using to best reverse upscaling done by streaming companies. Before continuing, I strongly recommend reading <a href="https://kageru.moe/blog/article/resolutions/">this</a>, 
+            if you know exactly which scaler they used, and the original resolution, you can use debilinear or debicubic to get the best possible result. The problem is that this kind of information is not exactly always available, and having a different configuration per title 
+            isn't really viable either. 
+        </p>
+        <p>
+            What's left to do then is figuring out the best overall configuration we can set dscale to. The methodology this time is pretty straightforward, since it's impossible to cover every single scenario (when it comes to scaling factor and upscaler used), 
+            I've done 3 different tests that should at least give an idea of what to use. 
+        </p>
+        <p>
+            The starting point was the previously used Violet Evergarden frame, from Netflix's encode. The image was upscaled to 2560x1440 (1.333x from 1920x1080) using bilinear, catmull_rom and bcspline with b = 0 and c = 1. Bilinear was chosen to 
+            represent the blurriest possible scenario. Catmull_rom is the middle term and the latter is probably their sharpest option. You can find examples of titles that were upscaled using those algorithms, and this is the second reason why I chose them.
+        </p>
+        <p>
+            We can proceed to the charts then:
+        </p>
+        <p>
+            <div class="row">
+                <div class="column">
+                    <img src="./images/mpv_upscaling/downscaling/tables/bilinear/iwssim.png" alt="Violet downscaling bilinear iwssim" width="454" height="284">
+                    <br><br>
+                    <img src="./images/mpv_upscaling/downscaling/tables/bilinear/psnrha.png" alt="Violet downscaling bilinear psnrha" width="454" height="284">
+                    <br><br>
+                    <img src="./images/mpv_upscaling/downscaling/tables/bilinear/psnrhma.png" alt="Violet downscaling bilinear psnrhma" width="454" height="284">
+                </div>
+                <div class="column">
+                    <img src="./images/mpv_upscaling/downscaling/tables/catmull_rom/iwssim.png" alt="Violet downscaling catmull_rom iwssim" width="454" height="284">
+                    <br><br>
+                    <img src="./images/mpv_upscaling/downscaling/tables/catmull_rom/psnrha.png" alt="Violet downscaling catmull_rom psnrha" width="454" height="284">
+                    <br><br>
+                    <img src="./images/mpv_upscaling/downscaling/tables/catmull_rom/psnrhma.png" alt="Violet downscaling catmull_rom psnrhma" width="454" height="284">
+                </div>
+                <div class="column">
+                    <img src="./images/mpv_upscaling/downscaling/tables/bcspline_0_1/iwssim.png" alt="Violet downscaling bcspline_0_1 iwssim" width="454" height="284">
+                    <br><br>
+                    <img src="./images/mpv_upscaling/downscaling/tables/bcspline_0_1/psnrha.png" alt="Violet downscaling bcspline_0_1 psnrha" width="454" height="284">
+                    <br><br>
+                    <img src="./images/mpv_upscaling/downscaling/tables/bcspline_0_1/psnrhma.png" alt="Violet downscaling bcspline_0_1 psnrhma" width="454" height="284">
+                </div>
+              </div>
+        </p>
+        <p>
+            We can see that depending on which algorithm is used in the upscaling step, the results change and therefore there isn't an universal solution that's always the best. Averaging those numbers can give us a better picture:
+        </p>
+        <p>
+            <div class="row">
+                <div class="column">
+                    <img src="./images/mpv_upscaling/downscaling/tables/average/iwssim.png" alt="Violet downscaling average iwssim" width="454" height="284">
+                </div>
+                <div class="column">
+                    <img src="./images/mpv_upscaling/downscaling/tables/average/psnrha.png" alt="Violet downscaling average psnrha" width="454" height="284">
+                </div>
+                <div class="column">
+                    <img src="./images/mpv_upscaling/downscaling/tables/average/psnrhma.png" alt="Violet downscaling average psnrhma" width="454" height="284">
+                </div>
+            </div>
+        </p>
+        <p>
+            We can see that SSimDownscaler can't exactly perform well since its input is extremely blurry, and that lanczos starts getting worse as you increase the upscaling sharpness. As expected, no algorithm gets even close to 
+            properly "restoring" the original image, and if you have to go through multiple scaling steps (we almost always have to), you shouldn't expect superb quality.
+        </p>
+        <p>
+            If we ignore mitchell, which is extremely blurry, all the other scalers seem to perform within each other and the difference between them on actual playback is probably negligible. I'd recommend using SSimDownscaler when 
+            your display's resolution is lower than the content's resolution (UHD 3840x2160 content on a FHD 1920x1080 display, for example) or when you're using a doubler while needing to downscale after doubling.
+        </p>
+        <p>
+            For blurry "sources", like our scenario here in this test, it doesn't really matter. Your result is always going to be blurry regardless. Just avoid using mitchell. 
+        </p>
+        <p>
+            SSimDownscaler is making the lines thinner. It does look better overall because it has fewer ringing artifacts and less blurry transitions, but the lines are thinner than they should be hence why it scores poorly on both IW-SSIM and PSNR-HMA/HA. 
+            We can safely conclude that if the reason you're downscaling your media is an upscale done by some entity before it reached you, you should probably just use lanczos if you prefer it to be accurate. SSimDownscaler does look cleaner however, and if the 
+            thinner lines aren't a problem you might prefer using it. 
+        </p>
+        <p>
+            It's important to remember that this isn't by any means an evaluation of downscaling in general, it's just an evaluation of downscaling after an upscaling. 
+        </p>
+
+    </section>
+    <section>
         <h3 id="chroma">Chroma Upscaling</h3>
         <p>
             Chroma subsampling is a technique utilised to save bitrate/filesize without strongly sacrificing perceived quality, by taking into account how our eyes biologically work and how our brains interpret the information they're receiving. 
@@ -427,104 +519,7 @@
             use it when you don't need luma upscaling, since then the only gains you can make are in chroma. 
         </p>
     </section>
-    <section>
-        <h3 id="downscaling">Luma Downscaling</h3>
-        <p>
-            While most people are likely to be consuming content utilising displays with resolutions that are equal or higher than what the media was encoded at, the anime industry is notoriously convoluted when it comes to scaling and most shows 
-            end up going through multiple scaling steps before actually reaching the viewer.
-            <br>
-            <ol>
-                <li>The characters are usually at a higher resolution than the backgrounds, which means that they might need to scale things before compositing the final frame.</li>
-                <li>Studios deliver their shows anywhere between 720p and 1080p. Popular choices are: 720p, 810p, 837p, 873p, 900p and 1080p.</li>
-                <li>The TV Channel / Streaming platform scales it before releasing to the public.</li>
-                <li>Your player needs to scale it once again to fit it in your display's resolution.</li>
-             </ol>
-             The point is, by the time the consumer can actually consume the media, it has already been through other scaling steps and trying to figure out the best possible individual solution for every single show is honestly futile. 
-        </p>
-        <p>
-            With that said, we can at least try to figure out which downscaling algorithm we should be using to best reverse upscaling done by streaming companies. Before continuing, I strongly recommend reading <a href="https://kageru.moe/blog/article/resolutions/">this</a>, 
-            if you know exactly which scaler they used, and the original resolution, you can use debilinear or debicubic to get the best possible result. The problem is that this kind of information is not exactly always available, and having a different configuration per title 
-            isn't really viable either. 
-        </p>
-        <p>
-            What's left to do then is figuring out the best overall configuration we can set dscale to. The methodology this time is pretty straightforward, since it's impossible to cover every single scenario (when it comes to scaling factor and upscaler used), 
-            I've done 3 different tests that should at least give an idea of what to use. 
-        </p>
-        <p>
-            The starting point was the previously used Violet Evergarden frame, from Netflix's encode. The image was upscaled to 2560x1440 (1.333x from 1920x1080) using bilinear, catmull_rom and bcspline with b = 0 and c = 1. Bilinear was chosen to 
-            represent the blurriest possible scenario. Catmull_rom is the middle term and the latter is probably their sharpest option. You can find examples of titles that were upscaled using those algorithms, and this is the second reason why I chose them.
-        </p>
-        <p>
-            We can proceed to the charts then:
-        </p>
-        <p>
-            <div class="row">
-                <div class="column">
-                    <img src="./images/mpv_upscaling/downscaling/tables/bilinear/iwssim.png" alt="Violet downscaling bilinear iwssim" width="454" height="284">
-                    <br><br>
-                    <img src="./images/mpv_upscaling/downscaling/tables/bilinear/psnrha.png" alt="Violet downscaling bilinear psnrha" width="454" height="284">
-                    <br><br>
-                    <img src="./images/mpv_upscaling/downscaling/tables/bilinear/psnrhma.png" alt="Violet downscaling bilinear psnrhma" width="454" height="284">
-                </div>
-                <div class="column">
-                    <img src="./images/mpv_upscaling/downscaling/tables/catmull_rom/iwssim.png" alt="Violet downscaling catmull_rom iwssim" width="454" height="284">
-                    <br><br>
-                    <img src="./images/mpv_upscaling/downscaling/tables/catmull_rom/psnrha.png" alt="Violet downscaling catmull_rom psnrha" width="454" height="284">
-                    <br><br>
-                    <img src="./images/mpv_upscaling/downscaling/tables/catmull_rom/psnrhma.png" alt="Violet downscaling catmull_rom psnrhma" width="454" height="284">
-                </div>
-                <div class="column">
-                    <img src="./images/mpv_upscaling/downscaling/tables/bcspline_0_1/iwssim.png" alt="Violet downscaling bcspline_0_1 iwssim" width="454" height="284">
-                    <br><br>
-                    <img src="./images/mpv_upscaling/downscaling/tables/bcspline_0_1/psnrha.png" alt="Violet downscaling bcspline_0_1 psnrha" width="454" height="284">
-                    <br><br>
-                    <img src="./images/mpv_upscaling/downscaling/tables/bcspline_0_1/psnrhma.png" alt="Violet downscaling bcspline_0_1 psnrhma" width="454" height="284">
-                </div>
-              </div>
-        </p>
-        <p>
-            We can see that depending on which algorithm is used in the upscaling step, the results change and therefore there isn't an universal solution that's always the best. Averaging those numbers can give us a better picture:
-        </p>
-        <p>
-            <div class="row">
-                <div class="column">
-                    <img src="./images/mpv_upscaling/downscaling/tables/average/iwssim.png" alt="Violet downscaling average iwssim" width="454" height="284">
-                </div>
-                <div class="column">
-                    <img src="./images/mpv_upscaling/downscaling/tables/average/psnrha.png" alt="Violet downscaling average psnrha" width="454" height="284">
-                </div>
-                <div class="column">
-                    <img src="./images/mpv_upscaling/downscaling/tables/average/psnrhma.png" alt="Violet downscaling average psnrhma" width="454" height="284">
-                </div>
-            </div>
-        </p>
-        <p>
-            Lanczos clearly starts getting worse as you increase the upscaling sharpness, since it'll oversharp and create more ringing artifacts. 
-            What's also interesting about those results is that SSimDownscaler seems to always be underperforming, and if we stop to take a look at the actual images we can clearly see why.
-        </p>
-        <p>
-            Open those images in a new tab so you can properly seem them.
-        </p>
-        <p>
-            The reference:
-            <br>
-            <img src="./images/mpv_upscaling/downscaling/explanation/ssim_problem_reference.png" alt="Violet reference showing ssim's problems" width="500" height="364">           
-            <br>
-            <br>
-            SSimDownscaler coming from Catmull_Rom:
-            <br>
-            <img src="./images/mpv_upscaling/downscaling/explanation/ssim_problem_ssim_from_catmull_rom.png" alt="Violet ssim from catmull_rom showing ssim's problems" width="500" height="364">
-        </p>
-        <p>
-            SSimDownscaler is making the lines thinner. It does look better overall because it has fewer ringing artifacts and less blurry transitions, but the lines are thinner than they should be hence why it scores poorly on both IW-SSIM and PSNR-HMA/HA. 
-            We can safely conclude that if the reason you're downscaling your media is an upscale done by some entity before it reached you, you should probably just use lanczos if you prefer it to be accurate. SSimDownscaler does look cleaner however, and if the 
-            thinner lines aren't a problem you might prefer using it. 
-        </p>
-        <p>
-            It's important to remember that this isn't by any means an evaluation of downscaling in general, it's just an evaluation of downscaling after an upscaling. 
-        </p>
-
-    </section>
+    
         <br>
         <br>
         <nav>
