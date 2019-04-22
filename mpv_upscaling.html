@@ -44,7 +44,7 @@
             Before attempting to reproduce, make sure to grab the latest version of <a href="https://mpv.io/">mpv</a> and updated user shaders. You can get 
             the shaders from <a href="https://github.com/bjin/mpv-prescalers">bjin</a> and <a href="https://github.com/igv/FSRCNN-TensorFlow/releases">igv (FSRCNNX)</a>/<a href="https://gist.github.com/igv">igv (SSSR)</a>.
         <p>
-            UPDATE - 21/04/2019: Preliminar downscaling evaluaton added, focusing on the most relevant algorithms first.
+            UPDATE - 21/04/2019: Preliminar fractional upscaling and downscaling evaluatons added, focusing on the most relevant algorithms first.
         </p>
         <p>
             UPDATE - 18/04/2019: Ravu-zoom-r4 added, r2 and r3 were updated. 
@@ -284,6 +284,34 @@
         <p>
             While I'm providing numerical test results to mathematically evaluate how those different algorithms perform, I strongly advise taking a look on how the upscaled images actually end up looking like. The viewer has his/her own preference regarding 
             different drawbacks like aliasing, ringing or blurring. Some people might prefer an algorithm that scores relatively poorly when compared to sharper choices, but you should please yourself while consuming your media.  
+        </p>
+    </section>
+    <section>
+        <h3 id="fractional">Fractional Luma Upscaling</h3>
+        <p>
+            Taking into consideration anime productions are still done at arbitrary resolutions between 1280x720 and 1920x1080 (with most below 1600x900) and that most users are still watching them on FHD 1920x1080 displays, the most common scenario 
+            when there's any luma upscaling being performed by the player is arguably 720p->1080p, which corresponds to a 1.5x scaling factor. With the recent addition of ravu-zoom to our ever growing arsenal of user shaders, and the need to 
+            find out which dscales work better alongside the double-only prescalers, adding a new series of measurements seem reasonable.    
+        </p>
+        <p>
+            The methodology is straightforward, Violet was downscaled to 1280x720 using catmull_rom and then brought back up to 1920x1080.
+        </p>
+        <p>
+            <div class="row">
+                <div class="column">
+                    <img src="./images/mpv_upscaling/fractional/tables/violet-iwssim.png" alt="Violet results IW-SSIM" width="454" height="473">
+                </div>
+                <div class="column">
+                    <img src="./images/mpv_upscaling/fractional/tables/violet-psnrhma.png" alt="Violet results PSNR-HMA" width="454" height="473">
+                </div>
+                <div class="column">
+                    <img src="./images/mpv_upscaling/fractional/tables/violet-psnrha.png" alt="Violet results PSNR-HA" width="454" height="473">
+                </div>
+              </div>
+        </p>
+        <p>
+            We can see that ravu-zoom-r4 scores the highest. Using FSRCNNX alongside a downscaler makes the end result either too blurry or too sharp, hurting its performance. Ravu-zoom produces more ringing artifacts, so I'd personally recommend a subjective analysis 
+            before choosing one solely by the numbers. 
         </p>
     </section>
     <section>
