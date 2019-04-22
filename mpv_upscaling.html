@@ -394,14 +394,10 @@
             your display's resolution is lower than the content's resolution (UHD 3840x2160 content on a FHD 1920x1080 display, for example) or when you're using a doubler while needing to downscale after doubling.
         </p>
         <p>
+            For blurry "sources", like our scenario here in this test, the scaler doesn't really matter. Your result is always going to be blurry regardless and using something like adaptive-sharpen to make it look nicer might be a good idea depending on the title. 
         </p>
         <p>
-            SSimDownscaler is making the lines thinner. It does look better overall because it has fewer ringing artifacts and less blurry transitions, but the lines are thinner than they should be hence why it scores poorly on both IW-SSIM and PSNR-HMA/HA. 
-            We can safely conclude that if the reason you're downscaling your media is an upscale done by some entity before it reached you, you should probably just use lanczos if you prefer it to be accurate. SSimDownscaler does look cleaner however, and if the 
-            thinner lines aren't a problem you might prefer using it. 
-        </p>
-        <p>
-            It's important to remember that this isn't by any means an evaluation of downscaling in general, it's just an evaluation of downscaling after an upscaling. 
+            It's important to remember that this isn't by any means an evaluation of downscaling in general, it's just an evaluation of downscaling after an upscale. 
         </p>
 
     </section>
