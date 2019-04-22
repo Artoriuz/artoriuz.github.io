@@ -310,8 +310,8 @@
               </div>
         </p>
         <p>
-            We can see that ravu-zoom-r4 scores the highest. Using FSRCNNX alongside a downscaler makes the end result either too blurry or too sharp, hurting its performance. Ravu-zoom produces more ringing artifacts, so I'd personally recommend a subjective analysis 
-            before choosing one solely by the numbers. 
+            As expected, the doublers perform relatively poorly alongside built-in scalers. Ravu-zoom is the best stand-alone scaler, but it gets beaten by ravu-lite and FSRCNNX when those are used with SSimDownscaler. I originally only wanted to include the 
+            best version of each shader, but FSRCNNX_x2_8-0-4-1 will need to be included soon since the peformance disparity between FSRCNNX_x2_8-0-4-1 + SSimDownscaler and Ravu-zoom-r4 is just too high.
         </p>
     </section>
     <section>
