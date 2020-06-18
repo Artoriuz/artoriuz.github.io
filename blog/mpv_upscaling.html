@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135192850-1"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-135192850-1');
+    </script>
+
+    <title>Evaluating mpv's upscaling algorithms - A study of performance and quality</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="./css/default.css" />
+    <link rel="stylesheet" type="text/css" href="./css/syntax.css" />
+    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?skin=doxy"></script>
+</head>
+
+<body>
+    <header>
+        <hgroup>
+            <h1>
+                <a href="./mpv_upscaling.html">Evaluating mpv's upscaling algorithms</a>
+            </h1>
+            <h2>A study of performance and quality by João Vitor Chrisóstomo</h2>
+        </hgroup>
+    </header>
+    <nav>
+        <menu>
+            <a href="../index.html">Home</a>
+            <a href="https://github.com/Artoriuz">GitHub</a>
+            <a href="https://www.linkedin.com/in/jvrchrisostomo/">LinkedIn</a>
+        </menu>
+    </nav>
+    <section>
+        <h3 id="introduction">Introduction</h3>
+        <p>
+            This work aims to mathematically quantify image quality and performance of different real-time upscaling algorithms.
+        </p>
+        <p>
+            Before attempting to reproduce, make sure to grab the latest version of <a href="https://mpv.io/">mpv</a> and updated user shaders. You can get 
+            the shaders from <a href="https://github.com/bjin/mpv-prescalers">bjin</a> and <a href="https://github.com/igv/FSRCNN-TensorFlow/releases">igv (FSRCNNX)</a>/<a href="https://gist.github.com/igv">igv (SSSR)</a>.
+        <p>
+            UPDATE - 11/05/2019: KrigBilateral updated. 
+        </p>
+        <p>
+            UPDATE - 22/04/2019: FSRCNNX updated, removing the downscaling section for now since people aren't exactly going out of their ways to fix shitty upscales and there's already some information about it on the fractional tables.
+        </p>
+        <p>
+            UPDATE - 21/04/2019: Preliminar fractional upscaling evaluatons added, focusing on the most relevant algorithms first.
+        </p>
+        <p>
+            UPDATE - 18/04/2019: Ravu-zoom-r4 added, r2 and r3 were updated. 
+        </p>
+        <p>
+            UPDATE - 17/04/2019: PSNR-HA/HMA measurements are now done with wstep = 7 as recommended by igv.
+        </p>
+        <p>
+            UPDATE - 16/04/2019: New FPS measurement methodology, files now play for 4 seconds and then I calculate how many frames were displayed based on which frame it stopped at after the time-frame has elapsed. 
+            --scalers-resizes-only was also removed since the half pixel shift is not noticeable during playback. Previous results had different numbers, but the order didn't exactly significantly change. 
+        </p>
+        <p>
+            UPDATE - 06/04/2019: Tables updated with newer versions of FSRCNNX again. 
+        </p>
+        <p>
+            UPDATE - 31/03/2019: MS-SSIM tables were removed. All remaining luma related tables were updated. New methodology consists of basically utilising a full-range greyscale PNG as input (which results in lower quantisation errors 
+            when compared to using limited range YCbCr). Ravu-zoom was added, FSRCNNX_x2_16-0-4-1 and Ravu-lite were updated. 
+        </p>
+        <p>
+            UPDATE - 27/03/2019: Updated PSNR-HA/HMA, you can expect to see ravu-ar and ravu-zoom soon. PSNR-HVS-M was removed since it's deprecated by the insertion of PSNR-HA.
+        </p>
+        <p>
+            UPDATE - 15/03/2019: New versions of FSRCNNX. 
+        </p>
+        </p>
+
+            UPDATE - 08/03/2019: Adding another test image for chroma, and changed all chroma tests to upscale from a yuv4mpegpipe y4m file which makes me more confident they're accurate.
+        </p>
+        <p>
+            UPDATE - 07/03/2019: Adding Ravu-lite and fixing NGU-AA's half pixel shift. Huge thanks for Bjin for providing a user-shader to accomplish the latter =). FPS chart should be updated soon.
+        </p>
+        <p>
+            UPDATE - 03/03/2019: Ravu-chroma and Ewa_Robidoux/Ewa_Robidouxsharp added. 
+        </p>
+        <p>
+            UPDATE - 27/02/2019: PSNR-HMA and PSNR-HA tables added. 
+        </p>
+        <p>
+            UPDATE - 25/02/2019: Initial version of the Chroma section is added. I'll take some time to slowly polish it with more information and different tests, and I'm also probably going to add PSNR-HMA to the RGB tests soon.
+        </p>
+        </p>
+            UPDATE - 20/02/2019: IW-SSIM tables added.
+        <p>
+            UPDATE - 19/02/2019: MS-SSIM tables fixed, code had issues with RGB -> greyscale conversion. 
+        </p>
+        <p>
+            UPDATE - 18/02/2019: Lanczos added, and tables now display results from best to worst.
+        </p>
+        <p>
+            UPDATE - 16/02/2019: Other EWA scalers were added.
+        </p>
+        <p>
+            UPDATE - 22/12/2018: I found out a mistake in previous results, and have once again updated all quality comparison results.
+            <br>
+            I'm not certain about what was causing the problems, but turning off PNG filtering and debanding seems to have fixed it. I'll investigate which of the two was the culprit once I have the time. 
+            <br>
+            Well, since I had to redo everything, I took this opportunity to improve the testing methodology, debanding was turned off to prevent loss of detail, and I used a lossless 
+            YUV444p AVC encode as upscaling source instead of a YUV444p JPEG.  
+        </p>
+        <p>
+            UPDATE - 18/12/2018: Results have been updated with latest versions of FSRCNNX and Waifu2x. On top of that, I've included MS-SSIM and PSNR-HVS-M measurements. 
+            I've also included all NGU algorithms from <a href="http://madvr.com/">MadVR</a> since people are interested in them.
+        </p>
+        <p>
+            If all you want is to look at the results, <a href=#results>follow this link.</a> 
+        </p>
+        <h3 id="upscaling">What is upscaling?</h3>
+        <p>
+            Like its name implies, upscaling is simply increasing the scale of something. More specifically, taking discrete information
+            in a given scale and finding values between the existing samples. The easiest and most classic way of doing this
+            is through simple linear interpolation, if you want to find a value between two points you can simply draw a
+            line between them and linearly find any value in this line. If you wanted to find the value that's placed exactly
+            in the middle of those 2 discrete points, you could simply do an arithmetic mean with their values to find your
+            answer.
+        </p>
+        <p>
+            Linear interpolation can be done in a plane, through both axis, creating what we call "bilinear" interpolation. Bilinear
+            interpolation is the simplest interpolation algorithm, easiest to calculate and also unironically the most used
+            one in the industry due to the fact that it's extremely simple to implement.
+        </p>
+        <p>
+            But can something as simple as just drawing a line between 2 known discrete points give us good results? It depends entirely
+            on how the original information looked like. We can however, increase the complexity of our upscaling algorithm
+            by increase the amount of information it takes into consideration in order to find values between our discrete
+            points. In this page we'll evaluate what we can do differently, how much better our results can get and how it
+            affects our performance.
+        </p>
+        <h3 id="polynomial">Polynomial interpolation</h3>
+        <p>
+            <img src="./images/mpv_upscaling/interpolation.png" alt="upscaling" class="center">
+            <br>
+            A relatively simple way of taking more information into consideration when finding values between discrete points is to use
+            more than just the information of 2 points to calculate a function that connects them. We can trace a polynomial
+            curve between points if we take into account the information of neighbouring elements, calculating the gradients
+            and therefore becoming able to connect them with curves instead of lines. The shape of the curve connecting points
+            depends on the windowing and scaling functions used.
+        </p>
+        <h3 id="SSSR">Structural Similarity Upscaling</h3>
+        <img src="./images/mpv_upscaling/sssr_bilinear.png" alt="upscaling" class="center">
+        <br>
+        <img src="./images/mpv_upscaling/sssr_sssr.png" alt="upscaling" class="center">
+        <p>
+            We can more precisely upscale something if we try to reconstruct strucutures, the most evident problem with linear or polynomial
+            scalers is the thickening of border areas where the interpolated result doesn't transit between values as sharply,
+            resulting in a blurrier image with "lost" detail in the strucutures if you're downscaling and then upscaling
+            it back.
+        </p>
+        <h3 id="machine">Machine Learning</h3>
+        <p>
+            Machine learning comes as a powerful successor to classical methods due to the fact that you do not need to rely solely on what you can currently retrieve 
+            from the image, but also on a set of trained parameters generated from analysing multiple images and coming up with an upscaling model.
+        </p>
+        <p>
+            There are multiple different machine learning based image upscalers, we'll stick to those that are easily testable as mpv user shaders, MadVR's NGU and finally Waifu2x as our state of the art representation. 
+        </p>
+        <p>
+            We'll test the following algorithms:
+            <li><a href="https://github.com/bjin/mpv-prescalers">RAVU</a></li>
+            <li><a href="http://avisynth.nl/index.php/Nnedi3">NNEDI3</a></li>
+            <li><a href="https://github.com/igv/FSRCNN-TensorFlow">FSRCNNX</a></li>
+            <li><a href = "http://madvr.com/">NGU</a></li>
+            <li><a href="https://github.com/nagadomi/waifu2x">Waifu2x</a></li>
+        </p>
+        
+        <h3 id="methodology">Testing methodology</h3>
+        <p>
+            Performance measurements were done upscaling an animation video encoded into 8bit AVC from 1280x720 to 2560x1440. Utilising mpv
+            with a benchmarking profile, all settings from profile=gpu-hq, with Vulkan as the renderer and hardware decoding turned off. The machine used has
+            an Ivy Bridge i5 3470, a Polaris RX 470 and user shaders were always compute shaders when possible. The methodology consists of letting mpv play the file for 4 seconds 
+            and then seeing at which frame it stopped. 
+        </p>
+        <p>
+            Quality measurements were done in 2 test images, one from animation and another one from live action. Debanding was turned off to prevent loss of fine detail.
+        </p>
+        <p>
+            The reasoning behind this comes from the fact that the live action image has more high frequency components that are harder
+            to "restore". In order to measure how "good" each algorithm is, the test images were previously bicubic downscaled
+            to a quarter of their original resolutions (0.5x scaling factor in both axes), and then upscaled back to their
+            original resolutions with a direct 2x upscaling factor (2x in both axes outputs a resolution that's 4x larger in pixels). 
+            Every single scaler was tested on a full range greyscale PNG, which can be found on the repository.
+        </p>
+        <p>
+            Performance was evaluated simply in frames per second, while quality was evaluated in 
+            <a href="https://en.wikipedia.org/wiki/Peak_signal-to-noise_ratio">PSNR</a>, 
+            <a href="https://en.wikipedia.org/wiki/Structural_similarity">SSIM</a>, 
+            <a href="https://ece.uwaterloo.ca/~z70wang/research/iwssim/">IW-SSIM</a>,
+            <a href="http://www.ponomarenko.info/psnrhma.htm">PSNR-HMA</a> and 
+            <a href="http://www.ponomarenko.info/psnrhma.htm">PSNR-HA</a>.
+        </p>
+        
+        
+        <h3 id="results">Testing and results</h3>
+        <p>The following image was used for the animation upscaling testing:</p>
+        <img src="./images/mpv_upscaling/violet/downscaled.png" alt="Downscaled Violet" class="center">
+        <br>
+        <p>
+            Before we continue to the results, you can find all images in <a href="https://github.com/Artoriuz/Artoriuz.github.io/tree/master/images/mpv_upscaling/violet">this repository.</a>
+        </p>
+        <p>We can see the results below:</p>
+        <div class="row">
+            <div class="column">
+                <img src="./images/mpv_upscaling/tables/fps.png" alt="Violet results FPS" width="454" height="756">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/tables/violet-ssim.png" alt="Violet results SSIM" width="454" height="756">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/tables/violet-psnr.png" alt="Violet results PSNR" width="454" height="756">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/tables/violet-iwssim.png" alt="Violet results IW-SSIM" width="454" height="756">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/tables/violet-psnrhma.png" alt="Violet results PSNR-HMA" width="454" height="756">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/tables/violet-psnrha.png" alt="Violet results PSNR-HA" width="454" height="756">
+            </div>
+          </div>
+    
+        <!--
+        <p>Or in a table format, for those who prefer to just look at the numbers:</p>
+        <div w3-include-html="./html/violet.htm"></div>
+        -->
+        
+        <p>The following image was used for the live-action upscaling testing:</p>
+        <img src="./images/mpv_upscaling/shuri/downscaled.png" alt="Downscaled Shuri" class="center">
+        <br>
+        <p>
+            Again, you can find all the images in <a href="https://github.com/Artoriuz/Artoriuz.github.io/tree/master/images/mpv_upscaling/shuri">this repository.</a>
+        </p>
+        <p>We can see the results below:</p>
+        <div class="row">
+            <div class="column">
+                <img src="./images/mpv_upscaling/tables/fps.png" alt="shuri results FPS" width="454" height="756">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/tables/shuri-ssim.png" alt="shuri results SSIM" width="454" height="756">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/tables/shuri-psnr.png" alt="shuri results PSNR" width="454" height="756">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/tables/shuri-iwssim.png" alt="shuri results IW-SSIM" width="454" height="756">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/tables/shuri-psnrhma.png" alt="shuri results PSNR-HMA" width="454" height="756">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/tables/shuri-psnrha.png" alt="shuri results PSNR-HA" width="454" height="756">
+            </div>
+          </div>
+       
+         <!--
+        <p>And again, a table:</p>
+        <div w3-include-html="./html/shuri.htm"></div>
+        -->
+
+        <p>
+            We can clearly see that in general, machine learning based scalers tend to give better quality, though as expected they're also more computationally
+            expensive. We can see that FSRCNNX is the highest scoring mpv scaler, trading blows only with NGU.  
+        </p>
+        <p>
+            All NGU algorithms were tested on their highest quality presets (Very High), which was fine on the RX470, but significantly heavier than FSRCNNX-8-0-4-1. 
+            FSRCNNX-16-0-4-1's performance is also relatively okay, but the increased quality over its lighter variant might not justify using it.  
+        </p>
+        <p>
+            NNEDI3 is pointless. SSSR can be a nice alternative for low scaling factors (since FSRCNNX is a doubler and therefore would need to be downscaled afterwards), and Ravu while being blurrier might be able to hide compression 
+            artifacts or bad art in general.
+        </p>
+        <p>
+            If the point is getting as close as possible to the intended result, for mpv FSRCNNX is the clear choice. 
+        </p>
+        <p>
+            If you're using MadVR, both NGU-STANDARD and NGU-SHARP look great as long as your system can handle them, and NGU-AA is a Ravu alternative.
+        </p>
+        <p>
+            While I'm providing numerical test results to mathematically evaluate how those different algorithms perform, I strongly advise taking a look on how the upscaled images actually end up looking like. The viewer has his/her own preference regarding 
+            different drawbacks like aliasing, ringing or blurring. Some people might prefer an algorithm that scores relatively poorly when compared to sharper choices, but you should please yourself while consuming your media.  
+        </p>
+    </section>
+    <section>
+        <h3 id="fractional">Fractional Luma Upscaling</h3>
+        <p>
+            Taking into consideration anime productions are still done at arbitrary resolutions between 1280x720 and 1920x1080 (with most below 1600x900) and that most users are still watching them on FHD 1920x1080 displays, the most common scenario 
+            when there's any luma upscaling (or rgb upscaling if you want to nitpick about it, since mpv merges luma and chroma right after doubling chroma) being performed by the player is arguably 720p->1080p, which corresponds to a 1.5x scaling factor. With the recent addition of ravu-zoom to our ever growing arsenal of user shaders, and the need to 
+            find out which dscales work better alongside the double-only prescalers, adding a new series of measurements seem reasonable.    
+        </p>
+        <p>
+            The methodology is straightforward, Violet was downscaled to 1280x720 using catmull_rom and then brought back up to 1920x1080.
+        </p>
+        <p>
+            <div class="row">
+                <div class="column">
+                    <img src="./images/mpv_upscaling/fractional/tables/violet-iwssim.png" alt="Violet results IW-SSIM" width="454" height="473">
+                </div>
+                <div class="column">
+                    <img src="./images/mpv_upscaling/fractional/tables/violet-psnrhma.png" alt="Violet results PSNR-HMA" width="454" height="473">
+                </div>
+                <div class="column">
+                    <img src="./images/mpv_upscaling/fractional/tables/violet-psnrha.png" alt="Violet results PSNR-HA" width="454" height="473">
+                </div>
+              </div>
+        </p>
+        <p>
+            As expected, the doublers perform relatively poorly alongside built-in scalers. Ravu-zoom is the best stand-alone scaler, but it gets beaten by ravu-lite and FSRCNNX when those are used with SSimDownscaler. I originally only wanted to include the 
+            best version of each shader, but FSRCNNX_x2_8-0-4-1 will need to be included soon since the peformance disparity between FSRCNNX_x2_8-0-4-1 + SSimDownscaler and Ravu-zoom-r4 is just too high.
+        </p>
+    </section>
+    <!--<section>
+        <h3 id="downscaling">Luma Downscaling</h3>
+        <p>
+            While most people are likely to be consuming content utilising displays with resolutions that are equal or higher than what the media was encoded at, the anime industry is notoriously convoluted when it comes to scaling and most shows 
+            end up going through multiple scaling steps before actually reaching the viewer.
+            <br>
+            <ol>
+                <li>The characters are usually at a higher resolution than the backgrounds, which means that they might need to scale things before compositing the final frame.</li>
+                <li>Studios deliver their shows anywhere between 720p and 1080p. Popular choices are: 720p, 810p, 837p, 873p, 900p and 1080p.</li>
+                <li>The TV Channel / Streaming platform scales it before releasing to the public.</li>
+                <li>Your player needs to scale it once again to fit it in your display's resolution.</li>
+             </ol>
+             The point is, by the time the consumer can actually consume the media, it has already been through other scaling steps and trying to figure out the best possible individual solution for every single show is honestly futile. 
+        </p>
+        <p>
+            With that said, we can at least try to figure out which downscaling algorithm we should be using to best reverse upscaling done by streaming companies. Before continuing, I strongly recommend reading <a href="https://kageru.moe/blog/article/resolutions/">this</a>, 
+            if you know exactly which scaler they used, and the original resolution, you can use debilinear or debicubic to get the best possible result. The problem is that this kind of information is not exactly always available, and having a different configuration per title 
+            isn't really viable either. 
+        </p>
+        <p>
+            What's left to do then is figuring out the best overall configuration we can set dscale to. The methodology this time is pretty straightforward, since it's impossible to cover every single scenario (when it comes to scaling factor and upscaler used), 
+            I've done 3 different tests that should at least give an idea of what to use. 
+        </p>
+        <p>
+            The starting point was the previously used Violet Evergarden frame, from Netflix's encode. The image was upscaled to 2560x1440 (1.333x from 1920x1080) using bilinear, catmull_rom and bcspline with b = 0 and c = 1. Bilinear was chosen to 
+            represent the blurriest possible scenario. Catmull_rom is the middle term and the latter is probably their sharpest option. You can find examples of titles that were upscaled using those algorithms, and this is the second reason why I chose them.
+        </p>
+        <p>
+            We can proceed to the charts then:
+        </p>
+        <p>
+            <div class="row">
+                <div class="column">
+                    <img src="./images/mpv_upscaling/downscaling/tables/bilinear/iwssim.png" alt="Violet downscaling bilinear iwssim" width="454" height="284">
+                    <br><br>
+                    <img src="./images/mpv_upscaling/downscaling/tables/bilinear/psnrha.png" alt="Violet downscaling bilinear psnrha" width="454" height="284">
+                    <br><br>
+                    <img src="./images/mpv_upscaling/downscaling/tables/bilinear/psnrhma.png" alt="Violet downscaling bilinear psnrhma" width="454" height="284">
+                </div>
+                <div class="column">
+                    <img src="./images/mpv_upscaling/downscaling/tables/catmull_rom/iwssim.png" alt="Violet downscaling catmull_rom iwssim" width="454" height="284">
+                    <br><br>
+                    <img src="./images/mpv_upscaling/downscaling/tables/catmull_rom/psnrha.png" alt="Violet downscaling catmull_rom psnrha" width="454" height="284">
+                    <br><br>
+                    <img src="./images/mpv_upscaling/downscaling/tables/catmull_rom/psnrhma.png" alt="Violet downscaling catmull_rom psnrhma" width="454" height="284">
+                </div>
+                <div class="column">
+                    <img src="./images/mpv_upscaling/downscaling/tables/bcspline_0_1/iwssim.png" alt="Violet downscaling bcspline_0_1 iwssim" width="454" height="284">
+                    <br><br>
+                    <img src="./images/mpv_upscaling/downscaling/tables/bcspline_0_1/psnrha.png" alt="Violet downscaling bcspline_0_1 psnrha" width="454" height="284">
+                    <br><br>
+                    <img src="./images/mpv_upscaling/downscaling/tables/bcspline_0_1/psnrhma.png" alt="Violet downscaling bcspline_0_1 psnrhma" width="454" height="284">
+                </div>
+              </div>
+        </p>
+        <p>
+            We can see that depending on which algorithm is used in the upscaling step, the results change and therefore there isn't an universal solution that's always the best. Averaging those numbers can give us a better picture:
+        </p>
+        <p>
+            <div class="row">
+                <div class="column">
+                    <img src="./images/mpv_upscaling/downscaling/tables/average/iwssim.png" alt="Violet downscaling average iwssim" width="454" height="284">
+                </div>
+                <div class="column">
+                    <img src="./images/mpv_upscaling/downscaling/tables/average/psnrha.png" alt="Violet downscaling average psnrha" width="454" height="284">
+                </div>
+                <div class="column">
+                    <img src="./images/mpv_upscaling/downscaling/tables/average/psnrhma.png" alt="Violet downscaling average psnrhma" width="454" height="284">
+                </div>
+            </div>
+        </p>
+        <p>
+            We can see that SSimDownscaler can't exactly perform well since its input is extremely blurry, and that lanczos starts getting worse as you increase the upscaling sharpness. As expected, no algorithm gets even close to 
+            properly "restoring" the original image, and if you have to go through multiple scaling steps (we almost always have to), you shouldn't expect superb quality.
+        </p>
+        <p>
+            If we ignore mitchell, which is extremely blurry, all the other scalers seem to perform within each other and the difference between them on actual playback is probably negligible. I'd recommend using SSimDownscaler when 
+            your display's resolution is lower than the content's resolution (UHD 3840x2160 content on a FHD 1920x1080 display, for example) or when you're using a doubler while needing to downscale after doubling.
+        </p>
+        <p>
+            For blurry "sources", like our scenario here in this test, the scaler doesn't really matter. Your result is always going to be blurry regardless and using something like adaptive-sharpen to make it look nicer might be a good idea depending on the title. 
+        </p>
+        <p>
+            It's important to remember that this isn't by any means an evaluation of downscaling in general, it's just an evaluation of downscaling after an upscale. 
+        </p>
+
+    </section>-->
+    <section>
+        <h3 id="chroma">Chroma Upscaling</h3>
+        <p>
+            Chroma subsampling is a technique utilised to save bitrate/filesize without strongly sacrificing perceived quality, by taking into account how our eyes biologically work and how our brains interpret the information they're receiving. 
+        </p>
+        <p>
+            With the rise of television broadcasting the recurring problem of bandwidth-heavy innovations rapidly making the electromagnetic spectrum "crowded" started to become problematic, the practical bands of low long-range attenuation 
+            were becoming scarce and that would undoubteadly limit the amount of things we could have "over the air", which then lead the way to new bandwidth-saving techniques that aimed to reduce the required bandwidth as much as reasonably possible 
+            without affecting the perceived quality of the service to the same extent.     
+        </p>
+        <p>
+            Since we're more likely to perceive contrast/luminosity differecens than chromatic details, chroma-subsampling is simply the most basic way of throwing away some colouring information without sacrificing on luminosity resolution.
+        </p>
+        <p>To make this simple to understand, we can see a normal image below alongside its RGB planes:</p>
+        <div class="row">
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/explanation/reference.png" alt="Rosetta Ref" width="600" height="800">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/explanation/reference_RGB_R.png" alt="Rosetta R" width="600" height="800">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/explanation/reference_RGB_G.png" alt="Rosetta G" width="600" height="800">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/explanation/reference_RGB_B.png" alt="Rosetta B" width="600" height="800">
+          </div>
+        </div>
+        <p>Now, the same image alongside its YUV/YCbCr planes:</p>
+        <div class="row">
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/explanation/reference.png" alt="Rosetta Ref" width="600" height="800">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/explanation/reference_YUV_Y.png" alt="Rosetta Y" width="600" height="800">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/explanation/reference_YUV_Cb.png" alt="Rosetta Cb" width="600" height="800">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/explanation/reference_YUV_Cr.png" alt="Rosetta Cr" width="600" height="800">
+            </div>
+        </div>
+        <p>
+            We can easily simulate how it would look like if it didn't have its entirely chromatic information available by simply downscaling the chroma planes to 1/4 of their original resolution (0.5x scaling factor) and then upscaling them back (2x scaling factor).
+        </p>
+        <p>
+            It's important to see how much "blurrier" the chromatic planes look after this process, in other words, how much high frequency information they lost. 
+        </p>
+        <div class="row">
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/explanation/reference_YUV420p.png" alt="Rosetta Chroma subsampled" width="600" height="800">
+            </div>    
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/explanation/reference_YUV_Y.png" alt="Rosetta Y" width="600" height="800">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/explanation/Cb_upscaled.png" alt="Rosetta upscaled Cb" width="600" height="800">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/explanation/Cr_upscaled.png" alt="Rosetta upscaled Cr" width="600" height="800">
+            </div>
+        </div>
+
+        <p>Can't notice the difference when you put it back to RGB? Well, that's the point. In any case, to make it possible for us to see, you can look at the image below, which is simply 128 plus the difference between the reference and the chroma subsampled version:</p>
+       
+        <img src="./images/mpv_upscaling/chroma/explanation/chroma_subsampling_difference.png" alt="Rosetta chroma subsampling difference" width="600" height="800" class="center">
+        
+        <p>From this simulation it's probably reasonable to understand why chroma upscaling isn't usually a big concern, it's just that you're unlikely to notice the difference on real content.</p>
+        <p>
+            With that in mind, we can proceed with the actual comparison. SSIM measurements can be ignored this time since the luma plane remains intact and therefore there are almost no significant gains to be made in structural similarity from switching the scaler.  
+        </p>
+        <div class="row">
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/tables/rosetta-psnr.png" alt="rosetta results PSNR" width="454" height="756">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/tables/rosetta-psnrhma.png" alt="rosetta results PSNR-HMA" width="454" height="756">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/tables/rosetta-psnrha.png" alt="rosetta results PSNR-HA" width="454" height="756">
+            </div>
+        </div>
+        <p>
+            Rosetta served as a somewhat unfaithful representation of what you should expect from anime, since usually speaking actual anime footage is far from being as detailed and therefore the scalers would score even closer overall. We can proceed 
+            with a live action example. 
+        </p>
+        <p>
+            <img src="./images/mpv_upscaling/chroma/dog/reference.png" alt="dog" width="960" height="540">
+        </p>
+        <div class="row">
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/tables/dog-psnr.png" alt="Dog results PSNR" width="454" height="756">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/tables/dog-psnrhma.png" alt="Dog results PSNR-HMA" width="454" height="756">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/chroma/tables/dog-psnrha.png" alt="Dog results PSNR-HA" width="454" height="756">
+            </div>
+        </div>
+        <p>
+            It's important to notice how the numerical difference between the scalers is much smaller when doing chroma measurements, and this is precisely why using a heavier scaler is usually not warranted unless the performance impact is negligible.
+        </p>
+        <p>
+            On my system, running KrigBilateral on Vulkan makes no difference whatsoever since I have a CPU decoding bottleneck at around ~1200 FPS with or without it on a 720p 8bit AVC file. Running on ra_d3d11 with d3d11va hardware decoding, I go from ~1800 FPS to ~1150 FPS going from 
+            lanczos to KrigBilateral. Running both FSRCNNX-8-0-4-1 and KrigBilateral at the same time gives me ~260 FPS on both d3d11 and Vulkan, with or without hwdec. 
+        </p>
+        <p>
+            My personal recommendation is that you should test it yourself to see if you can notice KrigBilateral's difference during playback, and use it if it doesn't really matter resource-wise (in the case your GPU is fine either way). Another sensible decision would be to 
+            use it when you don't need luma upscaling, since then the only gains you can make are in chroma. 
+        </p>
+    </section>
+    
+        <br>
+        <br>
+        <nav>
+            <menu>
+                <a href="../index.html">Home</a>
+                <a href="#introduction">Introduction</a>
+                <a href="https://github.com/Artoriuz">GitHub</a>
+                <a href="https://www.linkedin.com/in/jvrchrisostomo/">LinkedIn</a>
+            </menu>
+        </nav>
+        <br>
+        <br>
+</body>
+<script>
+    function includeHTML() {
+        var z, i, elmnt, file, xhttp;
+        /*loop through a collection of all HTML elements:*/
+        z = document.getElementsByTagName("*");
+        for (i = 0; i < z.length; i++) {
+            elmnt = z[i];
+            /*search for elements with a certain atrribute:*/
+            file = elmnt.getAttribute("w3-include-html");
+            if (file) {
+                /*make an HTTP request using the attribute value as the file name:*/
+                xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function () {
+                    if (this.readyState == 4) {
+                        if (this.status == 200) { elmnt.innerHTML = this.responseText; }
+                        if (this.status == 404) { elmnt.innerHTML = "Page not found."; }
+                        /*remove the attribute, and call this function once more:*/
+                        elmnt.removeAttribute("w3-include-html");
+                        includeHTML();
+                    }
+                }
+                xhttp.open("GET", file, true);
+                xhttp.send();
+                /*exit the function:*/
+                return;
+            }
+        }
+    }
+</script>
+ <script>
+        includeHTML();
+</script> 
+</html>

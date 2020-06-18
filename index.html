@@ -1,95 +1,325 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<!--[if lt IE 8 ]><html class="no-js ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="no-js ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 8)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
 <head>
-		<!-- Global site tag (gtag.js) - Google Analytics -->
-	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-135192850-1"></script>
-	<script>
-	window.dataLayer = window.dataLayer || [];
-	function gtag(){dataLayer.push(arguments);}
-	gtag('js', new Date());
 
-	gtag('config', 'UA-135192850-1');
-	</script>
+   <!--- Basic Page Needs
+   ================================================== -->
+   <meta charset="utf-8">
+	<title>Chrisóstomo's Homepage</title>
+	<meta name="description" content="">
+	<meta name="author" content="">
 
-	<title>João Vitor Rafael Chrisóstomo</title>
-	<meta charset="utf-8" />
-	<link rel="stylesheet" type="text/css" href="./css/default.css" />
-	<link rel="stylesheet" type="text/css" href="./css/syntax.css" />
-	<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?skin=doxy"></script>
+   <!-- Mobile Specific Metas
+   ================================================== -->
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<!-- CSS
+    ================================================== -->
+   <link rel="stylesheet" href="css/default.css">
+	<link rel="stylesheet" href="css/layout.css">
+   <link rel="stylesheet" href="css/media-queries.css">
+   <link rel="stylesheet" href="css/magnific-popup.css">
+
+   <!-- Script
+   ================================================== -->
+	<script src="js/modernizr.js"></script>
+
+   <!-- Favicons
+	================================================== -->
+	<link rel="shortcut icon" href="favicon.png" >
+
 </head>
 
 <body>
-	<header>
-		<hgroup>
-			<h1>
-				<a href="./index.html">João Vitor Rafael Chrisóstomo</a>
-			</h1>
-			<h2>Electrical Engineering M.Sc. Student at Unicamp</h2>
-		</hgroup>
-	</header>
-	<nav>
-		<menu>
-			<a href="./index.html">Home</a>
-			<a href="https://github.com/Artoriuz">GitHub</a>
-			<a href="https://www.linkedin.com/in/jvrchrisostomo/">LinkedIn</a>
-		</menu>
-	</nav>
-	<section id="author">
-		<h3>The author</h3>
-		<p>
-		    I'm an electrical engineer currently pursuing a master's degree at the State University of Campinas. 
-		    I'm highly interested in various EE related topics like digital electronics, digital communications, RTL design, 
-		    data-mining, digital image/signal processing, audio/video coding, compression algorithms, 
-		    instruction set architectures and display technology.
-		</p>
-		<p>
-		    My bachelor's final project was an academic-friendly 5-stage pipeline RISC-V RV32I CPU core written in VHDL, and
-		    I'm extremely interested into domain-specific low power and fault-tolerant architectures for edge IoT devices or space applications.
-                </p>
-		<p> 
-		    As an intern at INPE, The Brazilian National Institute for Speace Research, my job was contributing to the test-bench and verifying
-		    the design and functionality of their environmental data collection system, which will be part of the SBCDA. 
-		</p>
-		<p>
-		    For more details, please check my LinkedIn profile!
-		</p>
-	</section>
-	<section id="posts">
-		<h3>Blog posts</h3>
-		<ul>
-			<li>
-				<h4>
-					<a href="./open_hardware.html">Open hardware and RISC-V - A brief introduction</a>
-				</h4>
-			</li>
-			<li>
-				<h4>
-					<a href="./inpe_internship.html">Interning at the Brazilian National Institute for Space Research - The experience</a>
-				</h4>
-			</li>
-			<li>
-				<h4>
-					<a href="./keyframe_comparison.html">Keyframe encoding comparison - Numerically evaluating different popular video encoders on anime content</a>
-				</h4>
-			</li>
-			<li>
-				<h4>
-					<a href="./mpv_upscaling.html">Evaluating mpv's upscaling algorithms - A study of performance and quality</a>
-				</h4>
-			</li>
-			<li>
-				<h4>
-					<a href="./image_processing.html">Digital image processing - Some university assignments</a>
-				</h4>
-			</li>
-		</ul>
-	</section>
+
+   <!-- Header
+   ================================================== -->
+   <header id="home">
+
+      <nav id="nav-wrap">
+
+         <a class="mobile-btn" href="#nav-wrap" title="Show navigation">Show navigation</a>
+	      <a class="mobile-btn" href="#" title="Hide navigation">Hide navigation</a>
+
+         <ul id="nav" class="nav">
+            <li class="current"><a class="smoothscroll" href="#home">Home</a></li>
+            <li><a class="smoothscroll" href="#about">About</a></li>
+            <li><a class="smoothscroll" href="#resume">Resume</a></li>
+         </ul> <!-- end #nav -->
+
+      </nav> <!-- end #nav-wrap -->
+
+      <div class="row banner">
+         <div class="banner-text">
+            <img class="profile-pic"  src="images/joao.png" alt="" />
+            <h1 class="responsive-headline">João Vitor Rafael Chrisóstomo</h1>
+            <h3>Electrical Engineer</h3>
+            <hr />
+            <ul class="social">
+               <li><a href="https://www.linkedin.com/in/jvrchrisostomo/"><i class="fa fa-linkedin"></i></a></li>
+               <li><a href="https://github.com/Artoriuz"><i class="fa fa-github"></i></a></li>
+            </ul>
+         </div>
+      </div>
+
+      <p class="scrolldown">
+         <a class="smoothscroll" href="#about"><i class="icon-down-circle"></i></a>
+      </p>
+
+   </header> <!-- Header End -->
 
 
-	<footer>
+   <!-- About Section
+   ================================================== -->
+   <section id="about">
 
-	</footer>
+         <div class="center">
+
+            <h2>About Me</h2>
+
+            <p>
+               I'm an Electrical Engineer passionate about FPGAs, hardware design, embedded systems, fault-tolerant systems, domain-specific architectures, digital signal processing and high performance computing. I hold a 
+               BSEE from the Federal University of Rio Grande do Norte (UFRN) and I'm currently pursuing a MSEE at the State University of Campinas (UNICAMP). My BS final project was the implementation of a 5-stage pipeline 
+               RV32I RISC-V CPU Core written in VHDL for academic purposes. I did my internship at the National Institute for Space Research, working at the ARGOS-II Environmental Data Collector Cubesat payload. 
+            </p>
+            
+         </div>
+
+         <div class="center">
+            <h2>Blog Posts</h2>
+            <p>
+            <ul>
+               <li>
+                  <a href="./blog/open_hardware.html">Open hardware and RISC-V - A brief introduction</a>
+               </li>
+               <li>
+                  <a href="./blog/inpe_internship.html">Interning at the Brazilian National Institute for Space Research - The experience</a>
+               </li>
+               <li>
+                  <a href="./blog/keyframe_comparison.html">Keyframe encoding comparison - Numerically evaluating different popular video encoders on anime content</a>
+               </li>
+               <li>
+                  <a href="./blog/mpv_upscaling.html">Evaluating mpv's upscaling algorithms - A study of performance and quality</a>
+               </li>
+               <li>
+                  <a href="./blog/image_processing.html">Digital image processing - Some university assignments</a>
+               </li>
+            </ul>
+         </p>
+         </div>
+
+   </section> <!-- About Section End-->
+
+
+   <!-- Resume Section
+   ================================================== -->
+   <section id="resume">
+
+      <!-- Education
+      ----------------------------------------------- -->
+      <div class="row education">
+
+         <div class="three columns header-col">
+            <h1><span>Education</span></h1>
+         </div>
+
+         <div class="nine columns main-col">
+
+            <div class="row item">
+
+               <div class="twelve columns">
+
+                  <h3>State University of Campinas</h3>
+                  <p class="info">Master's Degree in Electrical Engineering <span>&bull;</span> <em class="date">Ongoing</em></p>
+
+                  <p>
+                  I'm currently studying the possibilities of open-hardware and domain-specific architectures in IoT devices.
+                  </p>
+
+               </div>
+
+            </div> <!-- item end -->
+
+            <div class="row item">
+
+               <div class="twelve columns">
+
+                  <h3>Federal University of Rio Grande do Norte</h3>
+                  <p class="info">Bachelor's Degree in Electrical Engineering <span>&bull;</span> <em class="date">Dec 2019</em></p>
+
+                  <p>
+                     Developed Maestro, a 5-stage pipeline in-order RV32I RISC-V core written entirely in VHDL for academic purposes. Intel Quartus Prime and ModelSim were utilised for synthesis and verification, 
+                     and a Cyclone V FPGA was used for testing purposes. The core is part of my bachelor’s degree and can be found at <a href="https://riscv.org/risc-v-cores">https://riscv.org/risc-v-cores</a>.
+                     <br><br>
+                     Conducted a performance and picture quality evaluation of different upscaling algorithms supported by the popular video player mpv, which includes a wide variety of choices, 
+                     from polynomial interpolation to convolutional neural networks based shaders. The study was conducted for a Digital Image Processing subject and can be found at 
+                     <a href="https://artoriuz.github.io/mpv_upscaling.html">https://artoriuz.github.io/mpv_upscaling.html</a>.
+                  </p>
+
+               </div>
+
+            </div> <!-- item end -->
+
+         </div> <!-- main-col end -->
+
+      </div> <!-- End Education -->
+
+
+      <!-- Work
+      ----------------------------------------------- -->
+      <div class="row work">
+
+         <div class="three columns header-col">
+            <h1><span>Work</span></h1>
+         </div>
+
+         <div class="nine columns main-col">
+
+            <div class="row item">
+
+               <div class="twelve columns">
+
+                  <h3>National Institute for Space Research</h3>
+                  <p class="info">Research Intern <span>&bull;</span> <em class="date">March 2010 - Present</em></p>
+
+                  <p>
+                     Assigned primarily at developing and maintaining the testbench of a SBCDA (Brazilian Environmental Data Collection System) Cubesat compatible payload, including a hardware in the loop test-routine 
+                     and the required code to emulate an on-board-computer utilising an x86 Workstation running Matlab as a master, an Arduino Due as an I²C bridge and a Rohde&Schwarz SMBV100A Vector Signal Generator.
+                     <br><br>
+                     Secondary tasks varied from firmware development to brainstorming possible engineering solutions or improvements to the Environmental Data Collector as a whole, 
+                     which included changes to the dedicated decoding hardware in the Microsemi Smartfusion 2 FPGA, or to the communication protocols handled by the ARM Cortex-M3 based microcontroller subsystem running FreeRTOS.
+                     <br><br>
+                     Updating internal and external use documentation was also part of the daily routine, on top of sometimes interacting with external teams integrating our system alongside their on-board-computers.
+                  </p>
+
+               </div>
+
+            </div> <!-- item end -->
+        
+         </div> <!-- main-col end -->
+
+      </div> <!-- End Education -->
+
+   <!-- Testimonials Section
+   ================================================== -->
+   <section id="testimonials">
+
+      <div class="text-container">
+
+         <div class="row">
+
+            <div class="two columns header-col">
+
+               <h1><span>Client Testimonials</span></h1>
+
+            </div>
+
+            <div class="ten columns flex-container">
+
+               <div class="flexslider">
+
+                  <ul class="slides">
+
+                     <li>
+                        <blockquote>
+                           <p>If I have seen further than others, it is by standing upon the shoulders of giants.
+                           </p>
+                           <cite>Isaac Newton</cite>
+                        </blockquote>
+                     </li> <!-- slide ends -->
+
+                     <li>
+                        <blockquote>
+                           <p>Intelligence is the ability to avoid doing work, yet getting the work done.
+                           </p>
+                           <cite>Linus Torvalds</cite>
+                        </blockquote>
+                     </li> <!-- slide ends -->
+
+                     <li>
+                        <blockquote>
+                           <p>Design is not just what it looks like and feels like. Design is how it works.
+                           </p>
+                           <cite>Steve Jobs</cite>
+                        </blockquote>
+                     </li> <!-- slide ends -->
+
+                     <li>
+                        <blockquote>
+                           <p>It's fine to celebrate success but it is more important to heed the lessons of failure.
+                           </p>
+                           <cite>Bill Gates</cite>
+                        </blockquote>
+                     </li> <!-- slide ends -->
+
+                     <li>
+                        <blockquote>
+                           <p>Primary causes are unknown to us, but are subject to simple and constant laws, which may be discovered by observation, the study of them being the object of natural philosophy.
+                           </p>
+                           <cite>Joseph Fourier</cite>
+                        </blockquote>
+                     </li> <!-- slide ends -->
+
+                     <li>
+                        <blockquote>
+                           <p>The important thing is not to stop questioning. Curiosity has its own reason for existing.
+                           </p>
+                           <cite>Albert Einstein</cite>
+                        </blockquote>
+                     </li> <!-- slide ends -->
+
+                  </ul>
+
+               </div> <!-- div.flexslider ends -->
+
+            </div> <!-- div.flex-container ends -->
+
+         </div> <!-- row ends -->
+
+       </div>  <!-- text-container ends -->
+
+   </section> <!-- Testimonials Section End-->
+
+   <!-- footer
+   ================================================== -->
+   <footer>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <ul class="social-links">
+               <li><a href="https://www.linkedin.com/in/jvrchrisostomo/"><i class="fa fa-linkedin"></i></a></li>
+               <li><a href="https://github.com/Artoriuz"><i class="fa fa-github"></i></a></li>
+            </ul>
+
+            <ul class="copyright">
+               <li>&copy; Copyright 2014 CeeVee</li>
+               <li>Design by <a title="Styleshout" href="http://www.styleshout.com/">Styleshout</a></li>   
+            </ul>
+
+         </div>
+
+         <div id="go-top"><a class="smoothscroll" title="Back to Top" href="#home"><i class="icon-up-open"></i></a></div>
+
+      </div>
+
+   </footer> <!-- Footer End-->
+
+   <!-- Java Script
+   ================================================== -->
+   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+   <script>window.jQuery || document.write('<script src="js/jquery-1.10.2.min.js"><\/script>')</script>
+   <script type="text/javascript" src="js/jquery-migrate-1.2.1.min.js"></script>
+
+   <script src="js/jquery.flexslider.js"></script>
+   <script src="js/waypoints.js"></script>
+   <script src="js/jquery.fittext.js"></script>
+   <script src="js/magnific-popup.js"></script>
+   <script src="js/init.js"></script>
+
 </body>
 
 </html>
