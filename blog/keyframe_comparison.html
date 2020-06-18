@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135192850-1"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-135192850-1');
+</script>
+
+    
+    <title>Keyframe encoding comparison - Numerically evaluating different popular video encoders on anime content</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="./css/default.css" />
+    <link rel="stylesheet" type="text/css" href="./css/syntax.css" />
+    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?skin=doxy"></script>
+</head>
+
+<body>
+    <header>
+        <hgroup>
+            <h1>
+                <a href="./keyframe_comparison.html">Keyframe encoding comparison</a>
+            </h1>
+            <h2>Numerically evaluating different popular video encoders on anime content by João Vitor Chrisóstomo</h2>
+        </hgroup>
+    </header>
+    <nav>
+        <menu>
+            <a href="../index.html">Home</a>
+            <a href="https://github.com/Artoriuz">GitHub</a>
+            <a href="https://www.linkedin.com/in/jvrchrisostomo/">LinkedIn</a>
+        </menu>
+    </nav>
+    <section>
+        <h3 id="introduction">Introduction</h3>
+        <p>
+            Keyframes are the frames contained in a video stream that contain the entire information about itself, delta-frames however only contain what has changed from a previous frame 
+            in order to avoid redundancy and improve compression. When evaluating how good a video encoder is, it's important to take into consideration numerous frames in order to see how it 
+            actually performs since a good portion of the magic is done in reconstructing the information from few keyframes. However, if you were to use those video encoders as image encoders 
+            all that matters to you is how well they perform on keyframe encoding since your source only has a single frame. This is exactly what gave us formats like WebP (based on VP8), and 
+            HEIF (can contain AVC or HEVC streams, support for AV1 streams (AVIF) seems to be on the horizon).
+        </p>
+        <p>
+            The goal of this study is simply seeing how different encoders behave at different bitrates and different anime source images, however it should not be taken as ground truth since 
+            the number of samples isn't exactly high (only 4 different FHD frames were compared) and the encoders weren't fine tuned either.  
+        </p>
+        <p>
+            The latest versions of the encoders included in FFMpeg were used as of October 2018. The encoders used were libaom for AV1, libvpx for VP9, x264 for AVC and x265 for HEVC. 
+        </p>
+        <p>
+            The methodology is quite simple and reproducible:
+            <ol>
+                <li>Every image was encoded at every format at the respective filesizes: 30KB, 75KB, 160KB, 250KB, 360KB, 550KB, 950KB.</li>
+                <li>Every encoder was configured with their respective "highest quality" preset, which means "-deadline best" for libvpx and "-preset placebo" for x264/x265.</li>
+                <li>Every encode was yuv444p, and contained in a MKV to simplify comparisons.</li>
+                <li>PSNR, SSIM and PSNR-HVS-M measurements were done against the source PNGs by simply transcoding the encodes into PNGs (lossless).</li>
+              </ol>                
+        </p>
+        <p>
+            With the methodology out of the way, we can take a look at the actual results:
+        </p>
+        <p>
+            <h3>YUNA</h3>
+        </p>
+        <p>
+            <img src="./images/keyframe_comparison/yuna.png" alt="YUNA" class="center" width="960" height="540">
+        </p>
+        <p>
+            <img src="./images/keyframe_comparison/yuna_psnr.png" alt="YUNA_PSNR" class="center">
+        </p>
+        <p>
+            <img src="./images/keyframe_comparison/yuna_ssim.png" alt="YUNA_SSIM" class="center">
+        </p>
+        <p>
+            <img src="./images/keyframe_comparison/yuna_psnrhvsm.png" alt="YUNA_PSNRHVSM" class="center">
+        </p>
+        <p>
+            <h3>ASUKA</h3>
+        </p>
+        <p>
+            <img src="./images/keyframe_comparison/asuka.png" alt="ASUKA" class="center" width="960" height="407">
+        </p>
+        <p>
+            <img src="./images/keyframe_comparison/asuka_psnr.png" alt="ASUKA_PSNR" class="center">
+        </p>
+        <p>
+            <img src="./images/keyframe_comparison/asuka_ssim.png" alt="ASUKA_SSIM" class="center">
+        </p>
+        <p>
+            <img src="./images/keyframe_comparison/asuka_psnrhvsm.png" alt="ASUKA_PSNRHVSM" class="center">
+        </p>
+        <p>
+            <h3>VIOLET</h3>
+        </p>
+        <p>
+            <img src="./images/keyframe_comparison/violet.png" alt="VIOLET" class="center" width="960" height="540">
+        </p>
+        <p>
+            <img src="./images/keyframe_comparison/violet_psnr.png" alt="VIOLET_PSNR" class="center">
+        </p>
+        <p>
+            <img src="./images/keyframe_comparison/violet_ssim.png" alt="VIOLET_SSIM" class="center">
+        </p>
+        <p>
+            <img src="./images/keyframe_comparison/violet_psnrhvsm.png" alt="VIOLET_PSNRHVSM" class="center">
+        </p>
+        <p>
+            <h3>ROOM</h3>
+        </p>
+        <p>
+            <img src="./images/keyframe_comparison/room.png" alt="ROOM" class="center" width="960" height="540">
+        </p>
+        <p>
+            <img src="./images/keyframe_comparison/room_psnr.png" alt="ROOM_PSNR" class="center">
+        </p>
+        <p>
+            <img src="./images/keyframe_comparison/room_ssim.png" alt="ROOM_SSIM" class="center">
+        </p>
+        <p>
+            <img src="./images/keyframe_comparison/room_psnrhvsm.png" alt="ROOM_PSNRHVSM" class="center">
+        </p>
+        <p>
+            The first image, YUNA, is a good representation of what we can expect from high quality anime frames. It's clear that we have more low-frequency components than high-frequency 
+            components, but the sharp lines and details need to be preserved otherwise it's extremely easy to spot blurring, which might not always be the case for live-action frames. We see 
+            that the number of different colour tones and high-frequency details has a high correlation with how efficient the encoders can be, the hardest image to encode was clearly ROOM due 
+            to the ridiculous amount of detail, and all measurements agree with it.   
+        </p>
+        <p>
+            We can see an average of the 4 tests in the graphs below:
+        </p>
+        <p>
+            <img src="./images/keyframe_comparison/average_psnr.png" alt="AVERAGE_PSNR" class="center">
+        </p>
+        <p>
+            <img src="./images/keyframe_comparison/average_ssim.png" alt="AVERAGE_SSIM" class="center">
+        </p>
+        <p>
+            <img src="./images/keyframe_comparison/average_psnrhvsm.png" alt="AVERAGE_PSNRHVSM" class="center">
+        </p>
+        <p>
+            It's extremely surprising to see libvpx beating x265 on most filesizes, but keep those encoders do have PSNR/SSIM affecting features that theoretically should improve 
+            perceived image quality despite the lower measurements. Those features, called psycho-visual optimisations, can be turned off with flags, which might improve 
+            the encoder's performance on said metrics. Since I was using default (with the high quality presets) settings, psycho-visual optimisations were turned on. 
+        </p>
+        <p>
+            Libaom beating everything was expected, which is great considering that the encoder is still immature and will improve over time. The caveat here is that it's also absurdly slow, 
+            and would be ridiculously painful to use when encoding actual videos. 
+        </p>
+        <p>
+            It seems that we can be happy that HEIF is slowly getting some momentum, even the worst tested video encoder is still leagues above jpeg encoders and the image compression future 
+            seems bright. 
+        </p>
+        <br>
+        <br>
+        <nav>
+            <menu>
+                <a href="../index.html">Home</a>
+                <a href="#introduction">Introduction</a>
+                <a href="https://github.com/Artoriuz">GitHub</a>
+                <a href="https://www.linkedin.com/in/jvrchrisostomo/">LinkedIn</a>
+            </menu>
+        </nav>
+        <br>
+        <br>
+    </section>
+</body>
+</html>
