@@ -12,7 +12,7 @@
 */
 
 body {
-	font-family: 'Lato', sans-serif;
+	font-family: 'Roboto', sans-serif;
 	font-size: 16px
 }
 
@@ -287,9 +287,9 @@ footer {
 
 #lead-content h1 {
 	color: #fff;
+	font-family: 'Roboto Condensed', sans-serif;
 	font-weight: 900;
 	font-size: 5em;
-	text-transform: uppercase;
 	letter-spacing: 0.05em;
     line-height: 0.9em;
     text-shadow: 0px 1px 3px rgba(0, 0, 0, .5)
@@ -297,6 +297,7 @@ footer {
 
 #lead-content h2 {
 	color: #fff;
+	font-family: 'Roboto Condensed', sans-serif;
 	font-weight: 500;
 	font-size: 2.25em;
     margin-bottom: 15px;
