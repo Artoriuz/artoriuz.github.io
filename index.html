@@ -1,325 +1,324 @@
 <!DOCTYPE html>
-<!--[if lt IE 8 ]><html class="no-js ie ie7" lang="en"> <![endif]-->
-<!--[if IE 8 ]><html class="no-js ie ie8" lang="en"> <![endif]-->
-<!--[if (gte IE 8)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<html class="no-js" lang="en">
+
 <head>
-
-   <!--- Basic Page Needs
-   ================================================== -->
-   <meta charset="utf-8">
-	<title>Chrisóstomo's Homepage</title>
-	<meta name="description" content="">
-	<meta name="author" content="">
-
-   <!-- Mobile Specific Metas
-   ================================================== -->
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-
-	<!-- CSS
-    ================================================== -->
-   <link rel="stylesheet" href="css/default.css">
-	<link rel="stylesheet" href="css/layout.css">
-   <link rel="stylesheet" href="css/media-queries.css">
-   <link rel="stylesheet" href="css/magnific-popup.css">
-
-   <!-- Script
-   ================================================== -->
-	<script src="js/modernizr.js"></script>
-
-   <!-- Favicons
-	================================================== -->
-	<link rel="shortcut icon" href="favicon.png" >
-
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My Portfolio</title>
+	<link rel="shortcut icon" href="favicon.png" type="image/x-icon">
+	<link rel="icon" href="favicon.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,900" rel="stylesheet">
+    <link rel="stylesheet" href="libs/font-awesome/css/font-awesome.min.css">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/font-awesome/css/font-awesome.min.css">
 </head>
 
 <body>
+    <div id="mobile-menu-open" class="shadow-large">
+        <i class="fa fa-bars" aria-hidden="true"></i>
+    </div>
+    <!-- End #mobile-menu-toggle -->
+    <header>
+        <div id="mobile-menu-close">
+            <span>Close</span> <i class="fa fa-times" aria-hidden="true"></i>
+        </div>
+        <ul id="menu" class="shadow">
+            <li>
+                <a href="#about">About</a>
+            </li>
+            <li>
+                <a href="#experience">Experience</a>
+            </li>
+            <li>
+                <a href="#education">Education</a>
+            </li>
+            <li>
+                <a href="#projects">Projects</a>
+            </li>
+            <li>
+                <a href="#skills">Skills</a>
+            </li>
+        </ul>
+    </header>
+    <!-- End header -->
 
-   <!-- Header
-   ================================================== -->
-   <header id="home">
-
-      <nav id="nav-wrap">
-
-         <a class="mobile-btn" href="#nav-wrap" title="Show navigation">Show navigation</a>
-	      <a class="mobile-btn" href="#" title="Hide navigation">Hide navigation</a>
-
-         <ul id="nav" class="nav">
-            <li class="current"><a class="smoothscroll" href="#home">Home</a></li>
-            <li><a class="smoothscroll" href="#about">About</a></li>
-            <li><a class="smoothscroll" href="#resume">Resume</a></li>
-         </ul> <!-- end #nav -->
-
-      </nav> <!-- end #nav-wrap -->
-
-      <div class="row banner">
-         <div class="banner-text">
-            <img class="profile-pic"  src="images/joao.webp" alt="" />
-            <h1 class="responsive-headline">João Vitor Rafael Chrisóstomo</h1>
-            <h3>Electrical Engineer</h3>
-            <hr />
-            <ul class="social">
-               <li><a href="https://www.linkedin.com/in/jvrchrisostomo/"><i class="fa fa-linkedin"></i></a></li>
-               <li><a href="https://github.com/Artoriuz"><i class="fa fa-github"></i></a></li>
-            </ul>
-         </div>
-      </div>
-
-      <p class="scrolldown">
-         <a class="smoothscroll" href="#about"><i class="icon-down-circle"></i></a>
-      </p>
-
-   </header> <!-- Header End -->
-
-
-   <!-- About Section
-   ================================================== -->
-   <section id="about">
-
-         <div class="center">
-
-            <h2>About Me</h2>
-
+    <div id="lead">
+        <div id="lead-content">
+            <img class=profile-pic src="./images/profile.webp">
+            <h1>João Vitor Chrisóstomo</h1>
+            <h2>Electrical Engineer</h2>
             <p>
-               I'm an Electrical Engineer passionate about FPGAs, hardware design, embedded systems, fault-tolerant systems, domain-specific architectures, digital signal processing and high performance computing. I hold a 
-               BSEE from the Federal University of Rio Grande do Norte (UFRN) and I'm currently pursuing a MSEE at the State University of Campinas (UNICAMP). My BS final project was the implementation of a 5-stage pipeline 
-               RV32I RISC-V CPU Core written in VHDL for academic purposes. I did my internship at the National Institute for Space Research, working at the ARGOS-II Environmental Data Collector Cubesat payload. 
+                <a href="https://github.com/Artoriuz"><i class="fa fa-github"></i></a>
+                <a href="https://www.linkedin.com/in/jvrchrisostomo/"><i class="fa fa-linkedin"></i></a>
+                <a href="https://www.reddit.com/user/Artoriuz/"><i class="fa fa-reddit"></i></a>
+                <a href="https://twitter.com/JoaoChrisostomo"><i class="fa fa-twitter"></i></a>
             </p>
-            
-         </div>
+        </div>
 
-         <div class="center">
-            <h2>Blog Posts</h2>
+        <!-- End #lead-content -->
+
+        <div id="lead-overlay"></div>
+
+        <div id="lead-down">
+            <span>
+                <i class="fa fa-chevron-down" aria-hidden="true"></i>
+            </span>
+        </div>
+        <!-- End #lead-down -->
+    </div>
+    <!-- End #lead -->
+
+    <div id="about">
+        <div class="container">
+            <h2 class="heading">About Me</h2>
             <p>
-            <ul>
-               <li>
-                  <a href="./blog/open_hardware.html">Open hardware and RISC-V - A brief introduction</a>
-               </li>
-               <li>
-                  <a href="./blog/inpe_internship.html">Interning at the Brazilian National Institute for Space Research - The experience</a>
-               </li>
-               <li>
-                  <a href="./blog/keyframe_comparison.html">Keyframe encoding comparison - Numerically evaluating different popular video encoders on anime content</a>
-               </li>
-               <li>
-                  <a href="./blog/mpv_upscaling.html">Evaluating mpv's upscaling algorithms - A study of performance and quality</a>
-               </li>
-               <li>
-                  <a href="./blog/image_processing.html">Digital image processing - Some university assignments</a>
-               </li>
-            </ul>
-         </p>
-         </div>
+                I'm an Electrical Engineer passionate about FPGAs, hardware design, embedded systems, fault-tolerant systems, domain-specific architectures, digital signal processing and high performance computing. 
+                <br><br>I hold a BSEE from the Federal University of Rio Grande do Norte (UFRN) and I'm currently pursuing a MSEE at the State University of Campinas (UNICAMP). 
+                <br><br>My BS final project was the implementation of a 5-stage pipeline RV32I RISC-V CPU Core written in VHDL for academic purposes. 
+                <br><br>I did my internship at the National Institute for Space Research, working at the ARGOS-II Environmental Data Collector Cubesat payload. 
+            </p>
+        </div>
+    </div>
+    <!-- End #about -->
 
-   </section> <!-- About Section End-->
+    <div id="blog">
+        <div class="container">
+            <h2 class="heading">Blog Posts</h2>
+            <p>
+                <a href="./blog/open_hardware.html">Open hardware and RISC-V - A brief introduction</a><br>
+                <a href="./blog/inpe_internship.html">Interning at the Brazilian National Institute for Space Research - The experience</a><br>
+                <a href="./blog/keyframe_comparison.html">Keyframe encoding comparison - Numerically evaluating different popular video encoders on anime content</a><br>
+                <a href="./blog/mpv_upscaling.html">Evaluating mpv's upscaling algorithms - A study of performance and quality</a><br>
+                <a href="./blog/image_processing.html">Digital image processing - Some university assignments</a><br>
+            </p>
+        </div>
+    </div>
+    <!-- End #about -->
 
+    <div id="experience" class="background-alt">
+        <h2 class="heading">Experience</h2>
+        <div id="experience-timeline">
+            <div data-date="May 2019 – Dec 2019">
+                <h3>National Institute for Space Research</h3>
+                <h4>Research Intern</h4>
+                <p>
+                    Assigned primarily at developing and maintaining the testbench of a SBCDA (Brazilian Environmental Data Collection System) Cubesat compatible payload, including a hardware in the loop test-routine 
+                    and the required code to emulate an on-board-computer utilising an x86 Workstation running Matlab as a master, an Arduino Due as an I²C bridge and a Rohde&Schwarz SMBV100A Vector Signal Generator.
+                    <br><br>
+                    Secondary tasks varied from firmware development to brainstorming possible engineering solutions or improvements to the Environmental Data Collector as a whole, 
+                    which included changes to the dedicated decoding hardware in the Microsemi Smartfusion 2 FPGA, or to the communication protocols handled by the ARM Cortex-M3 based microcontroller subsystem running FreeRTOS.
+                    <br><br>
+                    Updating internal and external use documentation was also part of the daily routine, on top of sometimes interacting with external teams integrating our system alongside their on-board-computers.
+                 </p>
+            </div>
+        </div>
+    </div>
+    <!-- End #experience -->
 
-   <!-- Resume Section
-   ================================================== -->
-   <section id="resume">
+    <div id="education">
+        <h2 class="heading">Education</h2>
+        <div class="education-block">
+            <h3>State University of Campinas</h3>
+            <span class="education-date">Ongoing</span>
+            <h4>Master of Science in Electrical Engineering</h4>
+            <p>
+                I'm currently studying the possibilities of open-hardware and domain-specific architectures in IoT devices.
+            </p>
+        </div>
+        <!-- End .education-block -->
 
-      <!-- Education
-      ----------------------------------------------- -->
-      <div class="row education">
+        <div class="education-block">
+            <h3>Federal University of Rio Grande do Norte</h3>
+            <span class="education-date">Aug 2014 - Dec 2019</span>
+            <h4>Bachelor of Science in Electrical Engineering</h4>
+            <p>
+                Developed Maestro, a 5-stage pipeline in-order RV32I RISC-V core written entirely in VHDL for academic purposes. Intel Quartus Prime and ModelSim were utilised for synthesis and verification, 
+                and a Cyclone V FPGA was used for testing purposes. The core is part of my bachelor’s degree and can be found at <a href="https://riscv.org/risc-v-cores">https://riscv.org/risc-v-cores</a>.
+                <br><br>
+                Conducted a performance and picture quality evaluation of different upscaling algorithms supported by the popular video player mpv, which includes a wide variety of choices, 
+                from polynomial interpolation to convolutional neural networks based shaders. The study was conducted for a Digital Image Processing subject and can be found at 
+                <a href="https://artoriuz.github.io/mpv_upscaling.html">https://artoriuz.github.io/mpv_upscaling.html</a>.
+             </p>
+        </div>
+        <!-- End .education-block -->
+    </div>
+    <!-- End #education -->
 
-         <div class="three columns header-col">
-            <h1><span>Education</span></h1>
-         </div>
+    <div id="projects" class="background-alt">
+        <h2 class="heading">Projects</h2>
+        <div class="container">
+            <div class="row">
+                <div class="project shadow-large">
+                    <div class="project-image">
+                        <img src="images/maestro.png" height=300px width=300px />
+                    </div>
+                    <!-- End .project-image -->
+                    <div class="project-info">
+                        <h3>Maestro</h3>
+                        <p>
+                            Maestro is a 5 stage pipeline implementation of the RV32I ISA strongly inspired by <a href="https://www.amazon.com/dp/0128122757">David Patterson's and John Hennessy's Computer Organization and Design RISC-V Edition.</a><br><br> 
+                            The project is entirely academic, it's written in VHDL in a beginner-friendly way so computer architecture students can also learn about hardware design.<br><br>
+                            The core is very good at demonstrating how to build simple workarounds for problems encountered within pipelined in-order CPU cores such as hazards and stalls. 
+                        </p>
+                        <a href="https://github.com/Artoriuz/maestro">View Project</a>
+                    </div>
+                    <!-- End .project-info -->
+                </div>
+                <!-- End .project -->
 
-         <div class="nine columns main-col">
+                <div class="project shadow-large">
+                    <div class="project-image">
+                        <img src="images/testbench.jpg" height=300px width=300px />
+                    </div>
+                    <!-- End .project-image -->
+                    <div class="project-info">
+                        <h3>EDC testbench</h3>
+                        <p>
+                            The environmental data collector is a Cubsat-compatible payload capable of decoding up to 12 <a href="https://www.argos-system.org/">ARGOS-2</a> PTT signals.<br><br>
+                            During my internship I was in charge of developing a way of simulating the system to catch bugs and evaluate its performance. The testbench was composed of a hardware in the loop test-routine 
+                            and the required code to emulate an on-board-computer utilising an x86 Workstation running Matlab as a master, an Arduino Due as an I²C bridge and a Rohde&Schwarz SMBV100A Vector Signal Generator.
+                        </p>
+                    </div>
+                    <!-- End .project-info -->
+                </div>
+                <!-- End .project -->
 
-            <div class="row item">
+                <div class="project shadow-large">
+                    <div class="project-image">
+                        <img src="images/upscaling.jpg" height=300px width=300px />
+                    </div>
+                    <!-- End .project-image -->
+                    <div class="project-info">
+                        <h3>Upscaling Evaluation</h3>
+                        <p>
+                            Conducted a performance and picture quality evaluation of different upscaling algorithms supported
+                            by the popular video player mpv, which includes a wide variety of choices, from polynomial interpolation to convolutional
+                            neural-network based shaders and measurements such as SSIM and PSNR.
+                        </p>
+                        <a href="https://artoriuz.github.io/blog/mpv_upscaling.html">View Project</a>
+                    </div>
+                    <!-- End .project-info -->
+                </div>
+                <!-- End .project -->
 
-               <div class="twelve columns">
+                <div class="project shadow-large">
+                    <div class="project-image">
+                        <img src="images/camera.png" height=300px width=300px />
+                    </div>
+                    <!-- End .project-image -->
+                    <div class="project-info">
+                        <h3>Motus Camera</h3>
+                        <p>
+                            Motus Camera is a movement detection surveillance program written in C++ using OpenCV.<br><br>
+                            Upon movement detection, the recording is then written to disk encoded into an AVC clip until the scene becomes still.
+                        </p>
+                        <a href="https://github.com/Artoriuz/motus-camera">View Project</a>
+                    </div>
+                    <!-- End .project-info -->
+                </div>
+                <!-- End .project -->
 
-                  <h3>State University of Campinas</h3>
-                  <p class="info">Master's Degree in Electrical Engineering <span>&bull;</span> <em class="date">Ongoing</em></p>
+                <div class="project shadow-large">
+                    <div class="project-image">
+                        <img src="images/maglock.jpg" height=300px width=300px />
+                    </div>
+                    <!-- End .project-image -->
+                    <div class="project-info">
+                        <h3>PIC Maglock</h3>
+                        <p>
+                            Magnetic lock prototype controlled by a PIC16 with a numpad made of push buttons and code wittren in ASM.
+                        </p>
+                        <a href="https://github.com/Artoriuz/PIC-ASM-Maglock">View Project</a>
+                    </div>
+                    <!-- End .project-info -->
+                </div>
+                <!-- End .project -->
 
-                  <p>
-                  I'm currently studying the possibilities of open-hardware and domain-specific architectures in IoT devices.
-                  </p>
-
-               </div>
-
-            </div> <!-- item end -->
-
-            <div class="row item">
-
-               <div class="twelve columns">
-
-                  <h3>Federal University of Rio Grande do Norte</h3>
-                  <p class="info">Bachelor's Degree in Electrical Engineering <span>&bull;</span> <em class="date">Dec 2019</em></p>
-
-                  <p>
-                     Developed Maestro, a 5-stage pipeline in-order RV32I RISC-V core written entirely in VHDL for academic purposes. Intel Quartus Prime and ModelSim were utilised for synthesis and verification, 
-                     and a Cyclone V FPGA was used for testing purposes. The core is part of my bachelor’s degree and can be found at <a href="https://riscv.org/risc-v-cores">https://riscv.org/risc-v-cores</a>.
-                     <br><br>
-                     Conducted a performance and picture quality evaluation of different upscaling algorithms supported by the popular video player mpv, which includes a wide variety of choices, 
-                     from polynomial interpolation to convolutional neural networks based shaders. The study was conducted for a Digital Image Processing subject and can be found at 
-                     <a href="https://artoriuz.github.io/mpv_upscaling.html">https://artoriuz.github.io/mpv_upscaling.html</a>.
-                  </p>
-
-               </div>
-
-            </div> <!-- item end -->
-
-         </div> <!-- main-col end -->
-
-      </div> <!-- End Education -->
-
-
-      <!-- Work
-      ----------------------------------------------- -->
-      <div class="row work">
-
-         <div class="three columns header-col">
-            <h1><span>Work</span></h1>
-         </div>
-
-         <div class="nine columns main-col">
-
-            <div class="row item">
-
-               <div class="twelve columns">
-
-                  <h3>National Institute for Space Research</h3>
-                  <p class="info">Research Intern <span>&bull;</span> <em class="date">March 2010 - Present</em></p>
-
-                  <p>
-                     Assigned primarily at developing and maintaining the testbench of a SBCDA (Brazilian Environmental Data Collection System) Cubesat compatible payload, including a hardware in the loop test-routine 
-                     and the required code to emulate an on-board-computer utilising an x86 Workstation running Matlab as a master, an Arduino Due as an I²C bridge and a Rohde&Schwarz SMBV100A Vector Signal Generator.
-                     <br><br>
-                     Secondary tasks varied from firmware development to brainstorming possible engineering solutions or improvements to the Environmental Data Collector as a whole, 
-                     which included changes to the dedicated decoding hardware in the Microsemi Smartfusion 2 FPGA, or to the communication protocols handled by the ARM Cortex-M3 based microcontroller subsystem running FreeRTOS.
-                     <br><br>
-                     Updating internal and external use documentation was also part of the daily routine, on top of sometimes interacting with external teams integrating our system alongside their on-board-computers.
-                  </p>
-
-               </div>
-
-            </div> <!-- item end -->
-        
-         </div> <!-- main-col end -->
-
-      </div> <!-- End Education -->
-
-   <!-- Testimonials Section
-   ================================================== -->
-   <section id="testimonials">
-
-      <div class="text-container">
-
-         <div class="row">
-
-            <div class="two columns header-col">
-
-               <h1><span>Quotes</span></h1>
+                <div class="project shadow-large">
+                    <div class="project-image">
+                        <img src="images/de2.jpg" height=300px width=300px />
+                    </div>
+                    <!-- End .project-image -->
+                    <div class="project-info">
+                        <h3>NIOS II Fast Fingers</h3>
+                        <p>
+                            Memory game implemented using Qsys, NIOS II soft core and a Cyclone II FPGA.
+                        </p>
+                        <a href="https://github.com/Artoriuz/Altera-Platform-Fast-Fingers">View Project</a>
+                    </div>
+                    <!-- End .project-info -->
+                </div>
+                <!-- End .project -->
 
             </div>
+        </div>
+    </div>
+    <!-- End #projects -->
 
-            <div class="ten columns flex-container">
+    <div id="skills">
+        <h2 class="heading">Skills</h2>
+        <ul>
+            <li>VHDL</li>
+            <li>SystemVerilog</li>
+            <li>FPGA</li>
+            <li>RISC-V</li>
+            <li>ARM/Thumb</li>
+            <li>PIC</li>
+            <li>Microcontrollers</li>
+            <li>C</li>
+            <li>C++</li>
+            <li>OpenCV</li>
+            <li>Matlab</li>
+            <li>Linux</li>
+            <li>FreeBSD</li>
+            <li>FreeRTOS</li>
+            <li>Internet of Things</li>
+            <li>Computer Architecture</li>
+            <li>Digital Signal Processing</li>
+            <li>Embedded Systems</li>
+            <li>Firmware Development</li>
+        </ul>
+    </div>
+    <!-- End #skills -->
 
-               <div class="flexslider">
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-5 copyright">
+                    <p>
+                        Copyright &copy; 2020 João Vitor Rafael Chrisóstomo
+                    </p>
+                </div>
+                <div class="col-sm-2 top">
+                    <span id="to-top">
+                        <i class="fa fa-chevron-up" aria-hidden="true"></i>
+                    </span>
+                </div>
+                <div class="col-sm-5 social">
+                    <ul>
+                        <li>
+                            <a href="https://github.com/Artoriuz" target="_blank"><i class="fa fa-github" aria-hidden="true"></i></a>
+                        </li>
+                        <li>
+                            <a href="https://www.linkedin.com/in/jvrchrisostomo/" target="_blank"><i class="fa fa-linkedin" aria-hidden="true"></i></a>
+                        </li>
+                        <li>
+                            <a href="https://www.reddit.com/user/Artoriuz/" target="_blank"><i class="fa fa-reddit" aria-hidden="true"></i></a>
+                        </li>
+                        <li>
+                            <a href="https://twitter.com/JoaoChrisostomo" target="_blank"><i class="fa fa-twitter" aria-hidden="true"></i></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- End footer -->
 
-                  <ul class="slides">
-
-                     <li>
-                        <blockquote>
-                           <p>If I have seen further than others, it is by standing upon the shoulders of giants.
-                           </p>
-                           <cite>Isaac Newton</cite>
-                        </blockquote>
-                     </li> <!-- slide ends -->
-
-                     <li>
-                        <blockquote>
-                           <p>Intelligence is the ability to avoid doing work, yet getting the work done.
-                           </p>
-                           <cite>Linus Torvalds</cite>
-                        </blockquote>
-                     </li> <!-- slide ends -->
-
-                     <li>
-                        <blockquote>
-                           <p>Design is not just what it looks like and feels like. Design is how it works.
-                           </p>
-                           <cite>Steve Jobs</cite>
-                        </blockquote>
-                     </li> <!-- slide ends -->
-
-                     <li>
-                        <blockquote>
-                           <p>It's fine to celebrate success but it is more important to heed the lessons of failure.
-                           </p>
-                           <cite>Bill Gates</cite>
-                        </blockquote>
-                     </li> <!-- slide ends -->
-
-                     <li>
-                        <blockquote>
-                           <p>Primary causes are unknown to us, but are subject to simple and constant laws, which may be discovered by observation, the study of them being the object of natural philosophy.
-                           </p>
-                           <cite>Joseph Fourier</cite>
-                        </blockquote>
-                     </li> <!-- slide ends -->
-
-                     <li>
-                        <blockquote>
-                           <p>The important thing is not to stop questioning. Curiosity has its own reason for existing.
-                           </p>
-                           <cite>Albert Einstein</cite>
-                        </blockquote>
-                     </li> <!-- slide ends -->
-
-                  </ul>
-
-               </div> <!-- div.flexslider ends -->
-
-            </div> <!-- div.flex-container ends -->
-
-         </div> <!-- row ends -->
-
-       </div>  <!-- text-container ends -->
-
-   </section> <!-- Testimonials Section End-->
-
-   <!-- footer
-   ================================================== -->
-   <footer>
-
-      <div class="row">
-
-         <div class="twelve columns">
-
-            <ul class="social-links">
-               <li><a href="https://www.linkedin.com/in/jvrchrisostomo/"><i class="fa fa-linkedin"></i></a></li>
-               <li><a href="https://github.com/Artoriuz"><i class="fa fa-github"></i></a></li>
-            </ul>
-
-            <ul class="copyright">
-               <li>&copy; Copyright 2014 CeeVee</li>
-               <li>Design by <a title="Styleshout" href="http://www.styleshout.com/">Styleshout</a></li>   
-            </ul>
-
-         </div>
-
-         <div id="go-top"><a class="smoothscroll" title="Back to Top" href="#home"><i class="icon-up-open"></i></a></div>
-
-      </div>
-
-   </footer> <!-- Footer End-->
-
-   <!-- Java Script
-   ================================================== -->
-   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-   <script>window.jQuery || document.write('<script src="js/jquery-1.10.2.min.js"><\/script>')</script>
-   <script type="text/javascript" src="js/jquery-migrate-1.2.1.min.js"></script>
-
-   <script src="js/jquery.flexslider.js"></script>
-   <script src="js/waypoints.js"></script>
-   <script src="js/jquery.fittext.js"></script>
-   <script src="js/magnific-popup.js"></script>
-   <script src="js/init.js"></script>
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="js/scripts.min.js"></script>
 </body>
 
 </html>
