@@ -431,8 +431,8 @@ footer {
     color: #fff;
 }
 
-#bloga:visited {
-    color: #fff;
+#blog a:visited {
+    color: #db34db;
 }
 
 #blog a:focus {
