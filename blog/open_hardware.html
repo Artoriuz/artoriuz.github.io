@@ -49,6 +49,12 @@
         <p>
             As a result, nearly everything these days relies on electronics in a way or another, and with IoT on the rise, we often see embedded systems in unexpected places such as fridges and ovens.
         </p>
+        
+        <p>
+            Simplifying things, processors work retrieving some data from memory, executing operations on said data and then saving it back in memory. The operations the processors must do are encoded in what we call instructions. 
+            Processors are split into 2 parts, a control unit and its datapath. The control unit is responsible for generating the proper control signals that dictate the path the data will take within the datapath, which is made of 
+            logic units like registers, multiplexers and ALUs. Complex CPU cores nowadays execute code in an out-of-order fashion, which means threads are broken into smaller independent pieces that get speculatively executed in parallel. 
+        </p>
         <p>
             Naturally, multiple studies are being conducted in order to increase performance, decrease price, make the nodes even smaller, etc. We’ve been seeing companies 
             constantly talking about EUV, 3D stacking and nanowires, but it’s clear that making better nodes has been getting exponentially harder and gains have to be gotten from other sources.
@@ -56,7 +62,7 @@
         <p>
             AMD’s Infinity Fabric is an excellent example of clever innovation, monolithic multi-core CPUs can get pretty large nowadays 
             (check the newest Xeons die size or IBM’s POWER9), and the SoCs also have to integrate multiple IPs such as memory controllers, A/V encoders and decoders, I/O controllers, 
-            GPUs, NGUs, Camera related circuitry, modems, etc.
+            GPUs, NGUs, Camera related circuitry, modems, etc. Those are called accelerators and they offload tasks from the general purpose CPU cores.
         </p>
         <p>
             The thing is, not every single IP within a modern SoC actually needs the absolute best node, and splitting it into several smaller dies may also significantly improve yields. 
@@ -69,8 +75,7 @@
         <br>
         <img src="./images/open_hardware/naples_vs_rome.png" alt="naples vs rome" class="center" width="600" height="208">
         <p>
-            Well, parallel computing created an opportunity for CPU designers to keep improving their products, but CPUs are general purpose computing units and any given task has to be broken into smaller instructions. 
-            Those operations called instructions are then executed through a pipeline, commanding logical elements such as muxes and ALUs. 
+            Any complex algorithm being executed in a CPU must first be broken into smaller, and simple, instructions. That's what your compiler does and it allows the same general purpose CPU to execute basically anything.
         </p>
         <p>
             General purpose computing is usually great because you can reuse the same processor for an infinite number of processing needs, however, 
@@ -86,7 +91,7 @@
         <img src="./images/open_hardware/summit_node.png" alt="Summit node" class="center" width="500" height="281">
         <center>Source: Wikichip</center>
         <p>
-            CPUs themselves nowadays come with specialised hardware for certain operations, which is the case with AVX instructions for x86 or NEON for ARM. 
+            CPUs themselves nowadays come with specialised hardware for certain operations, which is the case with SSE/AVX instructions for x86 or SVE/NEON for ARM. 
             Vector instructions are nothing more than a way to use SIMD operations, extremely useful for concurrent matrix multiplications or anything with a large number of simple mathematical operations, really.
         </p>
         <img src="./images/open_hardware/ARM_SIMD_vs_C.png" alt="NEON vs C" class="center" width="600" height="392">
