@@ -80,6 +80,16 @@
             The ISA aims to be the Linux of hardware and I highly recommend reading my blog post on open-hardware.
         </p>
         <p>
+            <img src="./images/building_a_cpu/riscv-logo-1.png" alt="RISC-V Logo" class="center" width="600" height="120">
+        </p>
+        <p>
+            Before continuing, I'd like to make it clear that RISC-V is not only relevant because it's royalty-free, the ISA itself is actually very competitive and the resulting code after the compilation process 
+            is usually not larger than x86 or ARM equivalents. The following image depicts what I'm talking about on SPEC, please check the <a href="https://youtu.be/Ii_pEXKKYUg">entire presentation from Christopher Celio.</a>
+        </p>
+        <p>
+            <img src="./images/building_a_cpu/isa-shootout.png" alt="RISC-V vs x86 and ARM" class="center" width="600" height="400">
+        </p>
+        <p>
             Without further ado, I’ll briefly introduce the RISC-V ISA so we can understand what we’ll be implementing in the next sections. 
         </p>
         <p>
@@ -93,7 +103,7 @@
             the naming scheme, so instead of having RV64IMAFDC with all extensions explicitly stated, we have RV64GC, G means general purpose and shortens IMAFD. 
         </p>
         <p>
-            The list of extensions is always changing and I recommend checking the most recent PDF at https://riscv.org/specifications/isa-spec-pdf/.
+            The list of extensions is always changing and I recommend checking the <a href="https://riscv.org/specifications/isa-spec-pdf/">most recent ISA manual PDF</a>.
         </p>
         <p>
             Instructions are grouped into encoding schemes by the kind of operation they perform, and the least significant bits tell the encoder how long the 
@@ -509,6 +519,13 @@ std_logic_vector(unsigned(PC_output) + 4), JTU_output, PC_next_address, PC_outpu
         <p>
             An interesting thing to note here is that we're actually seeing data forwarding in action here, x1 and x2 are repeated several times before the results are actually written back to the register file, 
             but there's no problem whatsoever. The Flushing Unit will redirect previous results into the EX stage so the calculations actually have the correct arguments.
+        </p>
+        <p>
+            If you've reached this far I'd like to say I really appreciate it. Computer architecture and digital electronics are both vast fields, I wouldn't be able to write this introduction without the help of giants who have 
+            been studying these topics for decades. I highly recommend getting copies of <a href="https://www.amazon.com/Computer-Organization-Design-RISC-V-Architecture/dp/0128122757">Computer Organization and Design RISC-V Edition: The Hardware Software Interface</a> 
+            by David Patterson and John Hennessy and <a href="">Digital Design with RTL Design, VHDL, and Verilog</a> by Frank Vahid. They're both excellent textbooks, but since those areas walk 
+            together there are also textbooks that cover both things like 
+            <a href="https://www.amazon.com/Digital-Design-Computer-Architecture-Harris/dp/0123944244">Digital Design and Computer Architecture</a> by David Harris and Sarah Harris.
         </p>
         <br>
         <br>
