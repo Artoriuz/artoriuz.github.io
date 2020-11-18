@@ -57,7 +57,7 @@
             <ol>
                 <li>Every image was encoded at every format at the respective filesizes: 30KB, 75KB, 160KB, 250KB, 360KB, 550KB, 950KB.</li>
                 <li>Every encoder was configured with their respective "highest quality" preset, which means "-deadline best" for libvpx and "-preset placebo" for x264/x265.</li>
-                <li>Every encode was yuv444p, and contained in a MKV to simplify comparisons.</li>
+                <li>Every encode was 8 bit yuv444p, and contained in a MKV to simplify comparisons.</li>
                 <li>PSNR, SSIM and PSNR-HVS-M measurements were done against the source PNGs by simply transcoding the encodes into PNGs (lossless).</li>
               </ol>                
         </p>
