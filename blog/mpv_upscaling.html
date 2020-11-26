@@ -297,11 +297,12 @@
         <h3 id="fractional">Fractional Luma Upscaling</h3>
         <p>
             Taking into consideration anime productions are still done at arbitrary resolutions between 1280x720 and 1920x1080 (with most below 1600x900) and that most users are still watching them on FHD 1920x1080 displays, the most common scenario 
-            when there's any luma upscaling (or rgb upscaling if you want to nitpick about it, since mpv merges luma and chroma right after doubling chroma) being performed by the player is arguably 720p->1080p, which corresponds to a 1.5x scaling factor. With the recent addition of ravu-zoom to our ever growing arsenal of user shaders, and the need to 
-            find out which dscales work better alongside the double-only prescalers, adding a new series of measurements seem reasonable.    
+            when there's any luma upscaling (or rgb upscaling if you want to nitpick about it, since mpv merges luma and chroma right after doubling chroma) being performed by the player is arguably 720p->1080p, which corresponds to a 1.5x scaling factor. 
+            With the recent addition of ravu-zoom to our ever growing arsenal of user shaders, and the need to find out which dscales work better alongside the double-only prescalers, adding a new series of measurements seem reasonable.    
         </p>
         <p>
-            The methodology is straightforward, Violet was downscaled to 1280x720 using catmull_rom and then brought back up to 1920x1080.
+            The methodology is straightforward, Violet was downscaled to 1280x720 using --dscale=catmull_rom --correct-downscaling --linear-downscaling, and then brought back up to 1920x1080. For the doublers, the following downscale was also 
+            performed with --correct-downscaling and --linear-downscaling. SSimDownscaler is the only exception, as igv states the shader is tuned to be used with --dscale=mitchell and --linear-downscaling=no.
         </p>
         <p>
             <div class="row">
