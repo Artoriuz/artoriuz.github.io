@@ -44,76 +44,6 @@
         <p>
             Before attempting to reproduce, make sure to grab the latest version of <a href="https://mpv.io/">mpv</a> and updated user shaders. You can get 
             the shaders from <a href="https://github.com/bjin/mpv-prescalers">bjin</a> and <a href="https://github.com/igv/FSRCNN-TensorFlow/releases">igv (FSRCNNX)</a>/<a href="https://gist.github.com/igv">igv (SSSR)</a>.
-        <p>
-            UPDATE - 11/05/2019: KrigBilateral updated. 
-        </p>
-        <p>
-            UPDATE - 22/04/2019: FSRCNNX updated, removing the downscaling section for now since people aren't exactly going out of their ways to fix shitty upscales and there's already some information about it on the fractional tables.
-        </p>
-        <p>
-            UPDATE - 21/04/2019: Preliminar fractional upscaling evaluatons added, focusing on the most relevant algorithms first.
-        </p>
-        <p>
-            UPDATE - 18/04/2019: Ravu-zoom-r4 added, r2 and r3 were updated. 
-        </p>
-        <p>
-            UPDATE - 17/04/2019: PSNR-HA/HMA measurements are now done with wstep = 7 as recommended by igv.
-        </p>
-        <p>
-            UPDATE - 16/04/2019: New FPS measurement methodology, files now play for 4 seconds and then I calculate how many frames were displayed based on which frame it stopped at after the time-frame has elapsed. 
-            --scalers-resizes-only was also removed since the half pixel shift is not noticeable during playback. Previous results had different numbers, but the order didn't exactly significantly change. 
-        </p>
-        <p>
-            UPDATE - 06/04/2019: Tables updated with newer versions of FSRCNNX again. 
-        </p>
-        <p>
-            UPDATE - 31/03/2019: MS-SSIM tables were removed. All remaining luma related tables were updated. New methodology consists of basically utilising a full-range greyscale PNG as input (which results in lower quantisation errors 
-            when compared to using limited range YCbCr). Ravu-zoom was added, FSRCNNX_x2_16-0-4-1 and Ravu-lite were updated. 
-        </p>
-        <p>
-            UPDATE - 27/03/2019: Updated PSNR-HA/HMA, you can expect to see ravu-ar and ravu-zoom soon. PSNR-HVS-M was removed since it's deprecated by the insertion of PSNR-HA.
-        </p>
-        <p>
-            UPDATE - 15/03/2019: New versions of FSRCNNX. 
-        </p>
-        </p>
-
-            UPDATE - 08/03/2019: Adding another test image for chroma, and changed all chroma tests to upscale from a yuv4mpegpipe y4m file which makes me more confident they're accurate.
-        </p>
-        <p>
-            UPDATE - 07/03/2019: Adding Ravu-lite and fixing NGU-AA's half pixel shift. Huge thanks for Bjin for providing a user-shader to accomplish the latter =). FPS chart should be updated soon.
-        </p>
-        <p>
-            UPDATE - 03/03/2019: Ravu-chroma and Ewa_Robidoux/Ewa_Robidouxsharp added. 
-        </p>
-        <p>
-            UPDATE - 27/02/2019: PSNR-HMA and PSNR-HA tables added. 
-        </p>
-        <p>
-            UPDATE - 25/02/2019: Initial version of the Chroma section is added. I'll take some time to slowly polish it with more information and different tests, and I'm also probably going to add PSNR-HMA to the RGB tests soon.
-        </p>
-        </p>
-            UPDATE - 20/02/2019: IW-SSIM tables added.
-        <p>
-            UPDATE - 19/02/2019: MS-SSIM tables fixed, code had issues with RGB -> greyscale conversion. 
-        </p>
-        <p>
-            UPDATE - 18/02/2019: Lanczos added, and tables now display results from best to worst.
-        </p>
-        <p>
-            UPDATE - 16/02/2019: Other EWA scalers were added.
-        </p>
-        <p>
-            UPDATE - 22/12/2018: I found out a mistake in previous results, and have once again updated all quality comparison results.
-            <br>
-            I'm not certain about what was causing the problems, but turning off PNG filtering and debanding seems to have fixed it. I'll investigate which of the two was the culprit once I have the time. 
-            <br>
-            Well, since I had to redo everything, I took this opportunity to improve the testing methodology, debanding was turned off to prevent loss of detail, and I used a lossless 
-            YUV444p AVC encode as upscaling source instead of a YUV444p JPEG.  
-        </p>
-        <p>
-            UPDATE - 18/12/2018: Results have been updated with latest versions of FSRCNNX and Waifu2x. On top of that, I've included MS-SSIM and PSNR-HVS-M measurements. 
-            I've also included all NGU algorithms from <a href="http://madvr.com/">MadVR</a> since people are interested in them.
         </p>
         <p>
             If all you want is to look at the results, <a href=#results>follow this link.</a> 
@@ -520,6 +450,80 @@
         <p>
             My personal recommendation is that you should test it yourself to see if you can notice KrigBilateral's difference during playback, and use it if it doesn't really matter resource-wise (in the case your GPU is fine either way). Another sensible decision would be to 
             use it when you don't need luma upscaling, since then the only gains you can make are in chroma. 
+        </p>
+        <h3 id="changelog">Changelog</h3>
+        <p>
+            <p>
+                11/05/2019: KrigBilateral updated. 
+            </p>
+            <p>
+                22/04/2019: FSRCNNX updated, removing the downscaling section for now since people aren't exactly going out of their ways to fix shitty upscales and there's already some information about it on the fractional tables.
+            </p>
+            <p>
+                21/04/2019: Preliminar fractional upscaling evaluatons added, focusing on the most relevant algorithms first.
+            </p>
+            <p>
+                18/04/2019: Ravu-zoom-r4 added, r2 and r3 were updated. 
+            </p>
+            <p>
+                17/04/2019: PSNR-HA/HMA measurements are now done with wstep = 7 as recommended by igv.
+            </p>
+            <p>
+                16/04/2019: New FPS measurement methodology, files now play for 4 seconds and then I calculate how many frames were displayed based on which frame it stopped at after the time-frame has elapsed. 
+                --scalers-resizes-only was also removed since the half pixel shift is not noticeable during playback. Previous results had different numbers, but the order didn't exactly significantly change. 
+            </p>
+            <p>
+                06/04/2019: Tables updated with newer versions of FSRCNNX again. 
+            </p>
+            <p>
+                31/03/2019: MS-SSIM tables were removed. All remaining luma related tables were updated. New methodology consists of basically utilising a full-range greyscale PNG as input (which results in lower quantisation errors 
+                when compared to using limited range YCbCr). Ravu-zoom was added, FSRCNNX_x2_16-0-4-1 and Ravu-lite were updated. 
+            </p>
+            <p>
+                27/03/2019: Updated PSNR-HA/HMA, you can expect to see ravu-ar and ravu-zoom soon. PSNR-HVS-M was removed since it's deprecated by the insertion of PSNR-HA.
+            </p>
+            <p>
+                15/03/2019: New versions of FSRCNNX. 
+            </p>
+            </p>
+    
+                08/03/2019: Adding another test image for chroma, and changed all chroma tests to upscale from a yuv4mpegpipe y4m file which makes me more confident they're accurate.
+            </p>
+            <p>
+                07/03/2019: Adding Ravu-lite and fixing NGU-AA's half pixel shift. Huge thanks for Bjin for providing a user-shader to accomplish the latter =). FPS chart should be updated soon.
+            </p>
+            <p>
+                03/03/2019: Ravu-chroma and Ewa_Robidoux/Ewa_Robidouxsharp added. 
+            </p>
+            <p>
+                27/02/2019: PSNR-HMA and PSNR-HA tables added. 
+            </p>
+            <p>
+                25/02/2019: Initial version of the Chroma section is added. I'll take some time to slowly polish it with more information and different tests, and I'm also probably going to add PSNR-HMA to the RGB tests soon.
+            </p>
+            </p>
+                20/02/2019: IW-SSIM tables added.
+            <p>
+                19/02/2019: MS-SSIM tables fixed, code had issues with RGB -> greyscale conversion. 
+            </p>
+            <p>
+                18/02/2019: Lanczos added, and tables now display results from best to worst.
+            </p>
+            <p>
+                16/02/2019: Other EWA scalers were added.
+            </p>
+            <p>
+                22/12/2018: I found out a mistake in previous results, and have once again updated all quality comparison results.
+                <br>
+                I'm not certain about what was causing the problems, but turning off PNG filtering and debanding seems to have fixed it. I'll investigate which of the two was the culprit once I have the time. 
+                <br>
+                Well, since I had to redo everything, I took this opportunity to improve the testing methodology, debanding was turned off to prevent loss of detail, and I used a lossless 
+                YUV444p AVC encode as upscaling source instead of a YUV444p JPEG.  
+            </p>
+            <p>
+                18/12/2018: Results have been updated with latest versions of FSRCNNX and Waifu2x. On top of that, I've included MS-SSIM and PSNR-HVS-M measurements. 
+                I've also included all NGU algorithms from <a href="http://madvr.com/">MadVR</a> since people are interested in them.
+            </p>
         </p>
     </section>
     
