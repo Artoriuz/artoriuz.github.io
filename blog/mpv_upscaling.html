@@ -403,7 +403,7 @@
             I chose to use Catmull Rom for all my downscales up to this point, and some of you might be asking yourselves why. Well, Catmull Rom is the sharpest BC-Spline that satisfies the B + 2C = 1 recommendation by 
             Don P. Mitchell and Arun N. Netravali. It is sometimes used in the industry and for a good reason, on top of being reasonably sharp it does not introduce many artifactd at all and the ringing is very tame when compared to 
             sharper filters like Lanczos. This, however, is just my own personal preference. It's nothing more than a subjective approach to the problem. Mitchell does produce even less artifacts but the end result is noticeably blurrier. 
-            <a href="https://stackoverflow.com/a/6171860">This Stackoverflow answer from 2008</a> indicates some sort os survey was conducted within Hollywood and they ended up choosing windowed sincs for downscaling and Mitchell for upscaling.
+            <a href="https://stackoverflow.com/a/6171860">This Stackoverflow answer from 2008</a> indicates some sort of survey was conducted within Hollywood and they ended up choosing windowed sincs for downscaling and Mitchell for upscaling.
         </p>
         <p>
             What can we do then? Well, no reference image quality metrics do exist. MATLAB comes with 3 of those metrics out of the box, <a href="https://www.mathworks.com/help/images/ref/brisque.html">BRISQUE (Blind/Referenceless Image Spatial Quality Evaluator)</a>, 
