@@ -50,34 +50,41 @@
         </p>
         <h3 id="upscaling">What is upscaling?</h3>
         <p>
-            Like its name implies, upscaling is simply increasing the scale of something. More specifically, taking discrete information
-            in a given scale and finding values between the existing samples. The easiest and most classic way of doing this
-            is through simple linear interpolation, if you want to find a value between two points you can simply draw a
+            Like its name implies, upscaling is simply the act of increasing the scale of something. In the digital signal processing case, 
+            taking discrete information in a given scale and calculating points between the existing samples. 
+            The easiest and most classic way of doing this is through simple linear interpolation, if you want to find a value between two points you can simply draw a
             line between them and linearly find any value in this line. If you wanted to find the value that's placed exactly
             in the middle of those 2 discrete points, you could simply do an arithmetic mean with their values to find your
             answer.
         </p>
         <p>
             Linear interpolation can be done in a plane, through both axis, creating what we call "bilinear" interpolation. Bilinear
-            interpolation is the simplest interpolation algorithm, easiest to calculate and also unironically the most used
-            one in the industry due to the fact that it's extremely simple to implement.
+            interpolation is the simplest interpolation algorithm, easiest to calculate and unironically the most widespread one due to the fact that it's extremely simple to implement.
         </p>
         <p>
             But can something as simple as just drawing a line between 2 known discrete points give us good results? It depends entirely
-            on how the original information looked like. We can however, increase the complexity of our upscaling algorithm
-            by increase the amount of information it takes into consideration in order to find values between our discrete
-            points. In this page we'll evaluate what we can do differently, how much better our results can get and how it
+            on how the original information looked like. We can, however, increase the complexity of our upscaling algorithm increasing the amount of information it takes into consideration 
+            to find values between the original discrete points. In this page we'll evaluate what we can do differently, how much better our results can get and how it
             affects our performance.
         </p>
         <h3 id="polynomial">Polynomial interpolation</h3>
         <p>
             <img src="./images/mpv_upscaling/interpolation.png" alt="upscaling" class="center">
             <br>
-            A relatively simple way of taking more information into consideration when finding values between discrete points is to use
-            more than just the information of 2 points to calculate a function that connects them. We can trace a polynomial
-            curve between points if we take into account the information of neighbouring elements, calculating the gradients
-            and therefore becoming able to connect them with curves instead of lines. The shape of the curve connecting points
-            depends on the windowing and scaling functions used.
+            A relatively simple way of taking more information into consideration is fitting a curve into more than 2 discrete points. If we connect 2 points directly and only have their values 
+            to work with our end result is always going to be a straight line connecting both, but if we can also look at the other neighbouring elements we might be able to fit actual curves and 
+            therefore calculate the in-between points more accuraterly. This is implemented through convolution, using a specific kernel that represents a corresponding filter. 
+        </p>
+        <p>
+            The math behind this comes from digital signal processing, to perfectly recover the analogue counterpart of a digitised signal you need an ideal low-pass filter of gain Ts and cutoff frequency between 
+            the Nyquist frequency and the Sampling frequency. An ideal low pass filter looks like a literal rectangle in the frequency domain, which translates into a sinc in the time domain. Multiplying signals 
+            in the time domain is equivalent to convoluting them through time, and we usually choose to use convolutions because they're faster than calculating the Digital Fourier Transform of the signal.
+        </p>
+        <p>
+            With that in mind, when it comes to images we don't have a "time" axis, but rather simply x and y. Everything else works the same though, but since the "ideal" reconstruction filter would require us to 
+            perform a convolution using an infinite sinc (means taking into consideration every single point in the image and others that don't even exist), several approximations and windows have been proposed. A window 
+            is nothing more than a way of limiting how big the kernel is, and since the kernel itself can't be a perfect infinite sinc tweaks have to be made in order to achieve good results. The Lanczos filter is a popular 
+            approxiation of the sinc function. The Lanczos filter is simply the sinc function windowed by the central lobe of a larger sinc function.
         </p>
         <h3 id="SSSR">Structural Similarity Upscaling</h3>
         <img src="./images/mpv_upscaling/sssr_bilinear.png" alt="upscaling" class="center">
@@ -92,7 +99,7 @@
         <h3 id="machine">Machine Learning</h3>
         <p>
             Machine learning comes as a powerful successor to classical methods due to the fact that you do not need to rely solely on what you can currently retrieve 
-            from the image, but also on a set of trained parameters generated from analysing multiple images and coming up with an upscaling model.
+            from the image, but also on a set of trained parameters generated from analysing multiple images and "learning" what it should do to go from "low resolution" to "high resolution".
         </p>
         <p>
             There are multiple different machine learning based image upscalers, we'll stick to those that are easily testable as mpv user shaders, MadVR's NGU and finally Waifu2x as our state of the art representation. 
@@ -264,93 +271,6 @@
             best version of each shader, but FSRCNNX_x2_8-0-4-1 will need to be included soon since the peformance disparity between FSRCNNX_x2_8-0-4-1 + SSimDownscaler and Ravu-zoom-r4 is just too high.
         </p>
     </section>
-    <!--<section>
-        <h3 id="downscaling">Luma Downscaling</h3>
-        <p>
-            While most people are likely to be consuming content utilising displays with resolutions that are equal or higher than what the media was encoded at, the anime industry is notoriously convoluted when it comes to scaling and most shows 
-            end up going through multiple scaling steps before actually reaching the viewer.
-            <br>
-            <ol>
-                <li>The characters are usually at a higher resolution than the backgrounds, which means that they might need to scale things before compositing the final frame.</li>
-                <li>Studios deliver their shows anywhere between 720p and 1080p. Popular choices are: 720p, 810p, 837p, 873p, 900p and 1080p.</li>
-                <li>The TV Channel / Streaming platform scales it before releasing to the public.</li>
-                <li>Your player needs to scale it once again to fit it in your display's resolution.</li>
-             </ol>
-             The point is, by the time the consumer can actually consume the media, it has already been through other scaling steps and trying to figure out the best possible individual solution for every single show is honestly futile. 
-        </p>
-        <p>
-            With that said, we can at least try to figure out which downscaling algorithm we should be using to best reverse upscaling done by streaming companies. Before continuing, I strongly recommend reading <a href="https://kageru.moe/blog/article/resolutions/">this</a>, 
-            if you know exactly which scaler they used, and the original resolution, you can use debilinear or debicubic to get the best possible result. The problem is that this kind of information is not exactly always available, and having a different configuration per title 
-            isn't really viable either. 
-        </p>
-        <p>
-            What's left to do then is figuring out the best overall configuration we can set dscale to. The methodology this time is pretty straightforward, since it's impossible to cover every single scenario (when it comes to scaling factor and upscaler used), 
-            I've done 3 different tests that should at least give an idea of what to use. 
-        </p>
-        <p>
-            The starting point was the previously used Violet Evergarden frame, from Netflix's encode. The image was upscaled to 2560x1440 (1.333x from 1920x1080) using bilinear, catmull_rom and bcspline with b = 0 and c = 1. Bilinear was chosen to 
-            represent the blurriest possible scenario. Catmull_rom is the middle term and the latter is probably their sharpest option. You can find examples of titles that were upscaled using those algorithms, and this is the second reason why I chose them.
-        </p>
-        <p>
-            We can proceed to the charts then:
-        </p>
-        <p>
-            <div class="row">
-                <div class="column">
-                    <img src="./images/mpv_upscaling/downscaling/tables/bilinear/iwssim.png" alt="Violet downscaling bilinear iwssim" width="454" height="284">
-                    <br><br>
-                    <img src="./images/mpv_upscaling/downscaling/tables/bilinear/psnrha.png" alt="Violet downscaling bilinear psnrha" width="454" height="284">
-                    <br><br>
-                    <img src="./images/mpv_upscaling/downscaling/tables/bilinear/psnrhma.png" alt="Violet downscaling bilinear psnrhma" width="454" height="284">
-                </div>
-                <div class="column">
-                    <img src="./images/mpv_upscaling/downscaling/tables/catmull_rom/iwssim.png" alt="Violet downscaling catmull_rom iwssim" width="454" height="284">
-                    <br><br>
-                    <img src="./images/mpv_upscaling/downscaling/tables/catmull_rom/psnrha.png" alt="Violet downscaling catmull_rom psnrha" width="454" height="284">
-                    <br><br>
-                    <img src="./images/mpv_upscaling/downscaling/tables/catmull_rom/psnrhma.png" alt="Violet downscaling catmull_rom psnrhma" width="454" height="284">
-                </div>
-                <div class="column">
-                    <img src="./images/mpv_upscaling/downscaling/tables/bcspline_0_1/iwssim.png" alt="Violet downscaling bcspline_0_1 iwssim" width="454" height="284">
-                    <br><br>
-                    <img src="./images/mpv_upscaling/downscaling/tables/bcspline_0_1/psnrha.png" alt="Violet downscaling bcspline_0_1 psnrha" width="454" height="284">
-                    <br><br>
-                    <img src="./images/mpv_upscaling/downscaling/tables/bcspline_0_1/psnrhma.png" alt="Violet downscaling bcspline_0_1 psnrhma" width="454" height="284">
-                </div>
-              </div>
-        </p>
-        <p>
-            We can see that depending on which algorithm is used in the upscaling step, the results change and therefore there isn't an universal solution that's always the best. Averaging those numbers can give us a better picture:
-        </p>
-        <p>
-            <div class="row">
-                <div class="column">
-                    <img src="./images/mpv_upscaling/downscaling/tables/average/iwssim.png" alt="Violet downscaling average iwssim" width="454" height="284">
-                </div>
-                <div class="column">
-                    <img src="./images/mpv_upscaling/downscaling/tables/average/psnrha.png" alt="Violet downscaling average psnrha" width="454" height="284">
-                </div>
-                <div class="column">
-                    <img src="./images/mpv_upscaling/downscaling/tables/average/psnrhma.png" alt="Violet downscaling average psnrhma" width="454" height="284">
-                </div>
-            </div>
-        </p>
-        <p>
-            We can see that SSimDownscaler can't exactly perform well since its input is extremely blurry, and that lanczos starts getting worse as you increase the upscaling sharpness. As expected, no algorithm gets even close to 
-            properly "restoring" the original image, and if you have to go through multiple scaling steps (we almost always have to), you shouldn't expect superb quality.
-        </p>
-        <p>
-            If we ignore mitchell, which is extremely blurry, all the other scalers seem to perform within each other and the difference between them on actual playback is probably negligible. I'd recommend using SSimDownscaler when 
-            your display's resolution is lower than the content's resolution (UHD 3840x2160 content on a FHD 1920x1080 display, for example) or when you're using a doubler while needing to downscale after doubling.
-        </p>
-        <p>
-            For blurry "sources", like our scenario here in this test, the scaler doesn't really matter. Your result is always going to be blurry regardless and using something like adaptive-sharpen to make it look nicer might be a good idea depending on the title. 
-        </p>
-        <p>
-            It's important to remember that this isn't by any means an evaluation of downscaling in general, it's just an evaluation of downscaling after an upscale. 
-        </p>
-
-    </section>-->
     <section>
         <h3 id="chroma">Chroma Upscaling</h3>
         <p>
