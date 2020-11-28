@@ -69,11 +69,12 @@
         </p>
         <h3 id="polynomial">Polynomial interpolation</h3>
         <p>
-            <img src="./images/mpv_upscaling/interpolation.png" alt="upscaling" class="center">
-            <br>
             A relatively simple way of taking more information into consideration is fitting a curve into more than 2 discrete points. If we connect 2 points directly and only have their values 
             to work with our end result is always going to be a straight line connecting both, but if we can also look at the other neighbouring elements we might be able to fit actual curves and 
             therefore calculate the in-between points more accuraterly. This is implemented through convolution, using a specific kernel that represents a corresponding filter. 
+        </p>
+        <p>
+            <img src="./images/mpv_upscaling/interpolation.png" alt="upscaling" class="center">
         </p>
         <p>
             The math behind this comes from digital signal processing, to perfectly recover the analogue counterpart of a digitised signal you need an ideal low-pass filter of gain Ts and cutoff frequency between 
@@ -87,19 +88,22 @@
             approxiation of the sinc function. The Lanczos filter is simply the sinc function windowed by the central lobe of a larger sinc function.
         </p>
         <h3 id="SSSR">Structural Similarity Upscaling</h3>
-        <img src="./images/mpv_upscaling/sssr_bilinear.png" alt="upscaling" class="center">
-        <br>
-        <img src="./images/mpv_upscaling/sssr_sssr.png" alt="upscaling" class="center">
         <p>
             We can more precisely upscale something if we try to reconstruct strucutures, the most evident problem with linear or polynomial
             scalers is the thickening of border areas where the interpolated result doesn't transit between values as sharply,
             resulting in a blurrier image with "lost" detail in the strucutures if you're downscaling and then upscaling
             it back.
         </p>
+        <img src="./images/mpv_upscaling/sssr_bilinear.png" alt="upscaling" class="center" width="300" height="180">
+        <br>
+        <img src="./images/mpv_upscaling/sssr_sssr.png" alt="upscaling" class="center" width="300" height="180">
         <h3 id="machine">Machine Learning</h3>
         <p>
             Machine learning comes as a powerful successor to classical methods due to the fact that you do not need to rely solely on what you can currently retrieve 
             from the image, but also on a set of trained parameters generated from analysing multiple images and "learning" what it should do to go from "low resolution" to "high resolution".
+        </p>
+        <p>
+            <img src="./images/mpv_upscaling/fsrcnn_explanation.png" alt="FSRCNN" class="center" width="900" height="333">
         </p>
         <p>
             There are multiple different machine learning based image upscalers, we'll stick to those that are easily testable as mpv user shaders, MadVR's NGU and finally Waifu2x as our state of the art representation. 
