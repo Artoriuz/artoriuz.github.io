@@ -87,6 +87,9 @@
             is nothing more than a way of limiting how big the kernel is, and since the kernel itself can't be a perfect infinite sinc tweaks have to be made in order to achieve good results. The Lanczos filter is a popular 
             approxiation of the sinc function. The Lanczos filter is simply the sinc function windowed by the central lobe of a larger sinc function.
         </p>
+        <p>
+            For a more in-depth explanation of scaling filters, you can check <a href="https://legacy.imagemagick.org/Usage/filter/">Imagemagick's documentation</a>.
+        </p>
         <h3 id="SSSR">Structural Similarity Upscaling</h3>
         <p>
             We can more precisely upscale something if we try to reconstruct strucutures, the most evident problem with linear or polynomial
@@ -217,7 +220,7 @@
         </p>
         <p>
             All NGU algorithms were tested on their highest quality presets (Very High), which was fine on the RX470, but significantly heavier than FSRCNNX-8-0-4-1. 
-            FSRCNNX-16-0-4-1's performance is also relatively okay, but the increased quality over its lighter variant might not justify using it.  
+            FSRCNNX-16-0-4-1's performance is also relatively okay, but the almost identical quality over its lighter variant might not be enough to justify using it.  
         </p>
         <p>
             NNEDI3 is pointless. SSSR can be a nice alternative for low scaling factors (since FSRCNNX is a doubler and therefore would need to be downscaled afterwards), and Ravu while being blurrier might be able to hide compression 
@@ -387,82 +390,162 @@
             My personal recommendation is that you should test it yourself to see if you can notice KrigBilateral's difference during playback, and use it if it doesn't really matter resource-wise (in the case your GPU is fine either way). Another sensible decision would be to 
             use it when you don't need luma upscaling, since then the only gains you can make are in chroma. 
         </p>
+    </section>
+    <section>
+        <h3 id="downscaling">What about downscaling?</h3>
+        <p>
+            Well, we've been talking about upscaling up to now, but is there any difference when it comes to downscaling? Intrinsically, downscaling images should be an easier task considering all we need to do is draw the same curves 
+            with fewer points. A normal person would find it much harder to differentiate downscalers, all reasonable filters are usually good enough and it becomes a subjective problem of avoiding the artifacts you dislike the most. 
+            Different filters will produce different amounts of ringing, blocking and aliasing. Some prefer smooth images, others prefer sharp images... The problem here is that we can't compare the results to a reference and calculate 
+            which filter managed to get the closest to the ground truth like we did before for upscaling.
+        </p>
+        <p>
+            I chose to use Catmull Rom for all my downscales up to this point, and some of you might be asking yourselves why. Well, Catmull Rom is the sharpest BC-Spline that satisfies the B + 2C = 1 recommendation by 
+            Don P. Mitchell and Arun N. Netravali. It is sometimes used in the industry and for a good reason, on top of being reasonably sharp it does not introduce many artifactd at all and the ringing is very tame when compared to 
+            sharper filters like Lanczos. This, however, is just my own personal preference. It's nothing more than a subjective approach to the problem. Mitchell does produce even less artifacts but the end result is noticeably blurrier. 
+            <a href="https://stackoverflow.com/a/6171860">This Stackoverflow answer from 2008</a> indicates some sort os survey was conducted within Hollywood and they ended up choosing windowed sincs for downscaling and Mitchell for upscaling.
+        </p>
+        <p>
+            What can we do then? Well, no reference image quality metrics do exist. MATLAB comes with 3 of those metrics out of the box, <a href="https://www.mathworks.com/help/images/ref/brisque.html">BRISQUE (Blind/Referenceless Image Spatial Quality Evaluator)</a>, 
+            <a href="https://www.mathworks.com/help/images/ref/niqe.html">NIQE (Natural Image Quality Evaluator)</a> and <a href="https://www.mathworks.com/help/images/ref/piqe.html">PIQE (Perception based Image Quality Evaluator)</a>. 
+            BRISQUE correlates well with human perception because it's trained taking into consideration human subjectivity with a SVM (Support Vector Machine). NIQE and PIQE, however, 
+            are opinion-unaware and do not depend on human subjectivity.
+        </p>
+        <p>
+            Since NIQE and PIQE are pretty much the same thing, let's drop PIQE and focus on the other 2. Since humans usually like sharp images I expect BRISQUE to rank the scalers based almost solely on sharpness. NIQE should 
+            theoretically be more objective and actually rank them in an order that goes from "less distortions" to "more distortions". Both of them rank "better" images with lower scores.
+        </p>
+        <p>
+            With all that in mind we can proceed to the test image. I'll be using Chitanda for downscaling, this keyframe represents anime content very well, you can see she it's not as sharp as fanart (likely because it's an upscale 
+            from some arbitrary resolution between 1280x720 and 1920x1080) but also not overly blurry either. I decided to use --linear=downscaling=no alongside --correct-downscaling and --deband=no this time to make the comparison 
+            against SSimDownscaler fairer, and funnily enough almost all filters seem to perform better on the test image this way. 
+        </p>
+        <p>
+            The following image was downscaled using all the available filters in mpv:
+            <img src="./images/mpv_upscaling/downscaling/images/reference.png" alt="Downscaled Violet" class="center" width="960" height="540">
+            <br>
+            <p>
+                As always, you can find all the resulting images in <a href="https://github.com/Artoriuz/Artoriuz.github.io/tree/master/blog/images/mpv_upscaling/downscaling/images">this repository.</a>
+            </p>
+            <p>We can see the results below:</p>
+            <div class="row">
+                <div class="column">
+                    <img src="./images/mpv_upscaling/downscaling/tables/brisque.png" alt="Chitanda results BRISQUE" width="567" height="756">
+                </div>
+                <div class="column">
+                    <img src="./images/mpv_upscaling/downscaling/tables/niqe.png" alt="Chitanda results NIQE" width="567" height="756">
+                </div>
+              </div>
+        </p>
+        <p>
+            As expected, BRISQUE really did almost perfectly rank them from sharpest to blurriest. NIQE put Haasnsoft on top which is an interesting result, I personally find Haasnsoft to be too blurry but that might be useful to hide 
+            source artifacts. Mitchell shows up fairly high too, which is a good sign considering it is the --profile=gpu-hq default downscaler. 
+        </p>
+        <p>   
+            Note that as I've been trying to say, downscaling is extremely subjective and even algorithms designed to measure the same things come up with extremely different results. 
+            Add the fact that neither of them were trained with anime content in mind and we have the 2 most useless tables in this entire page!
+        </p>
+        <p>
+            Out of curiosity, I decided to calculate the structural similarity between the outputs of SSimDownscaler, Lanczos and Catmull Rom. 
+            ssim(lanczos, ssimdownscaler) gives me 0.999721340635465 and ssim(catrom, ssimdownscaler) gives me 0.999692060660229. 
+            Those numbers are so close you'd be hard pressed to notice any differences whatsoever between the images. 
+        </p>
+        <p>
+            Since both BRISQUE and NIQE "learn" from images considered good, We can make them more accurate by actually training them on anime content. I won't go over the trouble of training a custom BRISQUE model, that would 
+            require me to give a subjective score to each image, but NIQE does not depend on human intervention and <a href="https://www.mathworks.com/help/images/ref/fitniqe.html">training it is trivial.</a> 
+        </p>
+        <p>
+            My original idea was uising Waifu2x's training dataset, but I found out it isn't public. Then I figured out that I could simply use my anime screenshots folder (which had 162 anime screenshots inside from numerous different shows). 
+            The resulting model does not only give all the scalers better results but it also correlates better with the BRISQUE results and my personal preferences.
+        <p>
+            <img src="./images/mpv_upscaling/downscaling/tables/niqe_anime.png" alt="Chitanda results Custom NIQE" class="center" width="567" height="756">
+        </p>
+        <p>
+            This looks like a table we can trust now, SSimDownscaler is at the top as it should but the following filters aren't ranked from sharpest to blurriest. Lanczos is considerably sharper than Catmull Rom but also creates 
+            more ringing artifacts, which likely explains why Catmull Rom is on top of it now. Mitchell and Haasnsoft are both too soft hence why those shifted to the bottom half of the table. Overall I really like the results.
+        </p>
+        <p>
+            I should probably repeat this for an image with more high frequency components like Rosetta, but for now Chitanda will suffice.
+        </p>
+    </section>
+    <section>
         <h3 id="changelog">Changelog</h3>
         <p>
-            <p>
-                26/11/2020: Changelog moved to the end of the page. Mitchell survey and some clarifications regarding downscaling added.
-            </p>
-            <p>
-                11/05/2019: KrigBilateral updated. 
-            </p>
-            <p>
-                22/04/2019: FSRCNNX updated, removing the downscaling section for now since people aren't exactly going out of their ways to fix shitty upscales and there's already some information about it on the fractional tables.
-            </p>
-            <p>
-                21/04/2019: Preliminar fractional upscaling evaluatons added, focusing on the most relevant algorithms first.
-            </p>
-            <p>
-                18/04/2019: Ravu-zoom-r4 added, r2 and r3 were updated. 
-            </p>
-            <p>
-                17/04/2019: PSNR-HA/HMA measurements are now done with wstep = 7 as recommended by igv.
-            </p>
-            <p>
-                16/04/2019: New FPS measurement methodology, files now play for 4 seconds and then I calculate how many frames were displayed based on which frame it stopped at after the time-frame has elapsed. 
-                --scalers-resizes-only was also removed since the half pixel shift is not noticeable during playback. Previous results had different numbers, but the order didn't exactly significantly change. 
-            </p>
-            <p>
-                06/04/2019: Tables updated with newer versions of FSRCNNX again. 
-            </p>
-            <p>
-                31/03/2019: MS-SSIM tables were removed. All remaining luma related tables were updated. New methodology consists of basically utilising a full-range greyscale PNG as input (which results in lower quantisation errors 
-                when compared to using limited range YCbCr). Ravu-zoom was added, FSRCNNX_x2_16-0-4-1 and Ravu-lite were updated. 
-            </p>
-            <p>
-                27/03/2019: Updated PSNR-HA/HMA, you can expect to see ravu-ar and ravu-zoom soon. PSNR-HVS-M was removed since it's deprecated by the insertion of PSNR-HA.
-            </p>
-            <p>
-                15/03/2019: New versions of FSRCNNX. 
-            </p>
-            </p>
-    
-                08/03/2019: Adding another test image for chroma, and changed all chroma tests to upscale from a yuv4mpegpipe y4m file which makes me more confident they're accurate.
-            </p>
-            <p>
-                07/03/2019: Adding Ravu-lite and fixing NGU-AA's half pixel shift. Huge thanks for Bjin for providing a user-shader to accomplish the latter =). FPS chart should be updated soon.
-            </p>
-            <p>
-                03/03/2019: Ravu-chroma and Ewa_Robidoux/Ewa_Robidouxsharp added. 
-            </p>
-            <p>
-                27/02/2019: PSNR-HMA and PSNR-HA tables added. 
-            </p>
-            <p>
-                25/02/2019: Initial version of the Chroma section is added. I'll take some time to slowly polish it with more information and different tests, and I'm also probably going to add PSNR-HMA to the RGB tests soon.
-            </p>
-            </p>
-                20/02/2019: IW-SSIM tables added.
-            <p>
-                19/02/2019: MS-SSIM tables fixed, code had issues with RGB -> greyscale conversion. 
-            </p>
-            <p>
-                18/02/2019: Lanczos added, and tables now display results from best to worst.
-            </p>
-            <p>
-                16/02/2019: Other EWA scalers were added.
-            </p>
-            <p>
-                22/12/2018: I found out a mistake in previous results, and have once again updated all quality comparison results.
-                <br>
-                I'm not certain about what was causing the problems, but turning off PNG filtering and debanding seems to have fixed it. I'll investigate which of the two was the culprit once I have the time. 
-                <br>
-                Well, since I had to redo everything, I took this opportunity to improve the testing methodology, debanding was turned off to prevent loss of detail, and I used a lossless 
-                YUV444p AVC encode as upscaling source instead of a YUV444p JPEG.  
-            </p>
-            <p>
-                18/12/2018: Results have been updated with latest versions of FSRCNNX and Waifu2x. On top of that, I've included MS-SSIM and PSNR-HVS-M measurements. 
-                I've also included all NGU algorithms from <a href="http://madvr.com/">MadVR</a> since people are interested in them.
-            </p>
+            28/11/2020: Improving scaling explanations considerably. Adding a new and improved downscaling section with no reference image quality metrics and a custom model fit for anime content.
+        </p>
+        <p>
+            26/11/2020: Changelog moved to the end of the page. Mitchell survey and some clarifications regarding downscaling added.
+        </p>
+        <p>
+            11/05/2019: KrigBilateral updated. 
+        </p>
+        <p>
+            22/04/2019: FSRCNNX updated, removing the downscaling section for now since people aren't exactly going out of their ways to fix shitty upscales and there's already some information about it on the fractional tables.
+        </p>
+        <p>
+            21/04/2019: Preliminar fractional upscaling evaluatons added, focusing on the most relevant algorithms first.
+        </p>
+        <p>
+            18/04/2019: Ravu-zoom-r4 added, r2 and r3 were updated. 
+        </p>
+        <p>
+            17/04/2019: PSNR-HA/HMA measurements are now done with wstep = 7 as recommended by igv.
+        </p>
+        <p>
+            16/04/2019: New FPS measurement methodology, files now play for 4 seconds and then I calculate how many frames were displayed based on which frame it stopped at after the time-frame has elapsed. 
+            --scalers-resizes-only was also removed since the half pixel shift is not noticeable during playback. Previous results had different numbers, but the order didn't exactly significantly change. 
+        </p>
+        <p>
+            06/04/2019: Tables updated with newer versions of FSRCNNX again. 
+        </p>
+        <p>
+            31/03/2019: MS-SSIM tables were removed. All remaining luma related tables were updated. New methodology consists of basically utilising a full-range greyscale PNG as input (which results in lower quantisation errors 
+            when compared to using limited range YCbCr). Ravu-zoom was added, FSRCNNX_x2_16-0-4-1 and Ravu-lite were updated. 
+        </p>
+        <p>
+            27/03/2019: Updated PSNR-HA/HMA, you can expect to see ravu-ar and ravu-zoom soon. PSNR-HVS-M was removed since it's deprecated by the insertion of PSNR-HA.
+        </p>
+        <p>
+            15/03/2019: New versions of FSRCNNX. 
+        </p>
+        </p>
+
+            08/03/2019: Adding another test image for chroma, and changed all chroma tests to upscale from a yuv4mpegpipe y4m file which makes me more confident they're accurate.
+        </p>
+        <p>
+            07/03/2019: Adding Ravu-lite and fixing NGU-AA's half pixel shift. Huge thanks for Bjin for providing a user-shader to accomplish the latter =). FPS chart should be updated soon.
+        </p>
+        <p>
+            03/03/2019: Ravu-chroma and Ewa_Robidoux/Ewa_Robidouxsharp added. 
+        </p>
+        <p>
+            27/02/2019: PSNR-HMA and PSNR-HA tables added. 
+        </p>
+        <p>
+            25/02/2019: Initial version of the Chroma section is added. I'll take some time to slowly polish it with more information and different tests, and I'm also probably going to add PSNR-HMA to the RGB tests soon.
+        </p>
+        </p>
+            20/02/2019: IW-SSIM tables added.
+        <p>
+            19/02/2019: MS-SSIM tables fixed, code had issues with RGB -> greyscale conversion. 
+        </p>
+        <p>
+            18/02/2019: Lanczos added, and tables now display results from best to worst.
+        </p>
+        <p>
+            16/02/2019: Other EWA scalers were added.
+        </p>
+        <p>
+            22/12/2018: I found out a mistake in previous results, and have once again updated all quality comparison results.
+            <br>
+            I'm not certain about what was causing the problems, but turning off PNG filtering and debanding seems to have fixed it. I'll investigate which of the two was the culprit once I have the time. 
+            <br>
+            Well, since I had to redo everything, I took this opportunity to improve the testing methodology, debanding was turned off to prevent loss of detail, and I used a lossless 
+            YUV444p AVC encode as upscaling source instead of a YUV444p JPEG.  
+        </p>
+        <p>
+            18/12/2018: Results have been updated with latest versions of FSRCNNX and Waifu2x. On top of that, I've included MS-SSIM and PSNR-HVS-M measurements. 
+            I've also included all NGU algorithms from <a href="http://madvr.com/">MadVR</a> since people are interested in them.
         </p>
     </section>
     
