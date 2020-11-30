@@ -418,7 +418,8 @@
         <p>
             With all that in mind we can proceed to the test image. I'll be using Chitanda for downscaling, this keyframe represents anime content very well, you can see she it's not as sharp as fanart (likely because it's an upscale 
             from some arbitrary resolution between 1280x720 and 1920x1080) but also not overly blurry either. I decided to use --linear=downscaling=no alongside --correct-downscaling and --deband=no this time to make the comparison 
-            against SSimDownscaler fairer, and funnily enough almost all filters seem to perform better on the test image this way. 
+            against SSimDownscaler fairer, and funnily enough almost all filters seem to perform better on the test image this way. It's important to note mpv does not support using --correct-downscaling alongside --dscale=bilinear, so this 
+            filter in particular looks sharper than it should.
         </p>
         <p>
             The following image was downscaled using all the available filters in mpv:
