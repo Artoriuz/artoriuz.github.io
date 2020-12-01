@@ -16,8 +16,8 @@
     <meta charset="utf-8" />
     <link rel="stylesheet" type="text/css" href="./css/default.css" />
     <link rel="stylesheet" type="text/css" href="./css/syntax.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet"> 
-    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?skin=doxy"></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&family=Roboto+Slab&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -264,30 +264,62 @@
     <section>
         <h3 id="fractional">Fractional Luma Upscaling</h3>
         <p>
-            Taking into consideration anime productions are still done at arbitrary resolutions between 1280x720 and 1920x1080 (with most below 1600x900) and that most users are still watching them on FHD 1920x1080 displays, the most common scenario 
-            when there's any luma upscaling (or rgb upscaling if you want to nitpick about it, since mpv merges luma and chroma right after doubling chroma) being performed by the player is arguably 720p->1080p, which corresponds to a 1.5x scaling factor. 
-            With the recent addition of ravu-zoom to our ever growing arsenal of user shaders, and the need to find out which dscales work better alongside the double-only prescalers, adding a new series of measurements seem reasonable.    
+            Taking into consideration anime productions are still done at arbitrary resolutions between 1280x720 and 1920x1080 (with most below 1600x900, check <a href="https://anibin.blogspot.com/">Anibin</a> for details) and that most users are still 
+            watching them on FHD 1920x1080 displays, the most common scenario when there's any luma upscaling (or rgb upscaling if you want to nitpick about it, since mpv merges luma and chroma right after doubling chroma) being performed by 
+            the player is arguably 720p->1080p, which corresponds to a 1.5x scaling factor. With the recent addition of ravu-zoom to our ever growing arsenal of user shaders, and the need to find out which dscales work better alongside the doublers, 
+            adding a new series of measurements seems reasonable.    
         </p>
         <p>
-            The methodology is straightforward, Violet was downscaled to 1280x720 using --dscale=catmull_rom --correct-downscaling --linear-downscaling, and then brought back up to 1920x1080. For the doublers, the following downscale was also 
-            performed with --correct-downscaling and --linear-downscaling. SSimDownscaler is the only exception, as igv states the shader is tuned to be used with --dscale=mitchell and --linear-downscaling=no.
+            The methodology is straightforward, violet-gray.png was downscaled to 1280x720 with imagemagick: 
+        <p>
+            magick convert violet-gray.png -filter catrom -resize 1280x720 downscaled.png
+        </p>
+        <p>
+            This is the equivalent of downscaling with mpv using --dscale=catmull_rom --correct-downscaling --linear-downscaling=no.
+        </p>
+        <p>
+            The downscaled image was then brought back up to 1920x1080 using the several shaders. For the doublers, the following downscale was 
+            performed with --correct-downscaling and --linear-downscaling=no. SSimDownscaler performs better than any standalone filter, but also adds a lot of computational weight for minimal quality gains over catrom or lanczos.
+        </p>
+        <p>
+            The following tables display the results. The filter specified after the doubler is the downscaling filter used from 2560x1440 to 1920x1080.
         </p>
         <p>
             <div class="row">
                 <div class="column">
-                    <img src="./images/mpv_upscaling/fractional/tables/violet-iwssim.png" alt="Violet results IW-SSIM" width="454" height="473">
+                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_vif.png" alt="Violet results VIF" width="378" height="1134">
                 </div>
                 <div class="column">
-                    <img src="./images/mpv_upscaling/fractional/tables/violet-psnrhma.png" alt="Violet results PSNR-HMA" width="454" height="473">
+                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_psnrhma.png" alt="Violet results PSNR-HMA" width="378" height="1134">
                 </div>
                 <div class="column">
-                    <img src="./images/mpv_upscaling/fractional/tables/violet-psnrha.png" alt="Violet results PSNR-HA" width="454" height="473">
+                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_psnr.png" alt="Violet results PSNR" width="378" height="1134">
+                </div>
+                <div class="column">
+                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_iwssim.png" alt="Violet results IW-SSIM" width="378" height="1134">
+                </div>
+                <div class="column">
+                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_msssim.png" alt="Violet results MS-SSIM" width="378" height="1134">
+                </div>
+                <div class="column">
+                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_ssim.png" alt="Violet results SSIM" width="378" height="1134">
+                </div>
+                <div class="column">
+                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_niqe.png" alt="Violet results NIQE" width="378" height="1134">
                 </div>
               </div>
         </p>
         <p>
-            As expected, the doublers perform relatively poorly alongside built-in scalers. Ravu-zoom is the best stand-alone scaler, but it gets beaten by ravu-lite and FSRCNNX when those are used with SSimDownscaler. I originally only wanted to include the 
-            best version of each shader, but FSRCNNX_x2_8-0-4-1 will need to be included soon since the peformance disparity between FSRCNNX_x2_8-0-4-1 + SSimDownscaler and Ravu-zoom-r4 is just too high.
+            Well, we can see that VIF clearly likes RAVU more than the other metrics. We can also see that the mitchell filter scores poorly when compared to lanczos or catrom regardless of doubler, and this can be easily 
+            attributed to the fact that it is significantly blurrier than the other 2. Lanczos is the sharpest downscaling filter between the 3 sane options tested here, and at the 0.75x scaling factor (1440p->1080p) its pronounced 
+            ringing artifacts are not "bad" enough to make it rank lower than catrom. Catrom is almost as sharp but it introduces less ringing to the output.
+        </p>
+        <p>
+            Overall the tables tell a story that clearly puts FSRCNNX on top, and more specifically the LineArt variant. RAVU-zoom is trading blows with RAVU-lite depending on the metric, and SSSR also shows up as a good "3rd place" 
+            contender. I didn't feel the need to include all the simple filters, Lanczos scored the best in the 2x upscaling test so it is the only one showing up again here.
+        </p>
+        <p>
+            I currently can't conduct any performance measurements, the quarantine left me without access to my desktop computer. Doing it on my laptop's Intel iGPU is not worth it.
         </p>
     </section>
     <section>
@@ -480,14 +512,30 @@
             more ringing artifacts, which likely explains why Catmull Rom is on top of it now. Mitchell and Haasnsoft are both too soft hence why those shifted to the bottom half of the table. Overall I really like the results on this test image. 
         </p>
         <p>
+            Let's remember Lanczos scored slightly better than Catrom in the NIQE chart from the fractional upscaling tests when they were both coupled with a doubler (FSRCNNX or RAVU), 
+            but the scaling factor there was 0.75x there, it is 0.5x here. As you increase the scaling factor (or decrease it, in the case of downscaling) you'll also make the artifacts a filter produces more visible.
+        </p>
+        <p>
+            The following image displays the difference between the Mitchell, Catrom and Lanczos filters (open them in a new tab at 100% scaling to see the ringing difference more easily):
+        </p>
+        <p>
+            <img src="./images/mpv_upscaling/downscaling/explanation/chitanda-comparison.png" alt="Chitanda Comparison" class="center" width="960" height="367">
+        </p>
+        <p>
             I should probably repeat this for an image with more high frequency components like Rosetta, but for now Chitanda will suffice. It's important to insist the optimal filter highly depends 
             on several factors such as the image itself and the scaling factor. To make any reasonably accurate claim I'd need to repeat this experiment on several images and average their results, which I probably won't do anytime soon 
-            considering the differences between them are honestly minimal. My personal recommendation is: Stick to Mitchell as the default if you really dislike ringing and perhaps switch to Catrom or Lanczos if sharper results look subjectively 
-            better to you.
+            considering the differences between them are honestly minimal.
+        </p>
+        <p>
+            My personal recommendation is: Stick to Mitchell as the default if you really dislike ringing. Switch to Lanczos if you want more perceived sharpness and if you 
+            don't want either extreme choose Catrom, which is a decent compromise.
         </p>
     </section>
     <section>
         <h3 id="changelog">Changelog</h3>
+        <p>
+            01/12/2020: Fractional upscaling section updated with the newest versions of all the prescalers and more downscaling options. Some qualitative comparisons added to the downscaling section.
+        </p>
         <p>
             30/11/2020: All shaders updated to their current versions in the Violet upscaling tests. Waifu2x and NGU dropped. Comparing against Waifu2x is unfair due to the time it takes to actually compute a result, and I simply don't care about MadVR. 
             Dropping these things allow me to greatly simplify the table generating process and I don't intend to add them back. NNEDI3 also dropped due to poor performance. PSNR-HA dropped due to being redundant alongside PSNR-HMA. VIF, 
