@@ -137,16 +137,16 @@
             magick image.png -colorspace gray image-gray.png
         </p>
         <p>
-            They were then downscaled to a quarter of their resolutions (0.5x scaling factor) using mpv and the Catmull Rom filter:
+            They were then downscaled to a quarter of their resolutions (0.5x scaling factor) using the Catmull Rom filter:
         </p> 
         <p>
-            mpv --no-config --profile=gpu-hq --deband=no --no-hidpi-window-scale --window-scale=0.5 --pause=yes --screenshot-format=png --dscale=catmull_rom image-gray.png
+            magick convert image_gray.png -filter catrom -resize 50% downscaled.png
         </p>
         <p>
             The images were then upscaled back by mpv:
         </p>
         <p>
-            mpv --no-config --profile=gpu-hq --deband=no --no-hidpi-window-scale --window-scale=2.0 --pause=yes --screenshot-format=png --scale=filter --glsl-shader=shader downscaled.png
+            mpv --no-config --profile=gpu-hq --deband=no --no-hidpi-window-scale --window-scale=2.0 --pause=yes --screenshot-format=png --no-scaler-resizes-only --scale=filter --glsl-shader=shader downscaled.png
         </p>
         <p>
             Since mpv writes PNGs in the rgb24 format, all screenshots were converted to greyscale using imagemagick as described above. This doesn't change how they're shown on screen, but changes them from 1920x1080x3 to 1920x1080x1.
@@ -536,6 +536,9 @@
     </section>
     <section>
         <h3 id="changelog">Changelog</h3>
+        <p>
+            06/12/2020: Downscaling outside linear light again for the upscaling tests. 
+        </p>
         <p>
             01/12/2020: Fractional upscaling section updated with the newest versions of all the prescalers and more downscaling options. Some qualitative comparisons added to the downscaling section.
         </p>
