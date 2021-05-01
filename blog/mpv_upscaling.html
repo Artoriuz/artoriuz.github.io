@@ -134,7 +134,7 @@
             In order to measure how "good" each algorithm is, the test images were first converted to grayscale with imagemagick:
         </p>                    
         <p>
-            magick image.png -colorspace gray image-gray.png
+            magick convert image.png -colorspace gray image-gray.png
         </p>
         <p>
             They were then downscaled to a quarter of their resolutions (0.5x scaling factor) using the Catmull Rom filter:
@@ -330,6 +330,59 @@
         </p>
         <p>
             I currently can't conduct any performance measurements, the quarantine left me without access to my desktop computer. Doing it on my laptop's Intel iGPU is not worth it.
+        </p>
+    </section>
+    <section>
+        <h3 id="sigmoid">Sigmoidal-Light Upscaling</h3>
+        <p>
+            The sRGB colour space does not have a linear gamma curve, it's actually (approximately) a power 2.2 function to compensante how the human visual system works giving more quantisation steps to the darker tones. 
+            This means scaling in sRGB gamma "blends" perceptual values instead of doing the arithmetic in linear light and then converting it back. This is not always bad, but it can create accentuated ringing artifacts towards 
+            the brighter tones. Doing it in linear light accentuates dark ringing artifacts though, which is the exact opposite and usually looks even worse in my opinion.
+        </p>
+        <p>
+            Taking this into consideration, the gimmicky yet clever technique of scaling in sigmoidal light was "developed". 
+            Sigmoid light treats dark and bright overshoots the same, as the quantisation precision is equal in both extremes. 
+        </p>
+        <p>
+            The following test compares linear light, sRGB light and sigmoidal light on a simple 4x orthogonal upscaling test with the Lanczos filter. 
+        </p>
+        <p>
+            The greyscale Violet was reused, but this time it was downscaled to 480x270 so we can upscale it back with a 4x scaling factor. The box filter was used to avoid creating pixels out of the original range and to avoid ringing 
+            artifacts in the downscaling process.
+        </p>
+        <p>
+            <img src="./images/mpv_upscaling/light/violet/violet_down.png" alt="Violet Down" class="center">
+        </p>
+        <p>
+            The sRGB light upscaling was done with "magick convert violet_down.png -filter lanczos -resize 400% srgb.png".
+        </p>
+        <p>
+            The linear light upscaling was done with "magick convert violet_down.png -colorspace LinearGray -filter lanczos -resize 400% -colorspace Gray srgb.png".
+        </p>
+        <p>
+            The sigmoidal light upscaling was done with "magick convert violet_down.png -colorspace LinearGray +sigmoidal-contrast 6.5,50% -filter lanczos -resize 400% -sigmoidal-contrast 6.5,50% -colorspace Gray sigmoid.png".
+        </p>
+        <p>
+            You can find all the images in <a href="https://github.com/Artoriuz/artoriuz.github.io/tree/master/blog/images/mpv_upscaling/light/violet">this repository.</a>
+        </p>
+        <p>
+            <div class="row">
+                <div class="column">
+                    <img src="./images/mpv_upscaling/light/tables/light_geomean.png" alt="Violet results Geometric Mean" width="500" height="216">
+                </div>
+                <div class="column">
+                    <img src="./images/mpv_upscaling/light/tables/light_vif.png" alt="Violet results VIF" width="500" height="216">
+                </div>
+                <div class="column">
+                    <img src="./images/mpv_upscaling/light/tables/light_psnrhma.png" alt="Violet results PSNR-HMA" width="500" height="216">
+                </div>
+                <div class="column">
+                    <img src="./images/mpv_upscaling/light/tables/light_iwssim.png" alt="Violet results IW-SSIM" width="500" height="216">
+                </div>
+              </div>
+        </p>
+        <p>
+            As we can see, all three relevant metrics seem to agree sigmoidal light is better. The flags for linear light and sigmoidal light upscaling in mpv are --linear-upscaling and --sigmoid-upscaling, respectively.
         </p>
     </section>
     <section>
@@ -543,6 +596,9 @@
     </section>
     <section>
         <h3 id="changelog">Changelog</h3>
+        <p>
+            01/05/2021: Adding sigmoidal light and linear light comparisons.
+        </p>
         <p>
             18/03/2021: Updating FSRCNNX-8-0-4-1 to the 05/03/2021 version.
         </p>
