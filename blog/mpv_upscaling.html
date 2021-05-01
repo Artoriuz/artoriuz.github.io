@@ -360,7 +360,7 @@
             The sRGB light upscaling was done with "magick convert violet_down.png -filter lanczos -resize 400% srgb.png".
         </p>
         <p>
-            The linear light upscaling was done with "magick convert violet_down.png -colorspace LinearGray -filter lanczos -resize 400% -colorspace Gray srgb.png".
+            The linear light upscaling was done with "magick convert violet_down.png -colorspace LinearGray -filter lanczos -resize 400% -colorspace Gray linear.png".
         </p>
         <p>
             The sigmoidal light upscaling was done with "magick convert violet_down.png -colorspace LinearGray +sigmoidal-contrast 6.5,50% -filter lanczos -resize 400% -sigmoidal-contrast 6.5,50% -colorspace Gray sigmoid.png".
