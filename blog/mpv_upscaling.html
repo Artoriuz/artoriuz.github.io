@@ -347,45 +347,51 @@
             <img src="./images/mpv_upscaling/light.png" alt="Light" class="center" width="900" height="284"> 
         </p>
         <p>
-            The following test compares linear light, sRGB light and sigmoidal light on a simple 4x orthogonal upscaling test with the Lanczos filter. 
+            The following test compares linear light, sRGB light and sigmoidal light on a simple 2x orthogonal upscaling test with the Lanczos filter. 
         </p>
         <p>
-            The greyscale Violet was reused, but this time it was downscaled to 480x270 so we can upscale it back with a 4x scaling factor. The box filter was used to avoid creating pixels out of the original range and to avoid ringing 
+            A new test image, Kanao, was reused. It was downscaled to 960x540 so we can upscale it back with a 2x scaling factor. The box filter was used to avoid creating pixels out of the original range and to avoid ringing 
             artifacts in the downscaling process.
         </p>
         <p>
-            <img src="./images/mpv_upscaling/light/violet/violet_down.png" alt="Violet Down" class="center">
+            <img src="./images/mpv_upscaling/kanao/kanao.png" alt="Kanao" class="center" width="960" height="540">
         </p>
         <p>
-            The sRGB light upscaling was done with "magick convert violet_down.png -filter lanczos -resize 400% srgb.png".
+            The sRGB light upscaling was done with "magick convert kanao_box.png -filter lanczos -resize 200% kanao_srgb.png".
         </p>
         <p>
-            The linear light upscaling was done with "magick convert violet_down.png -colorspace LinearGray -filter lanczos -resize 400% -colorspace Gray linear.png".
+            The linear light upscaling was done with "magick convert kanao_box.png -colorspace RGB -filter lanczos -resize 200% -colorspace sRGB kanao_linear.png".
         </p>
         <p>
-            The sigmoidal light upscaling was done with "magick convert violet_down.png -colorspace LinearGray +sigmoidal-contrast 6.5,50% -filter lanczos -resize 400% -sigmoidal-contrast 6.5,50% -colorspace Gray sigmoid.png".
+            The sigmoidal light upscaling was done with "magick convert kanao_box.png -colorspace RGB +sigmoidal-contrast 6.5,50% -filter lanczos -resize 200% -sigmoidal-contrast 6.5,50% -colorspace sRGB kanao_sigmoid.png".
         </p>
         <p>
-            You can find all the images in <a href="https://github.com/Artoriuz/artoriuz.github.io/tree/master/blog/images/mpv_upscaling/light/violet">this repository.</a>
+            You can find all the images in <a href="https://github.com/Artoriuz/artoriuz.github.io/tree/master/blog/images/mpv_upscaling/kanao">this repository.</a>
         </p>
         <p>
             <div class="row">
                 <div class="column">
-                    <img src="./images/mpv_upscaling/light/tables/light_geomean.png" alt="Violet results Geometric Mean" width="500" height="216">
+                    <img src="./images/mpv_upscaling/kanao/tables/geomean.png" alt="Violet results Geometric Mean" width="500" height="216">
                 </div>
                 <div class="column">
-                    <img src="./images/mpv_upscaling/light/tables/light_vif.png" alt="Violet results VIF" width="500" height="216">
+                    <img src="./images/mpv_upscaling/kanao/tables/vif.png" alt="Violet results VIF" width="500" height="216">
                 </div>
                 <div class="column">
-                    <img src="./images/mpv_upscaling/light/tables/light_psnrhma.png" alt="Violet results PSNR-HMA" width="500" height="216">
+                    <img src="./images/mpv_upscaling/kanao/tables/psnrhma.png" alt="Violet results PSNR-HMA" width="500" height="216">
                 </div>
                 <div class="column">
-                    <img src="./images/mpv_upscaling/light/tables/light_iwssim.png" alt="Violet results IW-SSIM" width="500" height="216">
+                    <img src="./images/mpv_upscaling/kanao/tables/iwssim.png" alt="Violet results IW-SSIM" width="500" height="216">
                 </div>
               </div>
         </p>
         <p>
-            As we can see, all three relevant metrics seem to agree sigmoidal light is better. The flags for linear light and sigmoidal light upscaling in mpv are --linear-upscaling and --sigmoid-upscaling, respectively.
+            As we can see, all three relevant metrics seem to agree sigmoidal light is better. The gpu-hq profiles comes with --sigmoid-upscaling by default and I highly advise you to keep it turned on.
+        </p>
+        <p>
+            The following image shows the difference (images have been scaled up with nearest neighbour for easier visualisation, open in a new tab at 100% scaling to see it).
+        </p>
+        <p>
+            <img src="./images/mpv_upscaling/kanao/kanao_comparison.png" alt="Kanao" class="center" width="518" height="156">
         </p>
     </section>
     <section>
