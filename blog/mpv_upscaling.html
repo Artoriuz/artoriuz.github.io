@@ -517,51 +517,57 @@
         </p>
         <p>
             I chose to use Catmull Rom for all my downscales up to this point, and some of you might be asking yourselves why. Well, Catmull Rom is the sharpest BC-Spline that satisfies the B + 2C = 1 recommendation by 
-            Don P. Mitchell and Arun N. Netravali. It is sometimes used in the industry and for a good reason, on top of being reasonably sharp it does not introduce many artifacts at all and the ringing is very tame when compared to 
-            sharper filters like Lanczos. This, however, is just my own personal preference. It's nothing more than a subjective approach to the problem. Mitchell does produce even less artifacts but the end result is noticeably blurrier. 
+            Don P. Mitchell and Arun N. Netravali. Catrom can be seen as a sharper version of Mitchell, which is mpv's default downscaler with profile=gpu-hq. 
+        </p>
+        <p>
+            Using Catrom in the upscaling tests was just my (reasonably arbitrary) personal preference at the time, Mitchell does produce even less artifacts but the end result is noticeably blurrier. 
             <a href="https://stackoverflow.com/a/6171860">This Stackoverflow answer from 2008</a> indicates some sort of survey was conducted within Hollywood and they ended up choosing windowed sincs for downscaling and Mitchell for upscaling.
         </p>
         <p>
-            What can we do then? Well, no reference image quality metrics do exist. MATLAB comes with 3 of those metrics out of the box, <a href="https://www.mathworks.com/help/images/ref/brisque.html">BRISQUE (Blind/Referenceless Image Spatial Quality Evaluator)</a>, 
+            For more detailed recommendations please read this <a href="https://legacy.imagemagick.org/Usage/filter/nicolas/">special section in the ImageMagic documentation written by Nicolas Robidoux.</a>
+        </p>
+        <p>
+            While downscaling evaluation is more of a qualitative thing, MATLAB comes with 3 no-reference quality metrics, <a href="https://www.mathworks.com/help/images/ref/brisque.html">BRISQUE (Blind/Referenceless Image Spatial Quality Evaluator)</a>, 
             <a href="https://www.mathworks.com/help/images/ref/niqe.html">NIQE (Natural Image Quality Evaluator)</a> and <a href="https://www.mathworks.com/help/images/ref/piqe.html">PIQE (Perception based Image Quality Evaluator)</a>. 
             BRISQUE correlates well with human perception because it's trained taking into consideration human subjectivity with a SVM (Support Vector Machine). NIQE and PIQE, however, 
             are opinion-unaware and do not depend on human subjectivity.
         </p>
         <p>
-            Since NIQE and PIQE are pretty much the same thing, let's drop PIQE and focus on the other 2. Since humans usually like sharp images I expect BRISQUE to rank the scalers based almost solely on sharpness. NIQE should 
-            theoretically be more objective and actually rank them in an order that goes from "less distortions" to "more distortions". Both of them rank "better" images with lower scores.
+            NIQE learns its model from pristine and distorted images, while PIQE does not need any training. let's drop PIQE and focus on the other 2. Since humans usually like sharp images I expect BRISQUE to rank the scalers based almost solely on sharpness. 
+            NIQE should theoretically be more objective and actually rank them in an order that goes from "less distortions" to "more distortions" if it gets trained properly with pristine anime screenshots. 
         </p>
         <p>
-            With all that in mind we can proceed to the test image. I'll be using Chitanda for downscaling, this keyframe represents anime content very well, you can see she it's not as sharp as fanart (likely because it's an upscale 
+            The problem with this approach is that we're assuming anime screenshots are pristine, and in fact they're not. Anime is usually delivered with 4:2:0 chroma-subsampling and a lot of lossy compression.
+        </p>
+        <p>
+            With all that in mind we can still try to evaluate this mathematically, despite the shortcomings. 
+        </p>
+        <p>
+            I'll be using Chitanda for downscaling, this keyframe represents anime content very well, you can see she it's not as sharp as fanart (likely because it's an upscale 
             from some arbitrary resolution between 1280x720 and 1920x1080) but also not overly blurry either. I decided to use --linear=downscaling=no alongside --correct-downscaling and --deband=no this time to make the comparison 
             against SSimDownscaler fairer, and funnily enough almost all filters seem to perform better on the test image this way. It's important to note mpv does not support using --correct-downscaling alongside --dscale=bilinear, so this 
             filter in particular looks sharper than it should.
         </p>
         <p>
             The following image was downscaled using all the available filters in mpv:
-            <p>
-                <img src="./images/mpv_upscaling/downscaling/images/reference.png" alt="Downscaled Violet" class="center" width="960" height="540">
-            </p>
-            <p>
-                As always, you can find all the resulting images in <a href="https://github.com/Artoriuz/Artoriuz.github.io/tree/master/blog/images/mpv_upscaling/downscaling/images">this repository.</a>
-            </p>
-            <p>We can see the results below:</p>
-            <div class="row">
-                <div class="column">
-                    <img src="./images/mpv_upscaling/downscaling/tables/brisque.png" alt="Chitanda results BRISQUE" width="473" height="756">
-                </div>
-                <div class="column">
-                    <img src="./images/mpv_upscaling/downscaling/tables/niqe.png" alt="Chitanda results NIQE" width="473" height="756">
-                </div>
-              </div>
+        <p>
+            <img src="./images/mpv_upscaling/downscaling/images/reference.png" alt="Downscaled Violet" class="center" width="960" height="540">
         </p>
         <p>
-            As expected, BRISQUE really did almost perfectly rank them from sharpest to blurriest. NIQE put Haasnsoft on top which is an interesting result, I personally find Haasnsoft to be too blurry but that might be useful to hide 
-            source artifacts. Mitchell shows up fairly high too, which is a good sign considering it is the --profile=gpu-hq default downscaler. 
+            As always, you can find all the resulting images in <a href="https://github.com/Artoriuz/Artoriuz.github.io/tree/master/blog/images/mpv_upscaling/downscaling/images">this repository.</a>
         </p>
-        <p>   
-            Note that as I've been trying to say, downscaling is extremely subjective and even algorithms designed to measure the same things come up with extremely different results. 
-            Add the fact that neither of them were trained with anime content in mind and we have the 2 most useless tables in this entire page!
+        <p>We can see the results below:</p>
+        <div class="row">
+            <div class="column">
+                <img src="./images/mpv_upscaling/downscaling/tables/brisque.png" alt="Chitanda results BRISQUE" width="473" height="756">
+            </div>
+            <div class="column">
+                <img src="./images/mpv_upscaling/downscaling/tables/niqe_anime.png" alt="Chitanda results NIQE" width="473" height="756">
+            </div>
+            </div>
+        </p>
+        <p>
+            As expected, BRISQUE really did almost perfectly rank them from sharpest to blurriest. The trained NIQE also put SSimDownscaler at the top, but the following filters aren't solely ranked from sharpest to blurriest. 
         </p>
         <p>
             Out of curiosity, I decided to calculate the structural similarity between the outputs of SSimDownscaler, Lanczos and Catmull Rom. 
@@ -569,19 +575,9 @@
             Those numbers are so close you'd be hard pressed to notice any differences whatsoever between the images. 
         </p>
         <p>
-            Since both BRISQUE and NIQE "learn" from images considered good, We can make them more accurate by actually training them on anime content. I won't go over the trouble of training a custom BRISQUE model, that would 
-            require me to give a subjective score to each image, but NIQE does not depend on human intervention and <a href="https://www.mathworks.com/help/images/ref/fitniqe.html">training it is trivial.</a> 
-        </p>
-        <p>
-            My original idea was using Waifu2x's training dataset, but I found out it isn't public. Then I figured out that I could simply use my anime screenshots folder (which had 162 anime screenshots inside from numerous different shows). 
-            The resulting model does not only give all the scalers better results but it also correlates better with the BRISQUE results and my personal preferences.
-        </p>
-        <p>
-            <img src="./images/mpv_upscaling/downscaling/tables/niqe_anime.png" alt="Chitanda results Custom NIQE" class="center" width="473" height="756">
-        </p>
-        <p>
-            This looks like a table we can attempt to trust now. SSimDownscaler is at the top as it should be, but the following filters aren't solely ranked from sharpest to blurriest. Lanczos is considerably sharper than Catmull Rom but also creates 
-            more ringing artifacts, which likely explains why Catmull Rom is on top of it now. Mitchell and Haasnsoft are both too soft hence why those shifted to the bottom half of the table. Overall I really like the results on this test image. 
+            My original idea was using Waifu2x's training dataset to train NIQE, but I found out it isn't public. Then I figured out that I could simply use my anime screenshots folder 
+            (which had 162 anime screenshots inside from numerous different shows). 
+            The resulting model does not only give all the scalers better results but it also correlates better to BRISQUE results. I should probably train NIQE with pristine fanarts to make it more accurate.
         </p>
         <p>
             Let's remember Lanczos scored slightly better than Catrom in the NIQE chart from the fractional upscaling tests when they were both coupled with a doubler (FSRCNNX or RAVU), 
@@ -596,11 +592,11 @@
         <p>
             I should probably repeat this for an image with more high frequency components like Rosetta, but for now Chitanda will suffice. It's important to insist the optimal filter highly depends 
             on several factors such as the image itself and the scaling factor. To make any reasonably accurate claim I'd need to repeat this experiment on several images and average their results, which I probably won't do anytime soon 
-            considering the differences between them are honestly minimal.
+            considering the differences between the filters are honestly minimal.
         </p>
         <p>
-            My personal recommendation is: Stick to Mitchell as the default if you really dislike ringing. Switch to Lanczos if you want more perceived sharpness and if you 
-            don't want either extreme choose Catrom, which is a decent compromise.
+            My personal recommendation is: Stick to Mitchell as the default if you really dislike ringing. Switch to Lanczos if you want more perceived sharpness. And If you 
+            don't want either extreme, Catrom might be a decent compromise. Sigmoid downscaling could potentially dampen the ringing but as far as I'm aware mpv only supports sigmoidal light upscaling.
         </p>
     </section>
     <section>
