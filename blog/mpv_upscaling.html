@@ -90,16 +90,6 @@
         <p>
             For a more in-depth explanation of scaling filters, you can check <a href="https://legacy.imagemagick.org/Usage/filter/">Imagemagick's documentation</a>.
         </p>
-        <h3 id="SSSR">Structural Similarity Upscaling</h3>
-        <p>
-            We can more precisely upscale something if we try to reconstruct strucutures, the most evident problem with linear or polynomial
-            scalers is the thickening of border areas where the interpolated result doesn't transit between values as sharply,
-            resulting in a blurrier image with "lost" detail in the strucutures if you're downscaling and then upscaling
-            it back.
-        </p>
-        <img src="./images/mpv_upscaling/sssr_bilinear.png" alt="upscaling" class="center" width="300" height="180">
-        <br>
-        <img src="./images/mpv_upscaling/sssr_sssr.png" alt="upscaling" class="center" width="300" height="180">
         <h3 id="machine">Machine Learning</h3>
         <p>
             Machine learning comes as a powerful successor to classical methods due to the fact that you do not need to rely solely on what you can currently retrieve 
