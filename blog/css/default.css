@@ -102,4 +102,12 @@ body {
     margin-left: auto;
     margin-right: auto;
    }
+   code {
+    color: coral;   
+    font-size: 16px;
+   }
+   inline_code {
+    font: monospace;
+    color: coral;
+   }
    
