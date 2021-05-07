@@ -4,19 +4,19 @@ body {
     margin:auto;
     padding:1em;
     line-height:1.4em;
-    color:#DCB;
-    background-color:#080C0D;
-    font-family: 'Roboto', sans-serif
+    color:#d8d1c8;
+    background-color:#000000;
+    font-family: 'Roboto', sans-serif;
    }
    h1,h2,h3,h4,h5,h6 {
     line-height:1.1em;
     font-family: 'Roboto Slab', serif;
    }
    a {
-    color:#FFAA0F
+    color:#5ab7ff
    }
    a:visited {
-    color:#FF5D4A
+    color:#ca86e7
    }
    p {
     margin-bottom:1.2em;
@@ -88,8 +88,18 @@ body {
     font-weight:bold;
     content:">> "
    }
-   .center {
+   .row {
+    display: flex;
+    overflow: scroll;
+    overflow-y: hidden;
+  }
+   .column {
+    flex: 33.33%;
+    padding: 5px;
+  }
+  .center {
     display: block;
     margin-left: auto;
     margin-right: auto;
    }
+   
