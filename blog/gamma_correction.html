@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135192850-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-135192850-1');
+    </script>
+
+    <title>Gamma Corretion</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="./css/default.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&family=Roboto+Slab&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <hgroup>
+            <h1>
+                Gamma Correction
+            </h1>
+            <h2>Why you should care by João Vitor Rafael Chrisóstomo</h2>
+        </hgroup>
+    </header>
+    <nav>
+        <menu>
+            <a href="../index.html">Home</a>
+            <a href="https://github.com/Artoriuz">GitHub</a>
+            <a href="https://www.linkedin.com/in/jvrchrisostomo/">LinkedIn</a>
+        </menu>
+    </nav>
+    <section>
+        <h3 id="introduction">Introduction</h3>
+        <p>
+            Gamma correction is the act of compensating the encoded gamma curve so you can display the content properly on your television, monitor or projector. 
+            When it comes to computers, generally speaking by default you should assume the sRGB colourspace unless the content itself explicitly tells you otherwise. 
+            sRGB is the standard colourspace on consumer monitors and the web, it gives more quantisation steps to the darker tones because the human visual system is more 
+            capable of perceiving slightly differences to dark shades of gray than it is to bright shades of gray. 
+        </p>
+        <p>
+            This is the exact same thing we do in telecommunication systems, where we encode audio in a non-linear way to give more quantisation steps to the lower frequencies.
+        </p>
+        <p>
+            When both ends expect the exact same encoding scheme, you don't need to do anything. The work has already been done. Why am I writing about this then? Well... It's because 
+            sRGB is a colourspace derived from Rec.709, which is the HDTV standard and usually the target when it comes to SDR video content.
+        </p>
+        <p>
+            Rec.709 does not specify a reference display EOTF (electro-optical transfer function), but it has been defined in ITU-R BT.1886 as an equivalent gamma of 2.4 for displays with infinite 
+            contrast. The actual curve depends on the display's characteristics to avoid crushing black detail, and the 2.4 figure is only ideal on dark viewing conditions without light from 
+            other sources hitting the display.
+        </p>
+        <p>
+            sRGB has the exact same white point and RGB primaries as Rec.709, but it modifies the EOTF to a gamma function that's approximately a power 2.2 curve (brighter than 2.4). 
+            The rationale comes from the fact that computer displays are generally used in moderately lit rooms like offices or bedrooms, so it's beneficial to boost the light up a little bit. 
+        </p>
+        <p>
+            With that said, it sounds like everything was designed properly and you shouldn't need to do anything. The Rec.709 content is displayed as it is in TVs and boosted in brightness on 
+            computer displays. The assumption that TVs are watched in dark rooms while computer displays are used in bright rooms does make sense.
+        </p>
+        <p>
+            The problem, though, is that sRGB does not define a power 2.2 EOTF (it's actually a spline between 1 and 2.4 that's only approximately 2.2). 
+        </p>
+        <img src="./images/gamma_correction/sRGB_gamma.png" alt="sRGB Gamma" class="center" width="600" height="645">
+        <p> 
+            The TVs do not always follow the 2.4 recommendation either. Check any recent TV review on <a href="https://www.rtings.com/tv/reviews">RTINGS</a> and you'll see that the 
+            uncalibrated measurements are almost always closer to 2.2. 
+        </p>
+        <p>
+            The sRGB EOTF is indeed very close to a pure power 2.2 EOTF though (as we can see in the image above), but the darker scenes are slightly brighter 
+            and the brighter scenes are slightly darker. This means displaying 2.2 content on an sRGB display will make you lose some contrast. 
+            The question is, is it noticeable? And if it is, what can we do about it?
+        </p>
+        <h3 id="uncorrected">Video Content on sRGB Displays Without Any Corrections</h3>
+        <p>
+            If we go by the assumption that video content is mastered at a 2.4 gamma curve display in a dark environment, having the display at 2.2 should be okay if the display is in a moderately lit 
+            room. What we want to do with gamma correction (in this case) is preserve the intent taking into consideration the differences between viewing conditions.  
+        </p>
+        <p>
+            Since you're probably reading this on a computer display, let's start with untouched content gamma on an sRGB gamma display:
+        </p>
+        <code>mpv --no-config --screenshot-format=png</code>
+        <p>
+            <img src="./images/gamma_correction/uncorrected.png" alt="Uncorrected" class="center" width="960" height="540">
+        </p>
+        <p>
+            The image looks reasonably fine, it doesn't look like we're getting any black crush and the gradients are smooth. 
+            Since we can't compare it to anything yet though, let's leave the conclusions for later.
+        </p>
+        <h3 id="srgb">Video Content on sRGB Displays With Gamma Correction</h3>
+        <p>
+            By default, mpv does not touch SDR content. It simply displays light as it is. 
+        </p>
+        <p>
+            We can, however, force it to perform gamma correction if we give it an ICC profile or set the EOTF with the <inline_code>--target-trc</inline_code> flag. And this is exactly what 
+            we're going to do next:
+        </p>
+        <code>mpv --no-config --screenshot-format=png --target-trc=srgb</code>
+        <p>
+            <img src="./images/gamma_correction/corrected_srgb.png" alt="Corrected to sRGB" class="center" width="960" height="540">
+        </p>
+        <p>
+            It might not be easy to see if you're not putting them side by side or switching between them, but now the screenshot looks darker.
+        </p>
+        <p>
+            Remember, SDR video content is defined by the Rec.709 HDTV standard which has its EOTF defined by BT.1886 (and is equivalent to a power 2.4 gamma curve prior to the modifications 
+            related to display contrast).
+        </p>
+        <p>
+            Doing what we just did tells mpv: "the content has a 2.4 power law gamma curve, my display has a sRGB gamma curve, please do the 
+            required corrections". And since the display's EOTF is a brigther curve than 2.4, the content needs to be darkened to preserve the intent.
+        </p>
+        <p>
+            It's important to note that this only makes sense if the viewing conditions are the same. So only do this if you intend to watch everything at night and with your lights turned off.
+        </p>
+        <h3 id="srgb">Video Content on sRGB Displays With Gamma Correction and Gamma Boost</h3>
+        <p>
+            Wait, there's more...? Remember when I made sure to say sRGB gamma is just APPROXIMATELY a 2.2 power law curve? Using <inline_code>--target-trc</inline_code> does take that into consideration 
+            but it also makes the image darker (to target a dark room). But what if we want to fix the lower contrast issue without making the entire picture noticeably darker?
+        </p>
+        <p>
+            You can achieve this by using <inline_code>--target-trc</inline_code> alongside <inline_code>--gamma-factor=1.1</inline_code>:
+        </p>
+        <code>mpv --no-config --screenshot-format=png --target-trc=srgb --gamma-factor=1.1</code>
+        <p>
+            <img src="./images/gamma_correction/corrected_srgb_boost.png" alt="Corrected to sRGB plus Boost" class="center" width="960" height="540">
+        </p>
+        <p>
+            Now we're telling mpv that the display follows sRGB gamma (it's not always the case with monitors, some manufacturers just ignore the sRGB gamma technicality and go for a 2.2 power law gamma), 
+            so it compensates the source by making the dark areas slightly darker (because sRGB gamma is slightly brighter than a 2.2 power law curve towards the darker tones) and also makes the bright 
+            areas slightly brighter (again to compensate the fact that sRGB gamma is slightly darker towards the brighter tones).
+        </p>
+        <p>
+            The 1.1 constant comes from the fact that 2.4/1.1 is approximately 2.2, which is what we want.
+        </p>
+        <p>
+            If you can not spot the differences between this last picture and the first one without any gamma corrections, just open them both in different tabs and switch between them.
+        </p>
+        <p>
+            Please note though that if you're using mpv to output to a television you do not need to do any of this. TVs do not follow sRGB gamma. They're Rec.709 or Rec.2020 devices. 
+            just send the content as it is and configure the TV itself depending on the viewing conditions (you usually have gamma controls on TVs, either 2 point or 10 point). 
+            The <inline_code>--target-trc --gamma-factor=1.1</inline_code> tweak only makes sense on monitors that in fact follow sRGB gamma (most of them at least attempt to do it).
+        </p>
+        <p>
+            It's also important to say that the ideal scenario for a computer monitor is having an ICC profile that describes your monitor's characteristics. 
+            The gamma curve is not the only thing that's usually slightly off when it comes to consumer level products, most of them have white points that are colder than they should 
+            and primaries that vary from being undersaturated (cheaper models) to oversaturated (the premium models with wider gamuts).
+        </p>
+        <p>
+            This is just my personal preference, but I strongly advise against modifying the source itself before sending it to a TV. Modern TVs offer you enough controls for you to fix whatever 
+            you want to change without having to touch the source and potentially reducing your dynamic range or creating some posterisation artifacts.
+        </p>
+        <br>
+        <br>
+        <nav>
+            <menu>
+                <a href="../index.html">Home</a>
+                <a href="#introduction">Introduction</a>
+                <a href="https://github.com/Artoriuz">GitHub</a>
+                <a href="https://www.linkedin.com/in/jvrchrisostomo/">LinkedIn</a>
+            </menu>
+        </nav>
+        <br>
+        <br>
+    </section>
+</body>
+</html>
