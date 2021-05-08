@@ -8,8 +8,18 @@ body {
     background-color:#000000;
     font-family: 'Roboto', sans-serif;
    }
-   h1,h2,h3,h4,h5,h6 {
+   h1 {
     line-height:1.1em;
+    color:#c79a3a;
+    font-family: 'Roboto Slab', serif;
+   }
+   h2 {
+    line-height:1.1em;
+    font-family: 'Roboto Slab', serif;
+   }
+   h3,h4,h5,h6 {
+    line-height:1.1em;
+    color:#c79a3a;
     font-family: 'Roboto Slab', serif;
    }
    a {
