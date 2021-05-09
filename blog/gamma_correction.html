@@ -124,7 +124,7 @@
             but it also makes the image darker (to target a dark room). But what if we want to fix the lower contrast issue without making the entire picture noticeably darker?
         </p>
         <p>
-            You can achieve this by using <inline_code>--target-trc</inline_code> alongside <inline_code>--gamma-factor=1.1</inline_code>:
+            You can achieve this by using <inline_code>--target-trc=srgb</inline_code> alongside <inline_code>--gamma-factor=1.1</inline_code>:
         </p>
         <code>mpv --no-config --screenshot-format=png --target-trc=srgb --gamma-factor=1.1</code>
         <p>
@@ -144,7 +144,7 @@
         <p>
             Please note though that if you're using mpv to output to a television you do not need to do any of this. TVs do not follow sRGB gamma. They're Rec.709 or Rec.2020 devices. 
             just send the content as it is and configure the TV itself depending on the viewing conditions (you usually have gamma controls on TVs, either 2 point or 10 point). 
-            The <inline_code>--target-trc --gamma-factor=1.1</inline_code> tweak only makes sense on monitors that in fact follow sRGB gamma (most of them at least attempt to do it).
+            The <inline_code>--target-trc=srgb --gamma-factor=1.1</inline_code> tweak only makes sense on monitors that in fact follow sRGB gamma (most of them at least attempt to do it).
         </p>
         <p>
             It's also important to say that the ideal scenario for a computer monitor is having an ICC profile that describes your monitor's characteristics. 
