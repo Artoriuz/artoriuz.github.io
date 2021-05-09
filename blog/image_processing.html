@@ -51,7 +51,7 @@
 			<a href=#contagem><h4>Object Counting</h4></a>
 			<a href=#equalização><h4>Histogram Equalisation</h4></a>
 			<a href=#movimentos><h4>Movement Detection</h4></a>
-			<a href=#lapgauss><h4>Spacial-domain filtering</h4></a>
+			<a href=#lapgauss><h4>spatial-domain filtering</h4></a>
 			<a href=#tiltshift><h4>Tilt-shift</h4></a>
 			<a href=#homomorphic><h4>Homomorphic Filter</h4></a>
 			<a href=#cannypoints><h4>Enhanced pointillism with canny edge detector</h4></a>
@@ -717,14 +717,14 @@ for (int i = 0; i < frame.rows; i++) {
 			</nav>
 			<br>
 			<br>
-			<h3 id="lapgauss">Spacial-domain Filtering</h3>
+			<h3 id="lapgauss">Spatial-domain Filtering</h3>
 			<p>
-                To filter in the spacial domain, we appropriate ourselves from a convolution property. The property tells us that a product in the frequency domain is the equivalent
+                To filter in the spatial domain, we appropriate ourselves from a convolution property. The property tells us that a product in the frequency domain is the equivalent
                 of a convolution in the time domain. In our case "time" is simply the value variation across an axis, and we have 2 axis creating a plane.
 			</p>
 			<p>
 				The program, as requested in the assignment should alternate between certain masks depending on the key pressed during execution. Starting from our original program  
-                <a href="http://agostinhobritojr.github.io/tutoriais/pdi/exemplos/filtroespacial.cpp">filtroespacial.cpp</a>, the objective is to add the option of doing a gaussian
+                <a href="http://agostinhobritojr.github.io/tutoriais/pdi/exemplos/filtroespatial.cpp">filtroespatial.cpp</a>, the objective is to add the option of doing a gaussian
                 filtering before applying the laplacian one. 
 			</p>
 			<p>
@@ -783,7 +783,7 @@ int main(int argvc, char** argv) {
 	std::cout << "width = " << width << "\n";;
 	std::cout << "height = " << height << "\n";;
 
-	namedWindow("spacialfilter", 1);
+	namedWindow("spatialfilter", 1);
 
 	mask_gauss = Mat(3, 3, CV_32F, gauss);
 	scaleAdd(mask_gauss, 1 / 16.0, Mat::zeros(3, 3, CV_32F), mask_gauss);
@@ -810,7 +810,7 @@ int main(int argvc, char** argv) {
 			frameFiltered2 = abs(frameFiltered2);
 			frameFiltered2.convertTo(result_lapgauss, CV_8U);
 
-			imshow("spacialfilter", result_lapgauss);
+			imshow("spatialfilter", result_lapgauss);
 
 		} else {
 			filter2D(frame32f, frameFiltered, frame32f.depth(), mask, Point(1, 1), 0);
@@ -818,7 +818,7 @@ int main(int argvc, char** argv) {
 				frameFiltered = abs(frameFiltered);
 			}
 			frameFiltered.convertTo(result, CV_8U);
-			imshow("spacialfilter", result);
+			imshow("spatialfilter", result);
 		}
 			
 		if (key == 27) break; // esc pressed!
@@ -872,7 +872,7 @@ int main(int argvc, char** argv) {
 					</code>
 				</pre>
 			</p>
-			<a href="https://github.com/Artoriuz/OpenCV-Examples/blob/master/spacialfilters.cpp">spacialfilters.cpp</a>
+			<a href="https://github.com/Artoriuz/OpenCV-Examples/blob/master/spatialfilters.cpp">spatialfilters.cpp</a>
 			<p>
                 The program can be used with images or videos, simply alternating between a few set of lines already commented in the code itself. The image 
                 used as input is shown below:
