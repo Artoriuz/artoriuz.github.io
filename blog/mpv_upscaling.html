@@ -41,10 +41,6 @@
             This work aims to mathematically quantify image quality and performance of different real-time upscaling algorithms.
         </p>
         <p>
-            Before attempting to reproduce, make sure to grab the latest version of <a href="https://mpv.io/">mpv</a> and updated user shaders. You can get 
-            the shaders from <a href="https://github.com/bjin/mpv-prescalers">bjin</a> and <a href="https://github.com/igv/FSRCNN-TensorFlow/releases">igv (FSRCNNX)</a>/<a href="https://gist.github.com/igv">igv (SSSR)</a>.
-        </p>
-        <p>
             If all you want is to look at the results, <a href=#results>follow this link.</a> 
         </p>
         <h3 id="upscaling">What is upscaling?</h3>
@@ -104,9 +100,10 @@
             There are multiple different machine learning based image upscalers, we'll stick to those that are easily testable as mpv user shaders.
         </p>
         <p>
-            We'll test the following algorithms:
+            We'll test the following shaders:
             <li><a href="https://github.com/bjin/mpv-prescalers">RAVU</a></li>
             <li><a href="https://github.com/igv/FSRCNN-TensorFlow">FSRCNNX</a></li>
+            <li><a href="https://github.com/bloc97/Anime4K">Anime4K</a></li>
         </p>
         
         <h3 id="methodology">Testing methodology</h3>
@@ -134,6 +131,10 @@
             The images were then upscaled back by mpv:
         </p>
         <code>mpv --no-config --profile=gpu-hq --deband=no --no-hidpi-window-scale --window-scale=2.0 --pause=yes --screenshot-format=png --no-scaler-resizes-only --scale=filter --glsl-shader=shader downscaled.png</code>
+        <p>
+            Anime4K has a modular design and you can find instructions <a href="https://github.com/bloc97/Anime4K/blob/master/GLSL_Instructions.md">here</a>. I used the 
+            "Remain as faithful to the original while enhancing details" configuration.
+        </p>
         <p>
             Since mpv writes PNGs in the rgb24 format, all screenshots were converted to greyscale using imagemagick as described above. This doesn't change how they're shown on screen, but changes them from 1920x1080x3 to 1920x1080x1.
         </p>
@@ -593,6 +594,9 @@
     </section>
     <section>
         <h3 id="changelog">Changelog</h3>
+        <p>
+            23/05/2021: Adding Anime4K. Fractional comparisons still missing.
+        </p>
         <p>
             01/05/2021: Adding sigmoidal light and linear light comparisons.
         </p>
