@@ -114,11 +114,8 @@
             and then seeing at which frame it stopped. 
         </p>
         <p>
-            Quality measurements were done in 2 test images, one from animation and another one from live action. Debanding was turned off to prevent loss of fine detail.
+            Quality measurements were done with an anime test image. Debanding was turned off to prevent loss of fine detail.
         </p>
-        <p>
-            The reasoning behind this comes from the fact that the live action image has more high frequency components that are harder
-            to "restore". 
         <p>
             In order to measure how "good" each algorithm is, the test images were first converted to grayscale with imagemagick:
         </p>                    
@@ -173,31 +170,31 @@
         <p>We can see the results below:</p>
         <div class="row">
             <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-geometric-mean.png" alt="Violet results Geometric Mean" width="378" height="1134">
+                <img src="./images/mpv_upscaling/tables/violet-geometric-mean.png" alt="Violet results Geometric Mean" width="378" .height="1220">
             </div>
             <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-vif.png" alt="Violet results VIF" width="378" height="1134">
+                <img src="./images/mpv_upscaling/tables/violet-vif.png" alt="Violet results VIF" width="378" .height="1220">
             </div>
             <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-psnrhma.png" alt="Violet results PSNR-HMA" width="378" height="1134">
+                <img src="./images/mpv_upscaling/tables/violet-psnrhma.png" alt="Violet results PSNR-HMA" width="378" .height="1220">
             </div>
             <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-psnr.png" alt="Violet results PSNR" width="378" height="1134">
+                <img src="./images/mpv_upscaling/tables/violet-psnr.png" alt="Violet results PSNR" width="378" .height="1220">
             </div>
             <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-iwssim.png" alt="Violet results IW-SSIM" width="378" height="1134">
+                <img src="./images/mpv_upscaling/tables/violet-iwssim.png" alt="Violet results IW-SSIM" width="378" .height="1220">
             </div>
             <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-msssim.png" alt="Violet results MS-SSIM" width="378" height="1134">
+                <img src="./images/mpv_upscaling/tables/violet-msssim.png" alt="Violet results MS-SSIM" width="378" .height="1220">
             </div>
             <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-ssim.png" alt="Violet results SSIM" width="378" height="1134">
+                <img src="./images/mpv_upscaling/tables/violet-ssim.png" alt="Violet results SSIM" width="378" .height="1220">
             </div>
             <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-niqe.png" alt="Violet results NIQE" width="378" height="1134">
+                <img src="./images/mpv_upscaling/tables/violet-niqe.png" alt="Violet results NIQE" width="378" .height="1220">
             </div>
           </div>
-        
+        <!--
         <p>The following image was used for the live-action upscaling testing:</p>
         <img src="./images/mpv_upscaling/shuri/downscaled.png" alt="Downscaled Shuri" class="center">
         <br>
@@ -225,7 +222,7 @@
                 <img src="./images/mpv_upscaling/tables/shuri-psnrha.png" alt="shuri results PSNR-HA" width="454" height="756">
             </div>
           </div>
-
+        -->
         <p>
             We can clearly see that in general, machine learning based scalers tend to give better quality, though as expected they're also more computationally
             expensive. We can see that FSRCNNX is the highest scoring mpv scaler, followed by RAVU. A previous version of this page included NNEDI3 in the charts, but it has been dropped due to poor performance. 
@@ -282,28 +279,28 @@
         <p>
             <div class="row">
                 <div class="column">
-                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_geometric_mean.png" alt="Violet results Geometric Mean" width="378" height="1134">
+                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_geometric_mean.png" alt="Violet results Geometric Mean" width="378" .height="1220">
                 </div>
                 <div class="column">
-                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_vif.png" alt="Violet results VIF" width="378" height="1134">
+                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_vif.png" alt="Violet results VIF" width="378" .height="1220">
                 </div>
                 <div class="column">
-                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_psnrhma.png" alt="Violet results PSNR-HMA" width="378" height="1134">
+                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_psnrhma.png" alt="Violet results PSNR-HMA" width="378" .height="1220">
                 </div>
                 <div class="column">
-                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_psnr.png" alt="Violet results PSNR" width="378" height="1134">
+                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_psnr.png" alt="Violet results PSNR" width="378" .height="1220">
                 </div>
                 <div class="column">
-                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_iwssim.png" alt="Violet results IW-SSIM" width="378" height="1134">
+                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_iwssim.png" alt="Violet results IW-SSIM" width="378" .height="1220">
                 </div>
                 <div class="column">
-                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_msssim.png" alt="Violet results MS-SSIM" width="378" height="1134">
+                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_msssim.png" alt="Violet results MS-SSIM" width="378" .height="1220">
                 </div>
                 <div class="column">
-                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_ssim.png" alt="Violet results SSIM" width="378" height="1134">
+                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_ssim.png" alt="Violet results SSIM" width="378" .height="1220">
                 </div>
                 <div class="column">
-                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_niqe.png" alt="Violet results NIQE" width="378" height="1134">
+                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_niqe.png" alt="Violet results NIQE" width="378" .height="1220">
                 </div>
               </div>
         </p>
@@ -315,9 +312,6 @@
         <p>
             Overall the tables tell a story that clearly puts FSRCNNX on top, and more specifically the LineArt variant. RAVU-zoom is trading blows with RAVU-lite depending on the metric, and SSSR also shows up as a good "3rd place" 
             contender. I didn't feel the need to include all the simple filters, Lanczos scored the best in the 2x upscaling test so it is the only one showing up again here.
-        </p>
-        <p>
-            I currently can't conduct any performance measurements, the quarantine left me without access to my desktop computer. Doing it on my laptop's Intel iGPU is not worth it.
         </p>
     </section>
     <section>
@@ -594,6 +588,10 @@
     </section>
     <section>
         <h3 id="changelog">Changelog</h3>
+        <p>
+            20/03/2022: Adding FSR, CAS and NVScaler. Fractional comparisons still missing (and I'm not exactly sure if I care enough to add them). 
+            I'm also hiding the live-action results from the page since these haven't been updated in ages.
+        </p>
         <p>
             23/05/2021: Adding Anime4K. Fractional comparisons still missing.
         </p>
