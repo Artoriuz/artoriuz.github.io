@@ -48,9 +48,7 @@
             Like its name implies, upscaling is simply the act of increasing the scale of something. In the digital signal processing case, 
             taking discrete information in a given scale and calculating points between the existing samples. 
             The easiest and most classic way of doing this is through simple linear interpolation, if you want to find a value between two points you can simply draw a
-            line between them and linearly find any value in this line. If you wanted to find the value that's placed exactly
-            in the middle of those 2 discrete points, you could simply do an arithmetic mean with their values to find your
-            answer.
+            line between them. 
         </p>
         <p>
             Linear interpolation can be done in a plane, through both axis, creating what we call "bilinear" interpolation. Bilinear
@@ -66,7 +64,7 @@
         <p>
             A relatively simple way of taking more information into consideration is fitting a curve into more than 2 discrete points. If we connect 2 points directly and only have their values 
             to work with our end result is always going to be a straight line connecting both, but if we can also look at the other neighbouring elements we might be able to fit actual curves and 
-            therefore calculate the in-between points more accuraterly. This is implemented through convolution, using a specific kernel that represents a corresponding filter. 
+            therefore calculate the in-between points more accuraterly.
         </p>
         <p>
             <img src="./images/mpv_upscaling/interpolation.png" alt="upscaling" class="center">
@@ -104,15 +102,18 @@
             <li><a href="https://github.com/bjin/mpv-prescalers">RAVU</a></li>
             <li><a href="https://github.com/igv/FSRCNN-TensorFlow">FSRCNNX</a></li>
             <li><a href="https://github.com/bloc97/Anime4K">Anime4K</a></li>
+            <li><a href="https://gist.github.com/agyild/7e8951915b2bf24526a9343d951db214">NVScaler</a></li>
+            <li><a href="https://gist.github.com/agyild/bbb4e58298b2f86aa24da3032a0d2ee6">CAS</a></li>
+            <li><a href="https://gist.github.com/agyild/82219c545228d70c5604f865ce0b0ce5">FSR</a></li>
         </p>
         
         <h3 id="methodology">Testing methodology</h3>
-        <p>
+        <!--<p>
             Performance measurements were done upscaling an animation video encoded into 8bit AVC from 1280x720 to 2560x1440. Utilising mpv
             with a benchmarking profile, all settings from profile=gpu-hq, with Vulkan as the renderer and hardware decoding turned off. The machine used has
             an Ivy Bridge i5 3470, a Polaris RX 470 and user shaders were always compute shaders when possible. The methodology consists of letting mpv play the file for 4 seconds 
             and then seeing at which frame it stopped. 
-        </p>
+        </p>-->
         <p>
             Quality measurements were done with an anime test image. Debanding was turned off to prevent loss of fine detail.
         </p>
@@ -133,7 +134,7 @@
             "Remain as faithful to the original while enhancing details" configuration.
         </p>
         <p>
-            Since mpv writes PNGs in the rgb24 format, all screenshots were converted to greyscale using imagemagick as described above. This doesn't change how they're shown on screen, but changes them from 1920x1080x3 to 1920x1080x1.
+            Since mpv writes PNGs in the rgb24 format, all screenshots were converted to greyscale using imagemagick as described above. This doesn't change how they're shown on screen, it simply reduces the number of channels from 3 to 1.
         </p>
         <p>
             Performance was evaluated simply in frames per second, while quality was evaluated in 
@@ -143,14 +144,10 @@
             <a href="https://ece.uwaterloo.ca/~z70wang/research/iwssim/">IW-SSIM</a>,
             <a href="http://www.ponomarenko.info/psnrhma.htm">PSNR-HMA</a>,
             <a href="https://live.ece.utexas.edu/research/Quality/VIF.htm">VIF</a> and
-            <a href="http://live.ece.utexas.edu/research/Quality/nrqa.htm">NIQE</a>.
+            <a href="https://github.com/richzhang/PerceptualSimilarity">LPIPS</a>.
         </p>
         <p>
-            With the exception of NIQE, all metrics are full-reference metrics and they compare the "distorted" image to what we call the "ground truth". 
-            For more information about NIQE please refer to the <a href="https://artoriuz.github.io/blog/mpv_upscaling.html#downscaling">downscaling section</a>.
-        </p>
-        <p>
-            All metrics were calculated on Matlab using their reference implementations. PSNR-HMA has its wstep set to 7.
+            All metrics were computed using their reference implementations. PSNR-HMA has its wstep set to 7.
         </p>
         <p>
             This entire process should be easily reproducible.
@@ -191,7 +188,7 @@
                 <img src="./images/mpv_upscaling/tables/violet-ssim.png" alt="Violet results SSIM" width="378" .height="1220">
             </div>
             <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-niqe.png" alt="Violet results NIQE" width="378" .height="1220">
+                <img src="./images/mpv_upscaling/tables/violet-lpips.png" alt="Violet results LPIPS" width="378" .height="1220">
             </div>
           </div>
         <!--
@@ -225,28 +222,26 @@
         -->
         <p>
             We can clearly see that in general, machine learning based scalers tend to give better quality, though as expected they're also more computationally
-            expensive. We can see that FSRCNNX is the highest scoring mpv scaler, followed by RAVU. A previous version of this page included NNEDI3 in the charts, but it has been dropped due to poor performance. 
-            NNEDI3 can be pretty much deprecated, FSRCNNX and RAVU are both better.
+            expensive. We can see that FSRCNNX is the highest scoring mpv scaler, followed by Anime4K and then RAVU. FSR seems particularly bad in the distortion metrics, but it scores well enough in LPIPS.
         </p>
         <p>
-            Between the simple scaling filters, Lanczos performs the best in almost every single table. There are a few things to consider though, sigmoidal upscaling can reduce ringing artifacts and elliptical/cylindrical scaling is 
-            supposed to considerably reduce aliasing at the expense of being slightly blurrier. These phenomena are more visible as we increase the scaling factor, this test is not conclusive in any way whatsoever.
-        </p>
-        <p>
-            While I'm providing numerical test results to mathematically evaluate how those different algorithms perform, I strongly advise taking a look on how the upscaled images actually end up looking like. The viewer has his/her own preference regarding 
-            different drawbacks like aliasing, ringing or blurring. Some people might prefer an algorithm that scores relatively poorly when compared to sharper choices, but you should please yourself while consuming your media.  
+            Between the simple scaling filters, Lanczos seems to be the best orthogonal filter while EWA_Robidoux is the best elliptical one. 
+            As a general rule of thumb, you can expect the elliptical counterparts to produce less aliasing while being slightly blurrier. At the 2x scaling factor the differences aren't particularly drastic, 
+            and since we're using sigmoidal gamma anyway the ringing artifacts from using a "sharp" filter like Lanczos are greatly reduced.
         </p>
         <p>
             The following image is the result of a survey conducted by Don P. Mitchell and Arun N. Netravali, alongside 9 other digital image processing experts with the intention of classifying the bicubic filters 
-            through the <a href="https://en.wikipedia.org/wiki/Mitchell-Netravali_filters">B and C parameters</a>. 
+            via the <a href="https://en.wikipedia.org/wiki/Mitchell-Netravali_filters">B and C parameters</a>. 
         </p>
         <p>
             <img src="./images/mpv_upscaling/mitchell_survey.png" alt="Mitchell Netravali Survey" width="540" height="540" class="center">
         </p>
         <p>    
             The variant known as "Mitchell-Netravali" nowadays is the filter you get with B=C=1/3, and it is mpv's <inline_code>--profile=gpu-hq</inline_code> default downscaler. 
-            Likewise, Imagemagick defaults to mitchell when you're upscaling or downscaling an image with transparency (it uses lanczos when there's no alpha channel). 
-            Note that those choices are subjective, the developers did not choose Mitchell based on mathematical measurements and you should do the same.
+        </p>
+        <p>
+            I didn't exactly expect the "numerically better" filters to actually match subjective choices, 
+            but Imagemagick's default orthogonal resampling filter is Lanczos for images without transparency. Likewise, Imagemagick uses Robidoux by default for distortion operations.
         </p>
     </section>
     <section>
@@ -588,6 +583,9 @@
     </section>
     <section>
         <h3 id="changelog">Changelog</h3>
+        <p>
+            21/03/2022: Replacing NIQE with LPIPS in the upscaling test, LPIPS is a perception-based full-reference image quality metric. 
+        </p>
         <p>
             20/03/2022: Adding FSR, CAS and NVScaler. Fractional comparisons still missing (and I'm not exactly sure if I care enough to add them). 
             I'm also hiding the live-action results from the page since these haven't been updated in ages.
