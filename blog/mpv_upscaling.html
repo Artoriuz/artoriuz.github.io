@@ -225,7 +225,7 @@
             expensive. We can see that FSRCNNX is the highest scoring mpv scaler, followed by Anime4K and then RAVU. FSR seems particularly bad in the distortion metrics, but it scores well enough in LPIPS.
         </p>
         <p>
-            Between the simple scaling filters, Lanczos seems to be the best orthogonal filter while EWA_Robidoux is the best elliptical one. 
+            Between the simple scaling filters, Lanczos seems to be the best orthogonal filter while EWA_Robidouxsharp is the best elliptical one. 
             As a general rule of thumb, you can expect the elliptical counterparts to produce less aliasing while being slightly blurrier. At the 2x scaling factor the differences aren't particularly drastic, 
             and since we're using sigmoidal gamma anyway the ringing artifacts from using a "sharp" filter like Lanczos are greatly reduced.
         </p>
