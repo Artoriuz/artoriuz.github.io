@@ -167,7 +167,7 @@
         <p>We can see the results below:</p>
         <div class="row">
             <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-geometric-mean.png" alt="Violet results Geometric Mean" width="378" .height="1220">
+                <img src="./images/mpv_upscaling/tables/violet-average.png" alt="Violet results" width="378" .height="1220">
             </div>
             <div class="column">
                 <img src="./images/mpv_upscaling/tables/violet-vif.png" alt="Violet results VIF" width="378" .height="1220">
@@ -584,7 +584,8 @@
     <section>
         <h3 id="changelog">Changelog</h3>
         <p>
-            21/03/2022: Replacing NIQE with LPIPS in the upscaling test, LPIPS is a perception-based full-reference image quality metric. 
+            21/03/2022: Replacing NIQE with LPIPS in the upscaling test, LPIPS is a perception-based full-reference image quality metric. Geometric mean replaced with the arithmetic mean of normalised metrics 
+            (all metrics are normalised to [0, 1] and then averaged together). Box scores 0 points because it's the worst in all metrics. I may or may not update the other sections...
         </p>
         <p>
             20/03/2022: Adding FSR, CAS and NVScaler. Fractional comparisons still missing (and I'm not exactly sure if I care enough to add them). 
