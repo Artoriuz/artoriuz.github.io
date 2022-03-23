@@ -167,31 +167,31 @@
         <p>We can see the results below:</p>
         <div class="row">
             <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-geomean.png" alt="Violet results" width="378" .height="1220">
+                <img src="./images/mpv_upscaling/tables/violet-average.png" alt="Violet results" width="378" .height="1623">
             </div>
             <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-vif.png" alt="Violet results VIF" width="378" .height="1220">
+                <img src="./images/mpv_upscaling/tables/violet-vif.png" alt="Violet results VIF" width="378" .height="1623">
             </div>
             <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-psnrhma.png" alt="Violet results PSNR-HMA" width="378" .height="1220">
+                <img src="./images/mpv_upscaling/tables/violet-psnrhma.png" alt="Violet results PSNR-HMA" width="378" .height="1623">
             </div>
             <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-psnr.png" alt="Violet results PSNR" width="378" .height="1220">
+                <img src="./images/mpv_upscaling/tables/violet-psnr.png" alt="Violet results PSNR" width="378" .height="1623">
             </div>
             <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-iwssim.png" alt="Violet results IW-SSIM" width="378" .height="1220">
+                <img src="./images/mpv_upscaling/tables/violet-iwssim.png" alt="Violet results IW-SSIM" width="378" .height="1623">
             </div>
             <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-msssim.png" alt="Violet results MS-SSIM" width="378" .height="1220">
+                <img src="./images/mpv_upscaling/tables/violet-msssim.png" alt="Violet results MS-SSIM" width="378" .height="1623">
             </div>
             <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-ssim.png" alt="Violet results SSIM" width="378" .height="1220">
+                <img src="./images/mpv_upscaling/tables/violet-ssim.png" alt="Violet results SSIM" width="378" .height="1623">
             </div>
             <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-lpips-alex.png" alt="Violet results LPIPS" width="378" .height="1220">
+                <img src="./images/mpv_upscaling/tables/violet-lpips-alex.png" alt="Violet results LPIPS" width="378" .height="1623">
             </div>
             <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-lpips-vgg.png" alt="Violet results LPIPS" width="378" .height="1220">
+                <img src="./images/mpv_upscaling/tables/violet-lpips-vgg.png" alt="Violet results LPIPS" width="378" .height="1623">
             </div>
           </div>
         <!--
@@ -587,6 +587,12 @@
     </section>
     <section>
         <h3 id="changelog">Changelog</h3>
+        <p>
+            22/03/2022: Replacing the geometric mean with the normalised average of the standardised metrics. The geometric mean is great at averaging different metrics together when these metrics 
+            do not have similar ranges, as an arbitrary percentual improvement in any metric would warrant an identical improvement in the final number. However, a 20% (as an example) improvement in PSNR is not the same as 
+            a 20% improvement in SSIM. Standardising the scores (mean = 0 and standard deviation = 1) before averaging them puts all metrics on the same playing field. The final numbers were normalised into [0, 1] to prevent the 
+            table from having negative numbers (due to the standardisation, badly performing metrics end up with negative scores).
+        </p>
         <p>
             21/03/2022: Replacing NIQE with LPIPS in the upscaling test, LPIPS is a perception-based full-reference image quality metric. Gaussian75 was removed.
         </p>
