@@ -108,12 +108,6 @@
         </p>
         
         <h3 id="methodology">Testing methodology</h3>
-        <!--<p>
-            Performance measurements were done upscaling an animation video encoded into 8bit AVC from 1280x720 to 2560x1440. Utilising mpv
-            with a benchmarking profile, all settings from profile=gpu-hq, with Vulkan as the renderer and hardware decoding turned off. The machine used has
-            an Ivy Bridge i5 3470, a Polaris RX 470 and user shaders were always compute shaders when possible. The methodology consists of letting mpv play the file for 4 seconds 
-            and then seeing at which frame it stopped. 
-        </p>-->
         <p>
             Quality measurements were done with an anime test image. Debanding was turned off to prevent loss of fine detail.
         </p>
@@ -246,6 +240,24 @@
         <p>
             I didn't exactly expect the "numerically better" filters to actually match subjective choices, 
             but Imagemagick's default orthogonal resampling filter is Lanczos for images without transparency. Likewise, Imagemagick uses EWA_Robidoux by default for distortion operations.
+        </p>
+        <p>
+            Performance tests were done with an 720p 4:2:0 8 bit H.264/AVC input video:
+        </p>
+        <code>mpv --no-config --profile=gpu-hq --vo=gpu-next --gpu-api=vulkan --audio=no --untimed=yes --video-sync=display-desync --vulkan-swap-mode=immediate --no-hidpi-window-scale --window-scale=2.0 --scale=filter --glsl-shader=shader input.mkv</code>
+        <p>
+            <img src="./images/mpv_upscaling/tables/fps.png" alt="fps" width="426" height="567" class="center">
+        </p>
+        <p>
+            I've decided to go ahead and benchmark using <a href="https://github.com/mpv-player/mpv/wiki/GPU-Next-vs-GPU">libplacebo</a> since it provides better performance and because I believe it'll eventually replace vo=gpu.
+        </p>
+        <p>
+            We can take a few things from this, orthogonal resampling is still faster than elliptical resampling by a significant margin. RAVU, FSR and the small variant of Anime4K are extremely fast, beating or matching ewa_lanczossharp. 
+            FSRCNNX_16 and the biggest variant of Anime4K are still reasonably easy to run as long as you have a semi-decent discrete GPU. I've benchmarked using an RX470, which is far from being "fast" by today's standards.
+        </p>
+        <p>
+            I didn't bother benchmarking filters/shaders that aren't worth considering. You can expect bilinear to be considerably faster than lanczos, but the other orthogonal filters should perform similarly. 
+            Likewise, you should not expect other elliptical filters to be considerably faster than ewa_lanczossharp. They all perform around each other. 
         </p>
     </section>
     <section>
@@ -587,6 +599,9 @@
     </section>
     <section>
         <h3 id="changelog">Changelog</h3>
+        <p>
+            26/03/2022: Adding a new performance chart.
+        </p>
         <p>
             22/03/2022: Replacing the geometric mean with the normalised average of the standardised metrics. The geometric mean is great at averaging different metrics together when these metrics 
             do not have similar ranges, as an arbitrary percentual improvement in any metric would warrant an identical improvement in the final number. However, a 20% (as an example) improvement in PSNR is not the same as 
