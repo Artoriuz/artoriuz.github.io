@@ -76,6 +76,21 @@
             and the brighter scenes are slightly darker. This means displaying 2.2 content on an sRGB display will make you lose some contrast. 
             The question is, is it noticeable? And if it is, what can we do about it?
         </p>
+        <p>
+            If you're still not convinced the difference is easily perceivable, the image below (takan from <a href="http://www.lagom.nl/lcd-test/black.php">lagom.nl</a>) should make it very clear. 
+        </p>
+        <img src="./images/gamma_correction/gamma_comparison.png" alt="sRGB Gamma" class="center" width="960" height="323">
+        <p>
+            On the right, the image is being interpreted as if it had a 2.2 power-law gamma curve, corrected to be displayed on a sRGB display. 
+            The image becomes darker to counter the fact that the sRGB gamma curve is brighter than a 2.2 power law-curve. 
+        </p>
+        <p>
+            On the left, we have the exact opposite. The image is interpreted as an sRGB image, and corrected to be displayed on a 2.2 power-law gamma curve display. 
+            The image becomes brighter to counter the fact that the 2.2 power-law curve is darker than the sRGB gamma curve. 
+        </p>
+        <p>
+            The original image without any modifications is shown in the middle. 
+        </p>
         <h3 id="uncorrected">Video Content on sRGB Displays Without Any Corrections</h3>
         <p>
             If we go by the assumption that video content is mastered at a 2.4 gamma curve display in a dark environment, having the display at 2.2 should be okay if the display is in a moderately lit 
