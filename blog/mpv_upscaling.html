@@ -207,11 +207,6 @@
             orthogonal Lanczos at doing this by the way, but Lanczos is sharper and this probably causes it to score higher on most metrics (since the main problem with classic resampling is blurriness).
         </p>
         <p>
-            As a general rule of thumb, you can expect the elliptical counterparts to produce less aliasing while being slightly blurrier. At the 2x scaling factor the differences aren't particularly drastic, 
-            and since we're using sigmoidal gamma anyway the ringing artifacts from using a "sharp" filter like Lanczos are greatly reduced. Pick tensor Lanczos if you can't notice the jagged edges at your scaling factor, 
-            otherwise EWA_Lanczossharp is a better option.
-        </p>
-        <p>
             The following image is the result of a survey conducted by Don P. Mitchell and Arun N. Netravali, alongside 9 other digital image processing experts with the intention of classifying the bicubic filters 
             via the <a href="https://en.wikipedia.org/wiki/Mitchell-Netravali_filters">B and C parameters</a>. 
         </p>
@@ -240,8 +235,7 @@
             FSRCNNX_16 and the biggest variant of Anime4K are still reasonably easy to run as long as you have a semi-decent discrete GPU. I've benchmarked using an RX470, which is far from being "fast" by today's standards.
         </p>
         <p>
-            I didn't bother benchmarking filters/shaders that aren't worth considering. You can expect bilinear to be considerably faster than lanczos, but the other orthogonal filters should perform similarly. 
-            Likewise, you should not expect other elliptical filters to be considerably faster than ewa_lanczossharp. They all perform around each other. 
+            When it comes to the built-in filters, you can expect polar resampling to be slower than orthogonal resampling, and you can also expect larger filters to be slower.
         </p>
     </section>
     <section>
