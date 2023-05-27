@@ -41,6 +41,18 @@
             This work aims to mathematically quantify image quality and performance of different real-time upscaling algorithms.
         </p>
         <p>
+            I want to make it clear though that you shouldn't take the results as gospel. Mathematical image quality metrics do not always correlate perfectly with how humans perceive image quality, 
+            and your personal preference is entirely subjective. You should take this page as what it is, a research that produces numbers, but you should not take these numbers for granted before 
+            understanding what they actually mean. In the context of image resampling, the primary problem is usually sharpness as reconstructing fine deteails accurately isn't a trivial task. For that 
+            matter, a sharper resampling filter will generally be numerically closer to the reference, even taking the usual side effects into consideration (ringing, blocking, aliasing, etc).
+        </p>
+        <p>
+            Being "numerically closer" to the reference does not always mean that it'll look closer to the reference from our perspective, and that's exactly why "image quality metrics" is still a 
+            research field to this day. The "state of the art" has even abandoned classic distortion-based metrics in favour of complex perception-based metrics in recent years, which are usually based 
+            on CNNs for image classification (computing the distance between the activations). I include LPIPS as a perceptual metric here just to make sure the results aren't too biased towards distortion, 
+            but keep in mind that these metrics were not originally designed to be measuring resampling quality.
+        </p>
+        <p>
             If all you want is to look at the results, <a href=#results>follow this link.</a> 
         </p>
         <h3 id="upscaling">What is Upscaling?</h3>
@@ -68,7 +80,7 @@
         
         <h3 id="methodology">Testing Methodology</h3>
         <p>
-            We'll test the following shaders:
+            We'll test the following shaders alongside the built-in filters found in mpv:
             <li><a href="https://github.com/bjin/mpv-prescalers">RAVU</a></li>
             <li><a href="https://github.com/igv/FSRCNN-TensorFlow">FSRCNNX</a></li>
             <li><a href="https://github.com/bloc97/Anime4K">Anime4K</a></li>
@@ -242,9 +254,8 @@
         </p>
         <p>
             The methodology is straightforward, violet-gray.png was downscaled to 1280x720 with imagemagick: 
-        <p>
-            magick convert violet-gray.png -filter catrom -resize 1280x720 downscaled.png
         </p>
+        <code>magick convert violet-gray.png -filter catrom -resize 1280x720 downscaled.png</code>
         <p>
             This is the equivalent of downscaling with mpv using <inline_code>--dscale=catmull_rom --correct-downscaling --linear-downscaling=no</inline_code>.
         </p>
@@ -571,6 +582,9 @@
     </section>
     <section>
         <h3 id="changelog">Changelog</h3>
+        <p>
+            27/05/2023: Adding a disclaimer.
+        </p>
         <p>
             20/05/2023: Minor updates because I wasn't very happy with the text. Violet's average chart also updated to be done using normalised metrics (it used standardised metrics previously). 
             I think this makes more sense because it treats all scores equally. Previously we'd have outliers carrying the average for some filters (like EWA_Robidouxsharp).
