@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135192850-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-135192850-1');
+    </script>
+
+    <title>Imagemagick Resampling</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="./css/default.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&family=Roboto+Slab&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <hgroup>
+            <h1>
+                Imagemagick Resampling
+            </h1>
+            <h2>When doing it with mpv isn't enough...</h2>
+        </hgroup>
+    </header>
+    <nav>
+        <menu>
+            <a href="../index.html">Home</a>
+            <a href="https://github.com/Artoriuz">GitHub</a>
+            <a href="https://www.linkedin.com/in/jvrchrisostomo/">LinkedIn</a>
+        </menu>
+    </nav>
+    <section>
+        <h3 id="introduction">Introduction</h3>
+        <p>
+            Some of you may be familiar with the blog post I made about mpv's scaling filters a while ago, but it was never really meant to be shared as much as it did. That page 
+            was originally the result of an assignment that I had during my undergrad, when I was formally studying digital image processing for the first time. Naturally, it was 
+            full of mistakes and the results weren't particularly scientific. I got a lot of feedback and the page ended up evolving in an organic way, 
+            but it still has some fundamental issues that can not be fixed without a major change in the methodology.
+        </p>
+        <p>
+            From the top of my head I can enumerate the following problems:
+            <ol>
+                <li>The resampling tests were only done for 1 or 2 test images.</li>
+                <li>I kept adding meme metrics since people requested them.</li>
+                <li>I also kept adding meme shaders since people requested them.</li>
+                <li>I created a bunch of different test cases but didn't really have the motivation to keep all of them up to date.</li>
+                <li>I originally used Matlab to compute the metrics and Excel to plot the tables, which means updating the page was a major pain in the ass.</li>
+                <li>I used catmull-rom in linear light to downscale the test images.</li>
+            </ol> 
+        </p>
+        <p>
+            So, to address these issues:
+            <ol>
+                <li>I chose to use the entire Manga109 dataset this time, which is probably the best widely-used dataset we have for line-art.</li>
+                <li>I chose to stick to the standard distortion metrics, I'll think about adding perception metrics to the mix but only if they have decent Python implementations and actually compute at a decent speed.</li>
+                <li>I chose to exclude all meme shaders. I'll stick to resampling filters this time. A following work with meme shaders isn't out of question but this is harder to automate.</li>
+                <li>I chose to only test a few things, don't ask me to add your niche use cases because I won't do it.</li>
+                <li>I chose to automate everything with a Python script so updating the numbers should be trivial (if this is needed at all).</li>
+                <li>I chose to use the box filter in linear light to downsample this time. Since I'm downsampling to 0.5x this should be a simple average of 4 pixels, which is the best case scenario and doesn't introduce any blurriness or ringing.</li>
+            </ol> 
+        </p>
+        <p>
+            With that out of the way, we can proceed with the real introduction.
+        </p>
+        <h3 id="resampling">Resampling</h3>
+        <p>
+            Resampling is the process of changing the number of samples of a discrete signal to obtain a new discrete representation of the underlying continuous signal. This definition comes from the idea of having 
+            a sensor of some kind producing an analog continuous-time voltage/current variance which is then periodically sampled and quantised into predefined amplitude levels so we can store it in bits/bytes.
+        </p>
+        <p>
+            The easiest and most classic way of resampling to a higher sample rate is via linear interpolation, if you want to find a value between two points you can simply draw a
+            line between them. Linear interpolation can be done in a cartesian plane, through both axis, creating what we call <a href="https://en.wikipedia.org/wiki/Bilinear_interpolation">"bilinear" interpolation</a>. Bilinear
+            interpolation is the simplest interpolation algorithm, the easiest to compute and probably the most widespread one.
+        </p>
+        <p>
+            But can something as simple as just drawing a line between 2 points give us good results? Sometimes it does, sometimes it doesn't. It really depends on the signal. Instead of taking 2 points 
+            and drawing a line, we could take more than 2 points and draw a higher-degree curve. The shape of the curve depends on the weights used in the calculation, and these weights depend on the chosen filter. The number 
+            of input samples in the calculation depends on the length/radius/support of the filter. If you want to understand how this is actually done, I suggest simply 
+            reading <a href="https://entropymine.com/imageworsener/resample/">this explanation</a>.
+        </p>
+        <p>
+            In short, the most common way of resampling images is treating each row/column as an independent 1-D signal and simply going over all of them until you have resampled the entire image. This means you have to choose a dimension 
+            to resample first but this is pretty much inconsequential to the end result. The resampling algorithm itself is pretty simple, for each output sample you simply centralise the filter on top of it and 
+            see which input samples end up inside of the window after you compute their equivalent positions, then you multiply these inputs by their corresponding weights depending on their distance to the centre.
+        </p>
+        <p>
+            There's a different method, usually called polar/cylindrical/elliptical resampling, that does the operation in the 2-D domain directly. The only difference here is that all samples that fit inside the 2-D filter will now 
+            be weighted simultaenously, which may drastically change how some filters behave.
+        </p>
+        <p>
+            <img src="./images/imagemagick_resampling/orthogonal_vs_polar.png" alt="Ortho_polar_comparison" class="center" width="900" height="285">
+        </p>
+        <p>
+            In this page I'll include results for both orthogonal and polar resampling. While polar resampling makes sense from a mathematical perspective, 
+            its implementations are generally slower and most filters weren't really designed to be used in this way (the most "famous" exception being polar lanczos, since we replace the sinc function with its 2-D "equivalent",
+            the jinc/sombrero function).
+        </p>
+        <h3 id="methodology">Methodology</h3>
+        <p>
+            As stated before the entire Manga109 dataset will be used in this comparison. This dataset has manga covers that look like this:
+        </p>
+        <p>
+            <img src="./images/imagemagick_resampling/manga109.png" alt="Manga109" class="center" width="960" height="340">
+        </p>
+        <p>
+            The dataset is downscaled with:
+        </p>
+        <code>magick mogrify -colorspace rgb -filter box -resize 50% -colorspace srgb -path low_res inputs/*.png</code>
+        <p>
+            The dataset is then brought back up with the following command for orthogonal resampling:
+        </p>
+        <code>magick mogrify -colorspace RGB +sigmoidal-contrast 7.5 -filter {resampling_filter} -resize 200% -sigmoidal-contrast 7.5 -colorspace sRGB -path high_res low_res/*.png</code>
+        <p>
+            And the following command for polar resampling:
+        </p>
+        <code>magick mogrify -colorspace RGB +sigmoidal-contrast 7.5 -filter {resampling_filter} -distort Resize 200% -sigmoidal-contrast 7.5 -colorspace sRGB -path high_res low_res/*.png</code>
+        <p>The <inline_code>{resampling_filter}</inline_code> argument is replaced by all available resampling filters:
+        <code>
+        ['Bartlett',
+        'Blackman',
+        'Bohman',
+        'Box',
+        'Catrom',
+        'Cosine',
+        'Cubic',
+        'Gaussian',
+        'Hamming',
+        'Hann',
+        'Hermite',
+        'Jinc',
+        'Kaiser',
+        'Lagrange',
+        'Lanczos',
+        'Lanczos2',
+        'Lanczos2Sharp',
+        'LanczosRadius',
+        'LanczosSharp',
+        'Mitchell',
+        'Parzen',
+        'Point',
+        'Quadratic',
+        'Robidoux',
+        'RobidouxSharp',
+        'Sinc',
+        'SincFast',
+        'Spline',
+        'CubicSpline',
+        'Triangle',
+        'Welch']
+        </code>
+        <p>
+            For a much better explanation of these filters, <a href="https://imagemagick.org/Usage/filter/">please check this page from Imagemagick.</a> 
+        </p>
+        </p>
+        <p>
+            The result is then evaluated with MAE, PSNR, SSIM and MS-SSIM. All calculations are done with all three RGB channels and in double-precision floating-point for accuracy. Metrics are normalised between [0, 1] and then 
+            averaged together with a normal arithmetic mean.
+        </p>
+        <p>
+            Please note that some of those filters are just aliases to other filters or aliases to sinc/jinc with different windows.
+        </p>
+        <p>
+            LanczosRadius is supposed to be a jinc-windowed jinc sharpened to have its second zero crossing 
+            at 3 instead of 3.2383154841662362.
+        </p>
+        <p>
+            LanczosSharp and Lanczos2Sharp are both supposed to be sharper jinc-windowed jincs since the original filters ended up too soft when compared to their sinc-windowed sinc orthogonal 
+            equivalents.
+        </p>
+        <p>
+            None of those sharper lanczoses make any sense to be used in orthogonal resampling, since you'll be sharpening the sinc instad of the jinc (Imagemagick replaces them automatically), but I've decided to keep 
+            all the results for completeness.
+        </p>
+        <h3 id="results">Results</h3>
+        <p>
+            <table>
+                <tr><td>Filter</td><td>MAE</td><td>PSNR</td><td>SSIM</td><td>MS-SSIM</td><td>MAE (N)</td><td>PSNR (N)</td><td>SSIM (N)</td><td>MS-SSIM (N)</td><td>Mean</td></tr>
+                <tr><td>LanczosSharp</td><td>0.0163</td><td>30.3992</td><td>0.9391</td><td>0.9952</td><td>1.0000</td><td>0.9973</td><td>0.9716</td><td>0.9944</td><td>0.9908</td></tr>
+                <tr><td>Polar_Catrom</td><td>0.0164</td><td>30.2800</td><td>0.9411</td><td>0.9953</td><td>0.9860</td><td>0.9704</td><td>1.0000</td><td>1.0000</td><td>0.9891</td></tr>
+                <tr><td>Hamming</td><td>0.0163</td><td>30.4113</td><td>0.9384</td><td>0.9950</td><td>0.9932</td><td>1.0000</td><td>0.9621</td><td>0.9826</td><td>0.9845</td></tr>
+                <tr><td>Cosine</td><td>0.0164</td><td>30.3786</td><td>0.9378</td><td>0.9950</td><td>0.9859</td><td>0.9926</td><td>0.9536</td><td>0.9796</td><td>0.9779</td></tr>
+                <tr><td>Polar_Lagrange</td><td>0.0166</td><td>30.3581</td><td>0.9396</td><td>0.9949</td><td>0.9686</td><td>0.9880</td><td>0.9784</td><td>0.9766</td><td>0.9779</td></tr>
+                <tr><td>Welch</td><td>0.0164</td><td>30.3915</td><td>0.9376</td><td>0.9949</td><td>0.9834</td><td>0.9955</td><td>0.9497</td><td>0.9781</td><td>0.9767</td></tr>
+                <tr><td>Lanczos</td><td>0.0164</td><td>30.3221</td><td>0.9379</td><td>0.9949</td><td>0.9837</td><td>0.9799</td><td>0.9550</td><td>0.9791</td><td>0.9744</td></tr>
+                <tr><td>LanczosRadius</td><td>0.0164</td><td>30.3221</td><td>0.9379</td><td>0.9949</td><td>0.9837</td><td>0.9799</td><td>0.9550</td><td>0.9791</td><td>0.9744</td></tr>
+                <tr><td>Hann</td><td>0.0165</td><td>30.2987</td><td>0.9377</td><td>0.9948</td><td>0.9779</td><td>0.9746</td><td>0.9515</td><td>0.9716</td><td>0.9689</td></tr>
+                <tr><td>Kaiser</td><td>0.0165</td><td>30.2733</td><td>0.9378</td><td>0.9948</td><td>0.9784</td><td>0.9688</td><td>0.9533</td><td>0.9731</td><td>0.9684</td></tr>
+                <tr><td>Bartlett</td><td>0.0165</td><td>30.2282</td><td>0.9377</td><td>0.9949</td><td>0.9764</td><td>0.9586</td><td>0.9520</td><td>0.9752</td><td>0.9656</td></tr>
+                <tr><td>Blackman</td><td>0.0166</td><td>30.1354</td><td>0.9372</td><td>0.9947</td><td>0.9636</td><td>0.9377</td><td>0.9440</td><td>0.9667</td><td>0.9530</td></tr>
+                <tr><td>Bohman</td><td>0.0166</td><td>30.1085</td><td>0.9371</td><td>0.9947</td><td>0.9613</td><td>0.9316</td><td>0.9425</td><td>0.9667</td><td>0.9505</td></tr>
+                <tr><td>Polar_LanczosRadius</td><td>0.0167</td><td>30.1668</td><td>0.9355</td><td>0.9946</td><td>0.9536</td><td>0.9448</td><td>0.9205</td><td>0.9570</td><td>0.9440</td></tr>
+                <tr><td>Parzen</td><td>0.0168</td><td>29.9988</td><td>0.9364</td><td>0.9946</td><td>0.9473</td><td>0.9068</td><td>0.9329</td><td>0.9612</td><td>0.9371</td></tr>
+                <tr><td>Polar_RobidouxSharp</td><td>0.0172</td><td>29.7304</td><td>0.9337</td><td>0.9946</td><td>0.9070</td><td>0.8462</td><td>0.8951</td><td>0.9598</td><td>0.9020</td></tr>
+                <tr><td>Lanczos2Sharp</td><td>0.0172</td><td>29.6361</td><td>0.9344</td><td>0.9947</td><td>0.8993</td><td>0.8249</td><td>0.9048</td><td>0.9644</td><td>0.8984</td></tr>
+                <tr><td>Polar_CubicSpline</td><td>0.0176</td><td>29.7738</td><td>0.9369</td><td>0.9933</td><td>0.8587</td><td>0.8560</td><td>0.9408</td><td>0.8811</td><td>0.8842</td></tr>
+                <tr><td>Sinc</td><td>0.0179</td><td>30.2249</td><td>0.9297</td><td>0.9937</td><td>0.8327</td><td>0.9579</td><td>0.8377</td><td>0.9046</td><td>0.8832</td></tr>
+                <tr><td>SincFast</td><td>0.0179</td><td>30.2249</td><td>0.9297</td><td>0.9937</td><td>0.8327</td><td>0.9579</td><td>0.8377</td><td>0.9046</td><td>0.8832</td></tr>
+                <tr><td>Polar_LanczosSharp</td><td>0.0173</td><td>29.8697</td><td>0.9308</td><td>0.9936</td><td>0.8888</td><td>0.8777</td><td>0.8534</td><td>0.8982</td><td>0.8795</td></tr>
+                <tr><td>CubicSpline</td><td>0.0175</td><td>29.6101</td><td>0.9318</td><td>0.9938</td><td>0.8765</td><td>0.8190</td><td>0.8676</td><td>0.9129</td><td>0.8690</td></tr>
+                <tr><td>Lanczos2</td><td>0.0175</td><td>29.5422</td><td>0.9322</td><td>0.9940</td><td>0.8708</td><td>0.8037</td><td>0.8741</td><td>0.9248</td><td>0.8683</td></tr>
+                <tr><td>Catrom</td><td>0.0175</td><td>29.4788</td><td>0.9320</td><td>0.9940</td><td>0.8687</td><td>0.7894</td><td>0.8705</td><td>0.9261</td><td>0.8637</td></tr>
+                <tr><td>Polar_Cosine</td><td>0.0176</td><td>29.7521</td><td>0.9289</td><td>0.9932</td><td>0.8627</td><td>0.8511</td><td>0.8266</td><td>0.8749</td><td>0.8538</td></tr>
+                <tr><td>Polar_Lanczos</td><td>0.0176</td><td>29.7521</td><td>0.9289</td><td>0.9932</td><td>0.8627</td><td>0.8511</td><td>0.8266</td><td>0.8749</td><td>0.8538</td></tr>
+                <tr><td>Polar_Welch</td><td>0.0176</td><td>29.7521</td><td>0.9289</td><td>0.9932</td><td>0.8627</td><td>0.8511</td><td>0.8266</td><td>0.8749</td><td>0.8538</td></tr>
+                <tr><td>Polar_Hann</td><td>0.0177</td><td>29.6535</td><td>0.9285</td><td>0.9931</td><td>0.8511</td><td>0.8288</td><td>0.8214</td><td>0.8713</td><td>0.8432</td></tr>
+                <tr><td>Polar_Bartlett</td><td>0.0177</td><td>29.6043</td><td>0.9287</td><td>0.9931</td><td>0.8513</td><td>0.8177</td><td>0.8231</td><td>0.8712</td><td>0.8408</td></tr>
+                <tr><td>Polar_Mitchell</td><td>0.0179</td><td>29.2988</td><td>0.9290</td><td>0.9935</td><td>0.8295</td><td>0.7487</td><td>0.8283</td><td>0.8956</td><td>0.8255</td></tr>
+                <tr><td>Polar_Hamming</td><td>0.0179</td><td>29.5229</td><td>0.9275</td><td>0.9928</td><td>0.8322</td><td>0.7993</td><td>0.8062</td><td>0.8509</td><td>0.8222</td></tr>
+                <tr><td>Polar_Kaiser</td><td>0.0180</td><td>29.4493</td><td>0.9272</td><td>0.9927</td><td>0.8248</td><td>0.7827</td><td>0.8022</td><td>0.8506</td><td>0.8151</td></tr>
+                <tr><td>Polar_Lanczos2Sharp</td><td>0.0182</td><td>29.2163</td><td>0.9269</td><td>0.9929</td><td>0.8015</td><td>0.7301</td><td>0.7981</td><td>0.8571</td><td>0.7967</td></tr>
+                <tr><td>Lagrange</td><td>0.0182</td><td>29.1906</td><td>0.9267</td><td>0.9926</td><td>0.7976</td><td>0.7243</td><td>0.7959</td><td>0.8413</td><td>0.7898</td></tr>
+                <tr><td>Polar_Blackman</td><td>0.0184</td><td>29.1789</td><td>0.9251</td><td>0.9923</td><td>0.7852</td><td>0.7216</td><td>0.7728</td><td>0.8260</td><td>0.7764</td></tr>
+                <tr><td>Polar_Robidoux</td><td>0.0184</td><td>29.0213</td><td>0.9258</td><td>0.9927</td><td>0.7766</td><td>0.6860</td><td>0.7818</td><td>0.8489</td><td>0.7733</td></tr>
+                <tr><td>Polar_Bohman</td><td>0.0184</td><td>29.1470</td><td>0.9249</td><td>0.9923</td><td>0.7808</td><td>0.7144</td><td>0.7698</td><td>0.8252</td><td>0.7725</td></tr>
+                <tr><td>Polar_Lanczos2</td><td>0.0187</td><td>28.9992</td><td>0.9232</td><td>0.9919</td><td>0.7511</td><td>0.6810</td><td>0.7450</td><td>0.8007</td><td>0.7445</td></tr>
+                <tr><td>Polar_Parzen</td><td>0.0188</td><td>28.8898</td><td>0.9227</td><td>0.9918</td><td>0.7397</td><td>0.6563</td><td>0.7383</td><td>0.7960</td><td>0.7326</td></tr>
+                <tr><td>RobidouxSharp</td><td>0.0193</td><td>28.5601</td><td>0.9204</td><td>0.9912</td><td>0.6857</td><td>0.5818</td><td>0.7054</td><td>0.7614</td><td>0.6836</td></tr>
+                <tr><td>Polar_Hermite</td><td>0.0202</td><td>27.7627</td><td>0.9180</td><td>0.9933</td><td>0.5937</td><td>0.4017</td><td>0.6713</td><td>0.8806</td><td>0.6369</td></tr>
+                <tr><td>Mitchell</td><td>0.0199</td><td>28.3003</td><td>0.9166</td><td>0.9903</td><td>0.6288</td><td>0.5232</td><td>0.6517</td><td>0.7060</td><td>0.6274</td></tr>
+                <tr><td>Hermite</td><td>0.0202</td><td>27.8860</td><td>0.9170</td><td>0.9923</td><td>0.5953</td><td>0.4296</td><td>0.6571</td><td>0.8217</td><td>0.6259</td></tr>
+                <tr><td>Robidoux</td><td>0.0202</td><td>28.1364</td><td>0.9141</td><td>0.9896</td><td>0.5916</td><td>0.4861</td><td>0.6161</td><td>0.6689</td><td>0.5907</td></tr>
+                <tr><td>Polar_Triangle</td><td>0.0207</td><td>27.8375</td><td>0.9122</td><td>0.9900</td><td>0.5479</td><td>0.4186</td><td>0.5888</td><td>0.6903</td><td>0.5614</td></tr>
+                <tr><td>Box</td><td>0.0220</td><td>26.5260</td><td>0.9105</td><td>0.9950</td><td>0.4101</td><td>0.1224</td><td>0.5649</td><td>0.9801</td><td>0.5194</td></tr>
+                <tr><td>Point</td><td>0.0220</td><td>26.5260</td><td>0.9105</td><td>0.9950</td><td>0.4101</td><td>0.1224</td><td>0.5649</td><td>0.9801</td><td>0.5194</td></tr>
+                <tr><td>Polar_Box</td><td>0.0220</td><td>26.5260</td><td>0.9105</td><td>0.9950</td><td>0.4101</td><td>0.1224</td><td>0.5649</td><td>0.9801</td><td>0.5194</td></tr>
+                <tr><td>Polar_Point</td><td>0.0213</td><td>27.6369</td><td>0.9069</td><td>0.9880</td><td>0.4762</td><td>0.3733</td><td>0.5140</td><td>0.5715</td><td>0.4838</td></tr>
+                <tr><td>Polar_Sinc</td><td>0.0213</td><td>27.6369</td><td>0.9069</td><td>0.9880</td><td>0.4762</td><td>0.3733</td><td>0.5140</td><td>0.5715</td><td>0.4838</td></tr>
+                <tr><td>Polar_SincFast</td><td>0.0213</td><td>27.6369</td><td>0.9069</td><td>0.9880</td><td>0.4762</td><td>0.3733</td><td>0.5140</td><td>0.5715</td><td>0.4838</td></tr>
+                <tr><td>Triangle</td><td>0.0213</td><td>27.6369</td><td>0.9069</td><td>0.9880</td><td>0.4762</td><td>0.3733</td><td>0.5140</td><td>0.5715</td><td>0.4838</td></tr>
+                <tr><td>Jinc</td><td>0.0214</td><td>27.8115</td><td>0.9049</td><td>0.9868</td><td>0.4681</td><td>0.4127</td><td>0.4854</td><td>0.5026</td><td>0.4672</td></tr>
+                <tr><td>Polar_Quadratic</td><td>0.0228</td><td>27.0915</td><td>0.8960</td><td>0.9850</td><td>0.3285</td><td>0.2501</td><td>0.3577</td><td>0.3992</td><td>0.3339</td></tr>
+                <tr><td>Polar_Gaussian</td><td>0.0231</td><td>26.9436</td><td>0.8941</td><td>0.9849</td><td>0.2939</td><td>0.2167</td><td>0.3308</td><td>0.3926</td><td>0.3085</td></tr>
+                <tr><td>Gaussian</td><td>0.0231</td><td>26.9424</td><td>0.8940</td><td>0.9849</td><td>0.2936</td><td>0.2164</td><td>0.3305</td><td>0.3923</td><td>0.3082</td></tr>
+                <tr><td>Quadratic</td><td>0.0233</td><td>26.8872</td><td>0.8920</td><td>0.9840</td><td>0.2718</td><td>0.2040</td><td>0.3009</td><td>0.3367</td><td>0.2783</td></tr>
+                <tr><td>Polar_Jinc</td><td>0.0247</td><td>26.9115</td><td>0.8953</td><td>0.9820</td><td>0.1285</td><td>0.2095</td><td>0.3489</td><td>0.2231</td><td>0.2275</td></tr>
+                <tr><td>Polar_Cubic</td><td>0.0255</td><td>26.1276</td><td>0.8741</td><td>0.9792</td><td>0.0446</td><td>0.0324</td><td>0.0472</td><td>0.0553</td><td>0.0449</td></tr>
+                <tr><td>Polar_Spline</td><td>0.0255</td><td>26.1276</td><td>0.8741</td><td>0.9792</td><td>0.0446</td><td>0.0324</td><td>0.0472</td><td>0.0553</td><td>0.0449</td></tr>
+                <tr><td>Cubic</td><td>0.0260</td><td>25.9843</td><td>0.8708</td><td>0.9782</td><td>0.0000</td><td>0.0000</td><td>0.0000</td><td>0.0000</td><td>0.0000</td></tr>
+                <tr><td>Spline</td><td>0.0260</td><td>25.9843</td><td>0.8708</td><td>0.9782</td><td>0.0000</td><td>0.0000</td><td>0.0000</td><td>0.0000</td><td>0.0000</td></tr>
+                </table>
+        </p>
+        <h3 id="commentary">Commentary</h3>
+        <p>
+            We started this little adventure to provide a bit more robustness to the numbers compared to my previous comparison done using mpv, and there are a few surprises in the results. The first one is that 
+            orthogonal LanczosSharp ended up on top of the table, an option that shouldn't even be in the comparison. If you want to give it a try on mpv, you can use <inline_code>--scale=lanczos --scale-blur=0.9812505644269356</inline_code>.
+        </p>
+        <p>
+            The second surprise is that Polar_Catrom is at the second place with the best scores for both SSIM and MS-SSIM. Polar_Catrom is an extremely sharp filter and I really like it when paired with pixel clipping for anti-ringing. 
+            Since it only rings once when it overshoots or undershoots, it's trivial to remove all ringing if we just clip the output of each pixel to the limits of the input pixels inside the window. 
+            <a href="https://github.com/Artoriuz/python-anti-ringing">I have written a proof of concept here</a>. If you want to give the filter a try on mpv, you can use <inline_code>--scale=ewa_robidoux --scale-param1=0 --scale--param2=0.5</inline_code>.
+        </p>
+        <p>
+            The third surprise is that the first lobe of a larger sinc apparently isn't the best windowing function for the lanczos filter, as the hamming window beat it on all 4 metrics. You can use this on mpv with 
+            <inline_code>--scale=lanczos --scale-window=hamming</inline_code>.
+        </p>
+        <p>
+            Finally, it's also a little bit funny to see Lanczos2 beating Catmull_Rom in the "orthogonal filters with radius = 2" category. And it's even funnier that Lanczos2Sharp beat them both, another filter that shouldn't even be here. 
+            To use Lanczos2 on mpv you can simply do <inline_code>--scale=lanczos --scale-radius=2</inline_code>, and for Lanczos2Sharp add <inline_code>--scale=blur=0.9549963639785485</inline_code>.
+        </p>
+        <p>
+            You might have also noticed that Polar_LanczosRadius is on top of Polar_LanczosSharp. Polar_LanczosRadius is sharpened to have its second zero crossing exactly at 3, and to accomplish that we have to divide it by its original position 
+            3.2383154841662362, that gives us a value of 0.92640757661 so to use it on mpv you can try <inline_code>--scale=ewa_lanczos --scale-radius=3 --scale-blur=0.92640757661</inline_code>.
+        </p>
+        <p>
+            Overall it looks like the filters were more or less ranked from sharpest to softest. This makes perfect sense as the main problem with image upsampling is unintended blurriness. PSNR is calculated using the MSE so it's overly 
+            sensitive to outliers, which naturally end up being the sharp transitions. SSIM was also literally designed to give good scores to distorted images that have similarish structures, which also favours sharpness. MAE is a little more 
+            neutral than PSNR which is why we generally use it as our target when training distortion-based CNNs, so it should punish filters that are too sharp in detriment to ringing, aliasing and blocking. That's the main reason why most of those 
+            CNNs end up generating images that look like oil painting. MS-SSIM was added to neutralise stupidly minor differences as we wouldn't be able to see them anyway from normal viewing distances.
+        </p>
+        <p>
+            As usual, the filters are ranked based on full-reference distortion metrics that may not always correlate with the human perception of quality, and your personal preference is entirely subjective.
+        </p>
+        <h3 id="outro">Outro</h3>
+        <p>
+            Nicolas Robidoux has a <a href="https://imagemagick.org/Usage/filter/nicolas/">personal page with some recommendations</a>, if you want a more qualitative approach.
+        </p>
+        <br>
+        <br>
+        <nav>
+            <menu>
+                <a href="../index.html">Home</a>
+                <a href="#introduction">Introduction</a>
+                <a href="https://github.com/Artoriuz">GitHub</a>
+                <a href="https://www.linkedin.com/in/jvrchrisostomo/">LinkedIn</a>
+            </menu>
+        </nav>
+        <br>
+        <br>
+    </section>
+</body>
+</html>
