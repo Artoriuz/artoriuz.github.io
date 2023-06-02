@@ -166,7 +166,7 @@
             Please note that some of those filters are just aliases to other filters or aliases to sinc/jinc with different windows.
         </p>
         <p>
-            LanczosRadius is supposed to be a jinc-windowed jinc sharpened to have its second zero crossing 
+            LanczosRadius is supposed to be a jinc-windowed jinc sharpened to have its third zero crossing 
             at 3 instead of 3.2383154841662362.
         </p>
         <p>
@@ -264,7 +264,7 @@
             To use Lanczos2 on mpv you can simply do <inline_code>--scale=lanczos --scale-radius=2</inline_code>, and for Lanczos2Sharp add <inline_code>--scale=blur=0.9549963639785485</inline_code>.
         </p>
         <p>
-            You might have also noticed that Polar_LanczosRadius is on top of Polar_LanczosSharp. Polar_LanczosRadius is sharpened to have its second zero crossing exactly at 3, and to accomplish that we have to divide it by its original position 
+            You might have also noticed that Polar_LanczosRadius is on top of Polar_LanczosSharp. Polar_LanczosRadius is sharpened to have its third zero crossing exactly at 3, and to accomplish that we have to divide it by its original position 
             3.2383154841662362, that gives us a value of 0.92640757661 so to use it on mpv you can try <inline_code>--scale=ewa_lanczos --scale-radius=3 --scale-blur=0.92640757661</inline_code>.
         </p>
         <p>
