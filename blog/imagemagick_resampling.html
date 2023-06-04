@@ -91,15 +91,14 @@
         </p>
         <p>
             There's a different method, usually called polar/cylindrical/elliptical resampling, that does the operation in the 2-D domain directly. The only difference here is that all samples that fit inside the 2-D filter will now 
-            be weighted simultaenously, which may drastically change how some filters behave.
+            be weighted simultaenously, which may drastically change how some filters behave since we're only calling the filter once per output pixel rather than twice as before.
         </p>
         <p>
             <img src="./images/imagemagick_resampling/orthogonal_vs_polar.png" alt="Ortho_polar_comparison" class="center" width="900" height="285">
         </p>
         <p>
-            In this page I'll include results for both orthogonal and polar resampling. While polar resampling makes sense from a mathematical perspective, 
-            its implementations are generally slower and most filters weren't really designed to be used in this way (the most "famous" exception being polar lanczos, since we replace the sinc function with its 2-D "equivalent",
-            the jinc/sombrero function).
+            In this page I'll include results for both orthogonal and polar resampling. It's important to note that polar resampling implementations are generally slower and most filters weren't really designed to be used in this way 
+            (the most "famous" exception being polar lanczos, since we replace the sinc function with its 2-D "equivalent", the jinc/sombrero function).
         </p>
         <h3 id="methodology">Methodology</h3>
         <p>
