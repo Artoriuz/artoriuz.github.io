@@ -252,7 +252,7 @@
         <p>
             The second surprise is that Polar_Catrom is at the second place with the best scores for both SSIM and MS-SSIM. Polar_Catrom is an extremely sharp filter and I really like it when paired with pixel clipping for anti-ringing. 
             Since it only rings once when it overshoots or undershoots, it's trivial to remove all ringing if we just clip the output of each pixel to the limits of the input pixels inside the window. 
-            <a href="https://github.com/Artoriuz/python-anti-ringing">I have written a proof of concept here</a>. If you want to give the filter a try on mpv, you can use <inline_code>--scale=ewa_robidoux --scale-param1=0 --scale--param2=0.5</inline_code>.
+            <a href="https://github.com/Artoriuz/python-anti-ringing">I have written a proof of concept here</a>. If you want to give the filter a try on mpv, you can use <inline_code>--scale=ewa_robidoux --scale-param1=0 --scale-param2=0.5</inline_code>.
         </p>
         <p>
             The third surprise is that the first lobe of a larger sinc apparently isn't the best windowing function for the lanczos filter, as the hamming window beat it on all 4 metrics. You can use this on mpv with 
@@ -260,7 +260,7 @@
         </p>
         <p>
             Finally, it's also a little bit funny to see Lanczos2 beating Catmull_Rom in the "orthogonal filters with radius = 2" category. And it's even funnier that Lanczos2Sharp beat them both, another filter that shouldn't even be here. 
-            To use Lanczos2 on mpv you can simply do <inline_code>--scale=lanczos --scale-radius=2</inline_code>, and for Lanczos2Sharp add <inline_code>--scale=blur=0.9549963639785485</inline_code>.
+            To use Lanczos2 on mpv you can simply do <inline_code>--scale=lanczos --scale-radius=2</inline_code>, and for Lanczos2Sharp add <inline_code>--scale-blur=0.9549963639785485</inline_code>.
         </p>
         <p>
             You might have also noticed that Polar_LanczosRadius is on top of Polar_LanczosSharp. Polar_LanczosRadius is sharpened to have its third zero crossing exactly at 3, and to accomplish that we have to divide it by its original position 
