@@ -255,7 +255,7 @@
             <a href="https://github.com/Artoriuz/python-anti-ringing">I have written a proof of concept here</a>. If you want to give the filter a try on mpv, you can use <inline_code>--scale=ewa_robidoux --scale-param1=0 --scale-param2=0.5</inline_code>.
         </p>
         <p>
-            The third surprise is that the first lobe of a larger sinc apparently isn't the best windowing function for the lanczos filter, as the hamming window beat it on all 4 metrics. You can use this on mpv with 
+            The third surprise is that the first lobe of a larger sinc apparently isn't the best windowing function for the sinc3 filter, as the hamming window beat it on all 4 metrics. You can use this on mpv with 
             <inline_code>--scale=lanczos --scale-window=hamming</inline_code>.
         </p>
         <p>
