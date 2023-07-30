@@ -265,7 +265,7 @@
         <p>
             You might have also noticed that Polar_LanczosRadius is on top of Polar_LanczosSharp. Polar_LanczosRadius is sharpened to have its third zero crossing exactly at 3, and to accomplish that we have to divide it by its original position 
             3.2383154841662362, that gives us a value of 0.92640757661 so to use it on mpv you can try <inline_code>--scale=ewa_lanczos --scale-blur=0.92640757661</inline_code>. 
-            On <inline_code>vo=gpu</inline_code> you also have to specify <inline_code>--scale-radius=3.2383154841662362</inline_code>.
+            On <inline_code>--vo=gpu</inline_code> you also have to specify <inline_code>--scale-radius=3.2383154841662362</inline_code>.
         </p>
         <p>
             Overall it looks like the filters were more or less ranked from sharpest to softest. This makes perfect sense as the main problem with image upsampling is unintended blurriness. PSNR is calculated using the MSE so it's overly 
