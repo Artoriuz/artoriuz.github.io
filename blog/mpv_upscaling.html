@@ -12,7 +12,7 @@
         gtag('config', 'UA-135192850-1');
     </script>
 
-    <title>Mathematically Evaluating mpv's Upscaling Algorithms - A study of performance and quality</title>
+    <title>Mathematically Evaluating mpv's Resampling Algorithms</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" type="text/css" href="./css/default.css" />
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -23,9 +23,9 @@
     <header>
         <hgroup>
             <h1>
-                Mathematically Evaluating mpv's Upscaling Algorithms
+                Mathematically Evaluating mpv's Resampling Algorithms
             </h1>
-            <h2>A study of performance and quality by João Vitor Chrisóstomo</h2>
+            <h2>The return of the memes</h2>
         </hgroup>
     </header>
     <nav>
@@ -38,670 +38,903 @@
     <section>
         <h3 id="introduction">Introduction</h3>
         <p>
-            This work aims to mathematically quantify image quality and performance of different real-time upscaling algorithms.
+            This page is meant to be treated as a follow-up to this scaler comparison done with <a href="https://artoriuz.github.io/blog/imagemagick_resampling.html">ImageMagick</a>. I'm only going to talk about niche topics here, 
+            so just refer to that other page if you only want to read about scalers.
+        </p>
+        <h3 id="upsampling_shaders">Upsampling Shaders</h3>
+        <p>
+            The mpv community has written several <s>meme</s> shaders you can use to upsample video in real time, and the rationale is that they can potentially achieve higher quality than the built-in methods. I still do not have a good way of 
+            automating mpv tests and therefore I'll have to stick to a single test image, which is still going to be violet.png just because I'm familiarised with it. If this is your first time reading these posts, this is what violet.png looks like:
         </p>
         <p>
-            I want to make it clear though that you shouldn't take the results as gospel. Mathematical image quality metrics do not always correlate perfectly with how humans perceive image quality, 
-            and your personal preference is entirely subjective. You should take this page as what it is, a research that produces numbers, but you should not take these numbers for granted before 
-            understanding what they actually mean. In the context of image resampling, the primary problem is usually sharpness as reconstructing fine details accurately isn't a trivial task. For that 
-            matter, a sharper resampling filter will generally be numerically closer to the reference, even taking the usual side effects into consideration (ringing, blocking, aliasing, etc).
+            <img src="./images/mpv_upscaling/upsampling/violet.png" alt="Violet" class="center" width="960" height="540">
         </p>
         <p>
-            Being "numerically closer" to the reference does not always mean that it'll look closer to the reference from our perspective, and that's exactly why "image quality metrics" is still a 
-            research field to this day. The "state of the art" has even abandoned classic distortion-based metrics in favour of complex perception-based metrics in recent years, which are usually based 
-            on CNNs for image classification (computing the distance between the activations). I include LPIPS as a perceptual metric here just to make sure the results aren't too biased towards distortion, 
-            but keep in mind that these metrics were not originally designed to be measuring resampling quality.
+            The small number of samples under test makes this very unscientific, but it is what it is.
         </p>
+        <h3 id="upsampling_methodology">Upsampling Methodology</h3>
         <p>
-            If all you want is to look at the results, <a href=#results>follow this link.</a> If you don't care about user shaders and would rather see more robust numbers for the built-in filters, follow 
-            <a href="https://artoriuz.github.io/blog/imagemagick_resampling.html">this link</a> instead.
-        </p>
-        <h3 id="upscaling">What is Upscaling?</h3>
-        <p>
-            Like its name implies, upscaling is simply the act of increasing the scale of something. In the digital signal processing case, 
-            it's equivalent to increasing the number of samples for a given signal (which is usually called "resampling"). 
-        </p>
-        <p>
-            The easiest and most classic way of doing this is through simple linear interpolation, if you want to find a value between two points you can simply draw a
-            line between them. Linear interpolation can be done in a plane, through both axis, creating what we call <a href="https://en.wikipedia.org/wiki/Bilinear_interpolation">"bilinear" interpolation</a>. Bilinear
-            interpolation is the simplest interpolation algorithm, the easiest to compute and probably the most widespread one.
-        </p>
-        <p>
-            But can something as simple as just drawing a line between 2 points give us good results? Sometimes it does, sometimes it doesn't. It really depends on the signal. Instead of taking 2 points 
-            and drawing a line, we could take more than 2 points and draw a curve. The shape of the curve depends on the weights used in the calculation, and these weights depend on the chosen filter. The number 
-            of points in the calculation depends on the length/radius/support of the filter. If you want to understand how this is actually done, I suggest simply 
-            reading <a href="https://entropymine.com/imageworsener/resample/">this explanation</a>.
-        </p>
-
-        <h3 id="machine">Machine Learning</h3>
-        <p>
-            If you're interested in this topic I highly recommend reading my <a href="./super_resolution.html">blog post about ML upscaling</a>. 
-            There are multiple different machine learning based image upscalers, we'll stick to those that can be easily used as mpv shaders (RAVU, FSRCNNX and Anime4K).
-        </p>
-        
-        <h3 id="methodology">Testing Methodology</h3>
-        <p>
-            We'll test the following shaders alongside the built-in filters found in mpv:
+            The following shaders were "benchmarked":
             <li><a href="https://github.com/bjin/mpv-prescalers">RAVU</a></li>
             <li><a href="https://github.com/igv/FSRCNN-TensorFlow">FSRCNNX</a></li>
             <li><a href="https://github.com/bloc97/Anime4K">Anime4K</a></li>
-            <li><a href="https://gist.github.com/agyild/7e8951915b2bf24526a9343d951db214">NVScaler</a></li>
-            <li><a href="https://gist.github.com/agyild/bbb4e58298b2f86aa24da3032a0d2ee6">CAS</a></li>
             <li><a href="https://gist.github.com/agyild/82219c545228d70c5604f865ce0b0ce5">FSR</a></li>
+            <br>
+            I've also added polar Lanczos to the mix just to have a reference point, but feel free to send me any other shaders you would like to get scored. 
+            Also note that the Anime4K author recommends using multiple shaders together, but I'm only interested in the upscaling CNNs here.
         </p>
         <p>
-            Quality measurements were done with an anime test image. Debanding was turned off to prevent loss of fine detail.
-        </p>
-        <p>
-            In order to measure how "good" each algorithm is, the test images were first converted to grayscale with imagemagick:
+            The test image is downsampled with:
         </p>                    
-        <code>magick convert image.png -colorspace gray image-gray.png</code>
-        <p>
-            They were then downscaled to a quarter of their resolutions (0.5x scaling factor) using the Catmull Rom filter:
-        </p> 
-        <code>magick convert image_gray.png -filter catrom -resize 50% downscaled.png</code>
-        <p>
-            The images were then upscaled back by mpv:
-        </p>
-        <code>mpv --no-config --profile=gpu-hq --deband=no --no-hidpi-window-scale --window-scale=2.0 --pause=yes --screenshot-format=png --no-scaler-resizes-only --scale=filter --glsl-shader=shader downscaled.png</code>
-        <p>
-            Anime4K has a modular design and you can find instructions <a href="https://github.com/bloc97/Anime4K/blob/master/GLSL_Instructions.md">here</a>. I used the 
-            "Remain as faithful to the original while enhancing details" configuration.
-        </p>
-        <p>
-            Since mpv writes PNGs in the rgb24 format, all screenshots were converted to greyscale using imagemagick as described above. This doesn't change how they're shown on screen, it simply reduces the number of channels from 3 to 1.
-        </p>
-        <p>
-            Performance was evaluated simply in frames per second, while quality was evaluated in 
-            <a href="https://en.wikipedia.org/wiki/Peak_signal-to-noise_ratio">PSNR</a>,  
-            <a href="https://en.wikipedia.org/wiki/Structural_similarity">SSIM</a>,
-            <a href="https://ece.uwaterloo.ca/~z70wang/publications/msssim.html">MS-SSIM</a>, 
-            <a href="https://ece.uwaterloo.ca/~z70wang/research/iwssim/">IW-SSIM</a>,
-            <a href="http://www.ponomarenko.info/psnrhma.htm">PSNR-HMA</a>,
-            <a href="https://live.ece.utexas.edu/research/Quality/VIF.htm">VIF</a> and
-            <a href="https://github.com/richzhang/PerceptualSimilarity">LPIPS</a>.
-        </p>
-        <p>
-            All metrics were computed using their reference implementations. PSNR-HMA has its wstep set to 7.
-        </p>
-        <p>
-            This entire process should be easily reproducible.
-        </p>
-        
-        <h3 id="results">Testing and Results</h3>
-        <p>
-            The following test image was used for the line art upscaling tests:
-        </p>
-        <p>
-            <img src="./images/mpv_upscaling/violet/violet.png" alt="Violet" class="center" width="960" height="540">
-        </p>
-        <p>
-            Before we continue to the results, you can find all images in <a href="https://github.com/Artoriuz/Artoriuz.github.io/tree/master/blog/images/mpv_upscaling/violet">this repository.</a> Including the greyscale variant and 
-            its downscaled counterpart.
-        </p>
-        <p>We can see the results below:</p>
-        <div class="row">
-            <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-average.png" alt="Violet results" width="378" .height="1623">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-vif.png" alt="Violet results VIF" width="378" .height="1623">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-psnrhma.png" alt="Violet results PSNR-HMA" width="378" .height="1623">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-psnr.png" alt="Violet results PSNR" width="378" .height="1623">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-iwssim.png" alt="Violet results IW-SSIM" width="378" .height="1623">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-msssim.png" alt="Violet results MS-SSIM" width="378" .height="1623">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-ssim.png" alt="Violet results SSIM" width="378" .height="1623">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-lpips-alex.png" alt="Violet results LPIPS" width="378" .height="1623">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/tables/violet-lpips-vgg.png" alt="Violet results LPIPS" width="378" .height="1623">
-            </div>
-          </div>
-        <!--
-        <p>The following image was used for the live-action upscaling testing:</p>
-        <img src="./images/mpv_upscaling/shuri/downscaled.png" alt="Downscaled Shuri" class="center">
-        <br>
-        <p>
-            Again, you can find all the images in <a href="https://github.com/Artoriuz/Artoriuz.github.io/tree/master/blog/images/mpv_upscaling/shuri">this repository.</a>
-        </p>
-        <p>We can see the results below:</p>
-        <div class="row">
-            <div class="column">
-                <img src="./images/mpv_upscaling/tables/fps.png" alt="shuri results FPS" width="454" height="756">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/tables/shuri-ssim.png" alt="shuri results SSIM" width="454" height="756">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/tables/shuri-psnr.png" alt="shuri results PSNR" width="454" height="756">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/tables/shuri-iwssim.png" alt="shuri results IW-SSIM" width="454" height="756">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/tables/shuri-psnrhma.png" alt="shuri results PSNR-HMA" width="454" height="756">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/tables/shuri-psnrha.png" alt="shuri results PSNR-HA" width="454" height="756">
-            </div>
-          </div>
-        -->
-        <p>
-            We can clearly see that in general, machine learning based scalers tend to give better quality, though as expected they're also more computationally
-            expensive. We can see that FSRCNNX is the highest scoring mpv scaler, followed by Anime4K and then RAVU. FSR seems particularly bad in the distortion metrics, but it scores well enough in LPIPS.
-        </p>
-        <p>
-            Between the simple scaling filters, Lanczos seems to be the best-scoring orthogonal filter while EWA_Robidouxsharp and EWA_Lanczossharp are the best-scoring elliptical ones. I personally like 
-            EWA_Lanczossharp way more than EWA_Robidouxsharp though, as it seems to be able to draw diagonal lines much better with way less aliasing (jagged edges). EWA_Lanczossharp is also better than 
-            orthogonal Lanczos at doing this by the way, but Lanczos is sharper and this probably causes it to score higher on most metrics (since the main problem with classic resampling is blurriness).
-        </p>
-        <p>
-            The following image is the result of a survey conducted by Don P. Mitchell and Arun N. Netravali, alongside 9 other digital image processing experts with the intention of classifying the bicubic filters 
-            via the <a href="https://en.wikipedia.org/wiki/Mitchell-Netravali_filters">B and C parameters</a>. 
-        </p>
-        <p>
-            <img src="./images/mpv_upscaling/mitchell_survey.png" alt="Mitchell Netravali Survey" width="540" height="540" class="center">
-        </p>
-        <p>    
-            The variant known as "Mitchell-Netravali" nowadays is the filter you get with B=C=1/3, and it is mpv's <inline_code>--profile=gpu-hq</inline_code> default downscaler. 
-        </p>
-        <p>
-            I didn't exactly expect the "numerically better" filters to actually match subjective choices, 
-            but Imagemagick's default orthogonal resampling filter is Lanczos for images without transparency. Likewise, Imagemagick uses EWA_Robidoux by default for distortion operations.
-        </p>
-        <p>
-            Performance tests were done with an 720p 4:2:0 8 bit H.264/AVC input video:
-        </p>
-        <code>mpv --no-config --profile=gpu-hq --vo=gpu-next --gpu-api=vulkan --audio=no --untimed=yes --video-sync=display-desync --vulkan-swap-mode=immediate --no-hidpi-window-scale --window-scale=2.0 --scale=filter --glsl-shader=shader input.mkv</code>
-        <p>
-            <img src="./images/mpv_upscaling/tables/fps.png" alt="fps" width="426" height="567" class="center">
-        </p>
-        <p>
-            I've decided to go ahead and benchmark using <a href="https://github.com/mpv-player/mpv/wiki/GPU-Next-vs-GPU">libplacebo</a> since it provides better performance and because I believe it'll eventually replace vo=gpu.
-        </p>
-        <p>
-            We can take a few things from this, orthogonal resampling is still faster than elliptical resampling by a significant margin. RAVU, FSR and the small variant of Anime4K are extremely fast, beating or matching ewa_lanczossharp. 
-            FSRCNNX_16 and the biggest variant of Anime4K are still reasonably easy to run as long as you have a semi-decent discrete GPU. I've benchmarked using an RX470, which is far from being "fast" by today's standards.
-        </p>
-        <p>
-            When it comes to the built-in filters, you can expect polar resampling to be slower than orthogonal resampling, and you can also expect larger filters to be slower.
-        </p>
-    </section>
-    <section>
-        <h3 id="fractional">Fractional Luma Upscaling</h3>
-        <p>
-            Taking into consideration anime productions are still done at arbitrary resolutions between 1280x720 and 1920x1080 (with most below 1600x900, check <a href="https://anibin.blogspot.com/">Anibin</a> for details) and that most users are still 
-            watching them on FHD 1920x1080 displays, the most common scenario when there's any luma upscaling (or rgb upscaling if you want to nitpick about it, since mpv merges luma and chroma right after doubling chroma) being performed by 
-            the player is arguably 720p->1080p, which corresponds to a 1.5x scaling factor. With the recent addition of ravu-zoom to our ever growing arsenal of user shaders, and the need to find out which dscales work better alongside the doublers, 
-            adding a new series of measurements seems reasonable.    
-        </p>
-        <p>
-            The methodology is straightforward, violet-gray.png was downscaled to 1280x720 with imagemagick: 
-        </p>
-        <code>magick convert violet-gray.png -filter catrom -resize 1280x720 downscaled.png</code>
-        <p>
-            This is the equivalent of downscaling with mpv using <inline_code>--dscale=catmull_rom --correct-downscaling --linear-downscaling=no</inline_code>.
-        </p>
-        <p>
-            The downscaled image was then brought back up to 1920x1080 using the several shaders. For the doublers, the following downscale was 
-            performed with <inline_code>--correct-downscaling --linear-downscaling=no</inline_code>. SSimDownscaler performs better than any standalone filter, 
-            but also adds a lot of computational weight for minimal quality gains over catrom or lanczos.
-        </p>
-        <p>
-            The following tables display the results. The filter specified after the doubler is the downscaling filter used from 2560x1440 to 1920x1080.
-        </p>
-        <p>
-            You can find all the images in <a href="https://github.com/Artoriuz/artoriuz.github.io/tree/master/blog/images/mpv_upscaling/fractional/violet">this repository.</a>
-        </p>
-        <p>
-            <div class="row">
-                <div class="column">
-                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_geometric_mean.png" alt="Violet results Geometric Mean" width="378" .height="1220">
-                </div>
-                <div class="column">
-                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_vif.png" alt="Violet results VIF" width="378" .height="1220">
-                </div>
-                <div class="column">
-                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_psnrhma.png" alt="Violet results PSNR-HMA" width="378" .height="1220">
-                </div>
-                <div class="column">
-                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_psnr.png" alt="Violet results PSNR" width="378" .height="1220">
-                </div>
-                <div class="column">
-                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_iwssim.png" alt="Violet results IW-SSIM" width="378" .height="1220">
-                </div>
-                <div class="column">
-                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_msssim.png" alt="Violet results MS-SSIM" width="378" .height="1220">
-                </div>
-                <div class="column">
-                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_ssim.png" alt="Violet results SSIM" width="378" .height="1220">
-                </div>
-                <div class="column">
-                    <img src="./images/mpv_upscaling/fractional/tables/violet_frac_niqe.png" alt="Violet results NIQE" width="378" .height="1220">
-                </div>
-              </div>
-        </p>
-        <p>
-            Well, we can see that VIF clearly likes RAVU more than the other metrics. We can also see that the mitchell filter scores poorly when compared to lanczos or catrom regardless of doubler, and this can be easily 
-            attributed to the fact that it is significantly blurrier than the other 2. Lanczos is the sharpest downscaling filter between the 3 sane options tested here, and at the 0.75x scaling factor (1440p->1080p) its pronounced 
-            ringing artifacts are not "bad" enough to make it rank lower than catrom. Catrom is almost as sharp but it introduces less ringing to the output.
-        </p>
-        <p>
-            Overall the tables tell a story that clearly puts FSRCNNX on top, and more specifically the LineArt variant. RAVU-zoom is trading blows with RAVU-lite depending on the metric, and SSSR also shows up as a good "3rd place" 
-            contender. I didn't feel the need to include all the simple filters, Lanczos scored the best in the 2x upscaling test so it is the only one showing up again here.
-        </p>
-    </section>
-    <section>
-        <h3 id="sigmoid">Sigmoidal-Light Upscaling</h3>
-        <p>
-            The sRGB colour space does not have a linear gamma curve, it's actually (approximately) a power 2.2 function to compensante how the human visual system works giving more quantisation steps to the darker tones. 
-            This means scaling in sRGB gamma "blends" perceptual values instead of doing the arithmetic in linear light and then converting it back. This is not always bad, but it can create accentuated ringing artifacts towards 
-            the brighter tones. Doing it in linear light accentuates dark ringing artifacts though, which is the exact opposite and usually looks even worse in my opinion.
-        </p>
-        <p>
-            Taking this into consideration, the gimmicky yet clever technique of scaling in sigmoidal light was "developed". 
-            Sigmoid light treats dark and bright overshoots the same, as the quantisation precision is equal in both extremes. 
-        </p>
-        <p>
-            <img src="./images/mpv_upscaling/light.png" alt="Light" class="center" width="900" height="284"> 
-        </p>
-        <p>
-            The following test compares linear light, sRGB light and sigmoidal light on a simple 2x orthogonal upscaling test with the Lanczos filter. 
-        </p>
-        <p>
-            A new test image, Kanao, was reused. It was downscaled to 960x540 so we can upscale it back with a 2x scaling factor. The box filter was used to avoid creating pixels out of the original range and to avoid ringing 
-            artifacts in the downscaling process.
-        </p>
-        <p>
-            <img src="./images/mpv_upscaling/kanao/kanao.png" alt="Kanao" class="center" width="960" height="540">
-        </p>
-        <p>
-            The sRGB light upscaling was done with:
-        </p>
-        <code>magick convert kanao_box.png -filter lanczos -resize 200% kanao_srgb.png</code>
-        <p>
-            The linear light upscaling was done with:
-        </p>
-        <code>magick convert kanao_box.png -colorspace RGB -filter lanczos -resize 200% -colorspace sRGB kanao_linear.png</code>
-        <p>
-            The sigmoidal light upscaling was done with:
-        </p>
-        <code>magick convert kanao_box.png -colorspace RGB +sigmoidal-contrast 6.5,50% -filter lanczos -resize 200% -sigmoidal-contrast 6.5,50% -colorspace sRGB kanao_sigmoid.png</code>
-        <p>
-            You can find all the images in <a href="https://github.com/Artoriuz/artoriuz.github.io/tree/master/blog/images/mpv_upscaling/kanao">this repository.</a>
-        </p>
-        <p>
-            <div class="row">
-                <div class="column">
-                    <img src="./images/mpv_upscaling/kanao/tables/geomean.png" alt="Violet results Geometric Mean" width="500" height="216">
-                </div>
-                <div class="column">
-                    <img src="./images/mpv_upscaling/kanao/tables/vif.png" alt="Violet results VIF" width="500" height="216">
-                </div>
-                <div class="column">
-                    <img src="./images/mpv_upscaling/kanao/tables/psnrhma.png" alt="Violet results PSNR-HMA" width="500" height="216">
-                </div>
-                <div class="column">
-                    <img src="./images/mpv_upscaling/kanao/tables/iwssim.png" alt="Violet results IW-SSIM" width="500" height="216">
-                </div>
-              </div>
-        </p>
-        <p>
-            As we can see, all three relevant metrics seem to agree sigmoidal light is better. The gpu-hq profiles comes with <inline_code>--sigmoid-upscaling</inline_code> by default and I highly advise you to keep it turned on.
-        </p>
-        <p>
-            The following image shows the difference (images have been scaled up with nearest neighbour for easier visualisation, open in a new tab at 100% scaling to see it).
-        </p>
-        <p>
-            <img src="./images/mpv_upscaling/kanao/kanao_comparison.png" alt="Kanao" class="center" width="518" height="156">
-        </p>
-    </section>
-    <section>
-        <h3 id="chroma">Chroma Upscaling</h3>
-        <p>
-            Chroma subsampling is a technique utilised to save bitrate/filesize without strongly sacrificing perceived quality, by taking into account how our eyes biologically work and how our brains interpret the information they're receiving. 
-        </p>
-        <p>
-            With the rise of television broadcasting the recurring problem of bandwidth-heavy innovations rapidly making the electromagnetic spectrum "crowded" started to become problematic, the practical bands of low long-range attenuation 
-            were becoming scarce and that would undoubteadly limit the amount of things we could have "over the air", which then lead the way to new bandwidth-saving techniques that aimed to reduce the required bandwidth as much as reasonably possible 
-            without affecting the perceived quality of the service to the same extent.     
-        </p>
-        <p>
-            Since we're more likely to perceive contrast/luminosity differences than chromatic details, chroma-subsampling is simply the most basic way of throwing away some colouring information without sacrificing on luminosity resolution.
-        </p>
-        <p>To make this simple to understand, we can see a normal image below alongside its RGB planes:</p>
-        <div class="row">
-            <div class="column">
-                <img src="./images/mpv_upscaling/chroma/explanation/reference.png" alt="Rosetta Ref" width="600" height="800">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/chroma/explanation/reference_RGB_R.png" alt="Rosetta R" width="600" height="800">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/chroma/explanation/reference_RGB_G.png" alt="Rosetta G" width="600" height="800">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/chroma/explanation/reference_RGB_B.png" alt="Rosetta B" width="600" height="800">
-          </div>
-        </div>
-        <p>Now, the same image alongside its YUV/YCbCr planes:</p>
-        <div class="row">
-            <div class="column">
-                <img src="./images/mpv_upscaling/chroma/explanation/reference.png" alt="Rosetta Ref" width="600" height="800">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/chroma/explanation/reference_YUV_Y.png" alt="Rosetta Y" width="600" height="800">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/chroma/explanation/reference_YUV_Cb.png" alt="Rosetta Cb" width="600" height="800">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/chroma/explanation/reference_YUV_Cr.png" alt="Rosetta Cr" width="600" height="800">
-            </div>
-        </div>
-        <p>
-            We can easily simulate how it would look like if it didn't have its entirely chromatic information available by simply downscaling the chroma planes to 1/4 of their original resolution (0.5x scaling factor) and then upscaling them back (2x scaling factor).
-        </p>
-        <p>
-            It's important to see how much "blurrier" the chromatic planes look after this process, in other words, how much high frequency information they lost. 
-        </p>
-        <div class="row">
-            <div class="column">
-                <img src="./images/mpv_upscaling/chroma/explanation/reference_YUV420p.png" alt="Rosetta Chroma subsampled" width="600" height="800">
-            </div>    
-            <div class="column">
-                <img src="./images/mpv_upscaling/chroma/explanation/reference_YUV_Y.png" alt="Rosetta Y" width="600" height="800">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/chroma/explanation/Cb_upscaled.png" alt="Rosetta upscaled Cb" width="600" height="800">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/chroma/explanation/Cr_upscaled.png" alt="Rosetta upscaled Cr" width="600" height="800">
-            </div>
-        </div>
-
-        <p>Can't notice the difference when you put it back to RGB? Well, that's the point. In any case, to make it possible for us to see, you can look at the image below, which is simply 128 plus the difference between the reference and the chroma subsampled version:</p>
-       
-        <img src="./images/mpv_upscaling/chroma/explanation/chroma_subsampling_difference.png" alt="Rosetta chroma subsampling difference" width="600" height="800" class="center">
-        
-        <p>From this simulation it's probably reasonable to understand why chroma upscaling isn't usually a big concern, it's just that you're unlikely to notice the difference on real content.</p>
-        <p>
-            With that in mind, we can proceed with the actual comparison. SSIM measurements can be ignored this time since the luma plane remains intact and therefore there are almost no significant gains to be made in structural similarity from switching the scaler.  
-        </p>
-        <div class="row">
-            <div class="column">
-                <img src="./images/mpv_upscaling/chroma/tables/rosetta-psnr.png" alt="rosetta results PSNR" width="454" height="756">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/chroma/tables/rosetta-psnrhma.png" alt="rosetta results PSNR-HMA" width="454" height="756">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/chroma/tables/rosetta-psnrha.png" alt="rosetta results PSNR-HA" width="454" height="756">
-            </div>
-        </div>
-        <p>
-            Rosetta served as a somewhat unfaithful representation of what you should expect from anime, since usually speaking actual anime footage is far from being as detailed and therefore the scalers would score even closer overall. We can proceed 
-            with a live action example. 
-        </p>
-        <p>
-            <img src="./images/mpv_upscaling/chroma/dog/reference.png" alt="dog" width="960" height="540">
-        </p>
-        <div class="row">
-            <div class="column">
-                <img src="./images/mpv_upscaling/chroma/tables/dog-psnr.png" alt="Dog results PSNR" width="454" height="756">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/chroma/tables/dog-psnrhma.png" alt="Dog results PSNR-HMA" width="454" height="756">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/chroma/tables/dog-psnrha.png" alt="Dog results PSNR-HA" width="454" height="756">
-            </div>
-        </div>
-        <p>
-            It's important to notice how the numerical difference between the scalers is much smaller when doing chroma measurements, and this is precisely why using a heavier scaler is usually not warranted unless the performance impact is negligible.
-        </p>
-        <p>
-            On my system, running KrigBilateral on Vulkan makes no difference whatsoever since I have a CPU decoding bottleneck at around ~1200 FPS with or without it on a 720p 8bit AVC file. Running on ra_d3d11 with d3d11va hardware decoding, I go from ~1800 FPS to ~1150 FPS going from 
-            lanczos to KrigBilateral. Running both FSRCNNX-8-0-4-1 and KrigBilateral at the same time gives me ~260 FPS on both d3d11 and Vulkan, with or without hwdec. 
-        </p>
-        <p>
-            My personal recommendation is that you should test it yourself to see if you can notice KrigBilateral's difference during playback, and use it if it doesn't really matter resource-wise (in the case your GPU is fine either way). Another sensible decision would be to 
-            use it when you don't need luma upscaling, since then the only gains you can make are in chroma. 
-        </p>
-    </section>
-    <section>
-        <h3 id="downscaling">What About Downscaling?</h3>
-        <p>
-            Well, we've been talking about upscaling up to now, but is there any difference when it comes to downscaling? Intrinsically, downscaling images should be an easier task considering all we need to do is draw the same curves 
-            with fewer points. A normal person would find it much harder to differentiate downscalers, all reasonable filters are usually good enough and it becomes a subjective problem of avoiding the artifacts you dislike the most. 
-            Different filters will produce different amounts of ringing, blocking and aliasing. Some prefer smooth images, others prefer sharp images... The problem here is that we can't compare the results to a reference and calculate 
-            which filter managed to get the closest to the ground truth like we did before for upscaling.
-        </p>
-        <p>
-            I chose to use Catmull Rom for all my downscales up to this point, and some of you might be asking yourselves why. Well, Catmull Rom is the sharpest BC-Spline that satisfies the B + 2C = 1 recommendation by 
-            Don P. Mitchell and Arun N. Netravali. Catrom can be seen as a sharper version of Mitchell, which is mpv's default downscaler with profile=gpu-hq. 
-        </p>
-        <p>
-            Using Catrom in the upscaling tests was just my (reasonably arbitrary) personal preference at the time, Mitchell does produce even less artifacts but the end result is noticeably blurrier. 
-            <a href="https://stackoverflow.com/a/6171860">This Stackoverflow answer from 2008</a> indicates some sort of survey was conducted within Hollywood and they ended up choosing windowed sincs for downscaling and Mitchell for upscaling.
-        </p>
-        <p>
-            For more detailed recommendations please read this <a href="https://legacy.imagemagick.org/Usage/filter/nicolas/">special section in the ImageMagic documentation written by Nicolas Robidoux.</a>
-        </p>
-        <p>
-            While downscaling evaluation is more of a qualitative thing, MATLAB comes with 3 no-reference quality metrics, <a href="https://www.mathworks.com/help/images/ref/brisque.html">BRISQUE (Blind/Referenceless Image Spatial Quality Evaluator)</a>, 
-            <a href="https://www.mathworks.com/help/images/ref/niqe.html">NIQE (Natural Image Quality Evaluator)</a> and <a href="https://www.mathworks.com/help/images/ref/piqe.html">PIQE (Perception based Image Quality Evaluator)</a>. 
-            BRISQUE correlates well with human perception because it's trained taking into consideration human subjectivity with a SVM (Support Vector Machine). NIQE and PIQE, however, 
-            are opinion-unaware and do not depend on human subjectivity.
-        </p>
-        <p>
-            NIQE learns its model from pristine and distorted images, while PIQE does not need any training. let's drop PIQE and focus on the other 2. Since humans usually like sharp images I expect BRISQUE to rank the scalers based almost solely on sharpness. 
-            NIQE should theoretically be more objective and actually rank them in an order that goes from "less distortions" to "more distortions" if it gets trained properly with pristine anime screenshots. 
-        </p>
-        <p>
-            The problem with this approach is that we're assuming anime screenshots are pristine, and in fact they're not. Anime is usually delivered with 4:2:0 chroma-subsampling and a lot of lossy compression.
-        </p>
-        <p>
-            With all that in mind we can still try to evaluate this mathematically, despite the shortcomings. 
-        </p>
-        <p>
-            I'll be using Chitanda for downscaling, this keyframe represents anime content very well, you can see she it's not as sharp as fanart (likely because it's an upscale 
-            from some arbitrary resolution between 1280x720 and 1920x1080) but also not overly blurry either. I decided to use <inline_code>--linear=downscaling=no</inline_code> alongside 
-            <inline_code>--correct-downscaling</inline_code> and <inline_code>--deband=no</inline_code> this time to make the comparison 
-            against SSimDownscaler fairer, and funnily enough almost all filters seem to perform better on the test image this way. 
-            It's important to note mpv does not support using <inline_code>--correct-downscaling</inline_code> alongside <inline_code>--dscale=bilinear</inline_code>, so this 
-            filter in particular looks sharper than it should.
-        </p>
-        <p>
-            The following image was downscaled using all the available filters in mpv:
-        <p>
-            <img src="./images/mpv_upscaling/downscaling/images/reference.png" alt="Downscaled Violet" class="center" width="960" height="540">
-        </p>
-        <p>
-            As always, you can find all the resulting images in <a href="https://github.com/Artoriuz/Artoriuz.github.io/tree/master/blog/images/mpv_upscaling/downscaling/images">this repository.</a>
-        </p>
-        <p>We can see the results below:</p>
-        <div class="row">
-            <div class="column">
-                <img src="./images/mpv_upscaling/downscaling/tables/brisque.png" alt="Chitanda results BRISQUE" width="473" height="756">
-            </div>
-            <div class="column">
-                <img src="./images/mpv_upscaling/downscaling/tables/niqe_anime.png" alt="Chitanda results NIQE" width="473" height="756">
-            </div>
-            </div>
-        </p>
-        <p>
-            As expected, BRISQUE really did almost perfectly rank them from sharpest to blurriest. The trained NIQE also put SSimDownscaler at the top, but the following filters aren't solely ranked from sharpest to blurriest. 
-        </p>
-        <p>
-            Out of curiosity, I decided to calculate the structural similarity between the outputs of SSimDownscaler, Lanczos and Catmull Rom. 
-            <inline_code>ssim(lanczos, ssimdownscaler)</inline_code> gives me 0.999721340635465 and <inline_code>ssim(catrom, ssimdownscaler)</inline_code> gives me 0.999692060660229. 
-            Those numbers are so close you'd be hard pressed to notice any differences whatsoever between the images. 
-        </p>
-        <p>
-            My original idea was using Waifu2x's training dataset to train NIQE, but I found out it isn't public. Then I figured out that I could simply use my anime screenshots folder 
-            (which had 162 anime screenshots inside from numerous different shows). 
-            The resulting model does not only give all the scalers better results but it also correlates better to BRISQUE results. I should probably train NIQE with pristine fanarts to make it more accurate.
-        </p>
-        <p>
-            Let's remember Lanczos scored slightly better than Catrom in the NIQE chart from the fractional upscaling tests when they were both coupled with a doubler (FSRCNNX or RAVU), 
-            but the scaling factor there was 0.75x, it is 0.5x here. As you increase the scaling factor (or decrease it, in the case of downscaling) you'll also make the artifacts a filter produces more visible.
-        </p>
-        <p>
-            The following image displays the difference between the Mitchell, Catrom and Lanczos filters (open it in a new tab at 100% scaling to see the ringing difference more easily):
-        </p>
-        <p>
-            <img src="./images/mpv_upscaling/downscaling/explanation/chitanda-comparison.png" alt="Chitanda Comparison" class="center" width="960" height="367">
-        </p>
-        <p>
-            I should probably repeat this for an image with more high frequency components like Rosetta, but for now Chitanda will suffice. It's important to insist the optimal filter highly depends 
-            on several factors such as the image itself and the scaling factor. To make any reasonably accurate claim I'd need to repeat this experiment on several images and average their results, which I probably won't do anytime soon 
-            considering the differences between the filters are honestly minimal.
-        </p>
-        <p>
-            My personal recommendation is: Stick to Mitchell as the default if you really dislike ringing. Switch to Lanczos if you want more perceived sharpness. And If you 
-            don't want either extreme, Catrom might be a decent compromise. Sigmoid downscaling could potentially dampen the ringing but as far as I'm aware mpv only supports sigmoidal light upscaling.
-        </p>
-    </section>
-    <section>
-        <h3 id="changelog">Changelog</h3>
-        <p>
-            27/05/2023: Adding a disclaimer.
-        </p>
-        <p>
-            20/05/2023: Minor updates because I wasn't very happy with the text. Violet's average chart also updated to be done using normalised metrics (it used standardised metrics previously). 
-            I think this makes more sense because it treats all scores equally. Previously we'd have outliers carrying the average for some filters (like EWA_Robidouxsharp).
-        </p>
-        <p>
-            26/03/2022: Adding a new performance chart.
-        </p>
-        <p>
-            22/03/2022: Replacing the geometric mean with the normalised average of the standardised metrics. The geometric mean is great at averaging different metrics together when these metrics 
-            do not have similar ranges, as an arbitrary percentual improvement in any metric would warrant an identical improvement in the final number. However, a 20% (as an example) improvement in PSNR is not the same as 
-            a 20% improvement in SSIM. Standardising the scores (mean = 0 and standard deviation = 1) before averaging them puts all metrics on the same playing field. The final numbers were normalised into [0, 1] to prevent the 
-            table from having negative numbers (due to the standardisation, badly performing metrics end up with negative scores).
-        </p>
-        <p>
-            21/03/2022: Replacing NIQE with LPIPS in the upscaling test, LPIPS is a perception-based full-reference image quality metric. Gaussian75 was removed.
-        </p>
-        <p>
-            20/03/2022: Adding FSR, CAS and NVScaler. Fractional comparisons still missing (and I'm not exactly sure if I care enough to add them). 
-            I'm also hiding the live-action results from the page since these haven't been updated in ages.
-        </p>
-        <p>
-            23/05/2021: Adding Anime4K. Fractional comparisons still missing.
-        </p>
-        <p>
-            01/05/2021: Adding sigmoidal light and linear light comparisons.
-        </p>
-        <p>
-            18/03/2021: Updating FSRCNNX-8-0-4-1 to the 05/03/2021 version.
-        </p>
-        <p>
-            17/01/2021: Adding geometric mean for Violet.
-        </p>
-        <p>
-            06/12/2020: Downscaling outside linear light again for the upscaling tests. 
-        </p>
-        <p>
-            01/12/2020: Fractional upscaling section updated with the newest versions of all the prescalers and more downscaling options. Some qualitative comparisons added to the downscaling section.
-        </p>
-        <p>
-            30/11/2020: All shaders updated to their current versions in the Violet upscaling tests. Waifu2x and NGU dropped. Comparing against Waifu2x is unfair due to the time it takes to actually compute a result, and I simply don't care about MadVR. 
-            Dropping these things allow me to greatly simplify the table generating process and I don't intend to add them back. NNEDI3 also dropped due to poor performance. PSNR-HA dropped due to being redundant alongside PSNR-HMA. VIF, 
-            MS-SSIM and NIQE added as new metrics. I still need to update Shuri, and I'll likely do it soon. But for now all old Violet tables can be found <a href="https://github.com/Artoriuz/artoriuz.github.io/tree/master/blog/images/mpv_upscaling/tables/old">here.</a>
-        </p>
-        <p>
-            28/11/2020: Improving scaling explanations considerably. Adding a new and improved downscaling section with no reference image quality metrics and a custom model fit for anime content.
-        </p>
-        <p>
-            26/11/2020: Changelog moved to the end of the page. Mitchell survey and some clarifications regarding downscaling added.
-        </p>
-        <p>
-            11/05/2019: KrigBilateral updated. 
-        </p>
-        <p>
-            22/04/2019: FSRCNNX updated, removing the downscaling section for now since people aren't exactly going out of their ways to fix shitty upscales and there's already some information about it on the fractional tables.
-        </p>
-        <p>
-            21/04/2019: Preliminar fractional upscaling evaluatons added, focusing on the most relevant algorithms first.
-        </p>
-        <p>
-            18/04/2019: Ravu-zoom-r4 added, r2 and r3 were updated. 
-        </p>
-        <p>
-            17/04/2019: PSNR-HA/HMA measurements are now done with wstep = 7 as recommended by igv.
-        </p>
-        <p>
-            16/04/2019: New FPS measurement methodology, files now play for 4 seconds and then I calculate how many frames were displayed based on which frame it stopped at after the time-frame has elapsed. 
-            --scalers-resizes-only was also removed since the half pixel shift is not noticeable during playback. Previous results had different numbers, but the order didn't exactly significantly change. 
-        </p>
-        <p>
-            06/04/2019: Tables updated with newer versions of FSRCNNX again. 
-        </p>
-        <p>
-            31/03/2019: MS-SSIM tables were removed. All remaining luma related tables were updated. New methodology consists of basically utilising a full-range greyscale PNG as input (which results in lower quantisation errors 
-            when compared to using limited range YCbCr). Ravu-zoom was added, FSRCNNX_x2_16-0-4-1 and Ravu-lite were updated. 
-        </p>
-        <p>
-            27/03/2019: Updated PSNR-HA/HMA, you can expect to see ravu-ar and ravu-zoom soon. PSNR-HVS-M was removed since it's deprecated by the insertion of PSNR-HA.
-        </p>
-        <p>
-            15/03/2019: New versions of FSRCNNX. 
-        </p>
-        </p>
-
-            08/03/2019: Adding another test image for chroma, and changed all chroma tests to upscale from a yuv4mpegpipe y4m file which makes me more confident they're accurate.
-        </p>
-        <p>
-            07/03/2019: Adding Ravu-lite and fixing NGU-AA's half pixel shift. Huge thanks for Bjin for providing a user-shader to accomplish the latter =). FPS chart should be updated soon.
-        </p>
-        <p>
-            03/03/2019: Ravu-chroma and Ewa_Robidoux/Ewa_Robidouxsharp added. 
-        </p>
-        <p>
-            27/02/2019: PSNR-HMA and PSNR-HA tables added. 
-        </p>
-        <p>
-            25/02/2019: Initial version of the Chroma section is added. I'll take some time to slowly polish it with more information and different tests, and I'm also probably going to add PSNR-HMA to the RGB tests soon.
-        </p>
-        </p>
-            20/02/2019: IW-SSIM tables added.
-        <p>
-            19/02/2019: MS-SSIM tables fixed, code had issues with RGB -> greyscale conversion. 
-        </p>
-        <p>
-            18/02/2019: Lanczos added, and tables now display results from best to worst.
-        </p>
-        <p>
-            16/02/2019: Other EWA scalers were added.
-        </p>
-        <p>
-            22/12/2018: I found out a mistake in previous results, and have once again updated all quality comparison results.
-            <br>
-            I'm not certain about what was causing the problems, but turning off PNG filtering and debanding seems to have fixed it. I'll investigate which of the two was the culprit once I have the time. 
-            <br>
-            Well, since I had to redo everything, I took this opportunity to improve the testing methodology, debanding was turned off to prevent loss of detail, and I used a lossless 
-            YUV444p AVC encode as upscaling source instead of a YUV444p JPEG.  
-        </p>
-        <p>
-            18/12/2018: Results have been updated with latest versions of FSRCNNX and Waifu2x. On top of that, I've included MS-SSIM and PSNR-HVS-M measurements. 
-            I've also included all NGU algorithms from <a href="http://madvr.com/">MadVR</a> since people are interested in them.
-        </p>
-    </section>
-    
+        <code>magick convert violet.png -colorspace rgb -filter box -resize 50% -colorspace srgb downscaled.png</code>
+        <p>
+            It is then converted to grayscale with:
+        </p>
+        <code>magick convert downscaled.png -colorspace gray downscaled.png</code>
+        <p>
+            We need to convert them to grayscale because some of these shaders do not have RGB support.
+        </p>
+        <p>
+            The images were then upsampled back with:
+        </p>
+        <code>mpv --no-config --vo=gpu-next --no-hidpi-window-scale --window-scale=2.0 --pause=yes --screenshot-format=png --sigmoid-upscaling --deband=no --dither-depth=no --screenshot-high-bit-depth=no --glsl-shader="path/to/meme/shader" downscaled.png</code>
+        <h3 id="upsampling_results">Upsampling Results</h3>
+        <p>
+            <table>
+                <tbody>
+                  <tr>
+                    <td>Shader/Filter</td>
+                    <td>MAE</td>
+                    <td>PSNR</td>
+                    <td>SSIM</td>
+                    <td>MS-SSIM</td>
+                    <td></td>
+                    <td>MAE (N)</td>
+                    <td>PSNR (N)</td>
+                    <td>SSIM (N)</td>
+                    <td>MS-SSIM (N)</td>
+                    <td></td>
+                    <td>Mean</td>
+                  </tr>
+                  <tr>
+                    <td>FSRCNNX_x2_8-0-4-1</td>
+                    <td>0.0038</td>
+                    <td>40.9503</td>
+                    <td>0.9882</td>
+                    <td>0.9987</td>
+                    <td></td>
+                    <td>1.0000</td>
+                    <td>1.0000</td>
+                    <td>1.0000</td>
+                    <td>1.0000</td>
+                    <td></td>
+                    <td>1.0000</td>
+                  </tr>
+                  <tr>
+                    <td>ravu-zoom-ar-r3</td>
+                    <td>0.0038</td>
+                    <td>40.1300</td>
+                    <td>0.9869</td>
+                    <td>0.9985</td>
+                    <td></td>
+                    <td>0.9695</td>
+                    <td>0.8437</td>
+                    <td>0.8911</td>
+                    <td>0.8769</td>
+                    <td></td>
+                    <td>0.8953</td>
+                  </tr>
+                  <tr>
+                    <td>FSRCNNX_x2_16-0-4-1</td>
+                    <td>0.0040</td>
+                    <td>39.9168</td>
+                    <td>0.9873</td>
+                    <td>0.9984</td>
+                    <td></td>
+                    <td>0.8801</td>
+                    <td>0.8030</td>
+                    <td>0.9247</td>
+                    <td>0.8541</td>
+                    <td></td>
+                    <td>0.8655</td>
+                  </tr>
+                  <tr>
+                    <td>ravu-zoom-ar-r2</td>
+                    <td>0.0040</td>
+                    <td>39.7097</td>
+                    <td>0.9860</td>
+                    <td>0.9984</td>
+                    <td></td>
+                    <td>0.9049</td>
+                    <td>0.7635</td>
+                    <td>0.8079</td>
+                    <td>0.8666</td>
+                    <td></td>
+                    <td>0.8357</td>
+                  </tr>
+                  <tr>
+                    <td>FSR</td>
+                    <td>0.0051</td>
+                    <td>39.0008</td>
+                    <td>0.9817</td>
+                    <td>0.9981</td>
+                    <td></td>
+                    <td>0.3916</td>
+                    <td>0.6284</td>
+                    <td>0.4552</td>
+                    <td>0.6647</td>
+                    <td></td>
+                    <td>0.5350</td>
+                  </tr>
+                  <tr>
+                    <td>polar_lanczos</td>
+                    <td>0.0050</td>
+                    <td>37.9718</td>
+                    <td>0.9806</td>
+                    <td>0.9980</td>
+                    <td></td>
+                    <td>0.4426</td>
+                    <td>0.4323</td>
+                    <td>0.3575</td>
+                    <td>0.5797</td>
+                    <td></td>
+                    <td>0.4530</td>
+                  </tr>
+                  <tr>
+                    <td>Anime4K_Upscale_CNN_x2_S</td>
+                    <td>0.0054</td>
+                    <td>36.7883</td>
+                    <td>0.9795</td>
+                    <td>0.9974</td>
+                    <td></td>
+                    <td>0.2346</td>
+                    <td>0.2068</td>
+                    <td>0.2677</td>
+                    <td>0.2762</td>
+                    <td></td>
+                    <td>0.2463</td>
+                  </tr>
+                  <tr>
+                    <td>Anime4K_Upscale_CNN_x2_VL</td>
+                    <td>0.0055</td>
+                    <td>36.1490</td>
+                    <td>0.9794</td>
+                    <td>0.9971</td>
+                    <td></td>
+                    <td>0.2006</td>
+                    <td>0.0849</td>
+                    <td>0.2564</td>
+                    <td>0.0930</td>
+                    <td></td>
+                    <td>0.1587</td>
+                  </tr>
+                  <tr>
+                    <td>Anime4K_Upscale_CNN_x2_UL</td>
+                    <td>0.0056</td>
+                    <td>35.9095</td>
+                    <td>0.9790</td>
+                    <td>0.9971</td>
+                    <td></td>
+                    <td>0.1788</td>
+                    <td>0.0393</td>
+                    <td>0.2300</td>
+                    <td>0.0561</td>
+                    <td></td>
+                    <td>0.1260</td>
+                  </tr>
+                  <tr>
+                    <td>Anime4K_Upscale_CNN_x2_L</td>
+                    <td>0.0058</td>
+                    <td>35.7035</td>
+                    <td>0.9772</td>
+                    <td>0.9972</td>
+                    <td></td>
+                    <td>0.0874</td>
+                    <td>0.0000</td>
+                    <td>0.0768</td>
+                    <td>0.1609</td>
+                    <td></td>
+                    <td>0.0813</td>
+                  </tr>
+                  <tr>
+                    <td>Anime4K_Upscale_CNN_x2_M</td>
+                    <td>0.0060</td>
+                    <td>35.7087</td>
+                    <td>0.9763</td>
+                    <td>0.9970</td>
+                    <td></td>
+                    <td>0.0000</td>
+                    <td>0.0010</td>
+                    <td>0.0000</td>
+                    <td>0.0000</td>
+                    <td></td>
+                    <td>0.0002</td>
+                  </tr>
+                </tbody>
+            </table>
+        </p>
+    <h3 id="upsampling_commentary">Upsampling Commentary</h3>
+    <p>
+        The funniest thing about these results is that, according to distortion metrics, Anime4K is actually worse at "recreating the ground truth" than polar Lanczos. 
+        The problem seems to be that the shader is too sharp, it does not only ring but also makes the lines thinner. This isn't necessarily bad depending on how blurry your source is, but my test image here isn't 
+        blurry at all.
+    </p>
+    <p>
+        The slower variant of FSRCNNX is also scored lower than its smaller sibling, presumably for the same reason. I don't think igv trained these networks with images that had been downsampled in linear light, so that's probably part 
+        of the problem.
+    </p>
+    <p>
+        The overly-sharp shaders would probably do much better on perceptual metrics, I'll evaluate whether adding a few of them to the benchmarking script makes sense on a later date.
+    </p>
+    <p>
+        It's nice to see that bjin came back from the dead with gold. ravu-zoom-ar-r3 performs much better than its previous iterations and it's also free of the half-pixel shift problem.
+    </p>
+    <p>
+        In any case, if you were looking for a doubler FSRCNNX_x2_8-0-4-1 is probably a safe bet. It was the best scoring shader on all 4 distortion metrics.
+    </p>
+    <h3 id="chroma_shaders">Chroma Shaders</h3>
+    <p>
+        Using shaders to upsample chroma is an old meme, as igv ported Shiandow's KrigBilateral to mpv years ago. KrigBilateral finds the correlation between luma and chroma, and then maps the missing values based on that. 
+        You can read more about it <a href="https://en.wikipedia.org/wiki/Kriging">here</a>.
+    </p>
+    <p>
+        There's a different technique, usually called Joint or Cross Bilateral, that simply uses luma as an extra weighting factor. In short, chromatic information from pixels with similar luminosities is preferred. <a href="">I've written a shader that 
+        implements this idea</a> mostly to learn GLSL, but it ended up being quite useful as it's much faster than KrigBilateral while still keeping a clear lead over classic methods.
+    </p>
+    <p>
+        In any case, my goal here is to compare these chroma shaders against polar Lanczos, which I'm using as a reference poing.
+    </p>
+    <h3 id="chroma_methodology">Chroma Methodology</h3>
+    <p>
+        This test is a little different and it requires a slightly more elaborate process. The first problem with this is that, with real video content, we rarely get a 4:4:4 copy. This means that we generally don't have a reference point 
+        to work with, so we have to create one on our own.
+    </p>
+    <p>
+        I've semi-arbitrarily decided to use a downsampled version of <a href="https://twitter.com/fujinoomori/status/1576159422040064001">this danmachi fanart</a>. This image is particularly good at showing the difference between these shaders 
+        because it's full of pixel-to-pixel chromatic deviations, specially in the red areas. I might change this to a different test image at a later date, but for now it'll do.
+    </p>
+    <p>
+        This is what the original test image looks like:
+    </p>
+    <p>
+        <img src="./images/mpv_upscaling/chroma/reference.png" alt="chroma_reference" class="center" width="620" height="666">
+    </p>
+    <p>
+        Two versions of the image were created using FFmpeg:
+    </p>
+    <code>ffmpeg -i downscaled.png -pix_fmt yuv444p10le -c:v libx264 -preset placebo -qp 0 -an danmachi444.mp4</code>
+    <br>
+    <code>ffmpeg -i downscaled.png -pix_fmt yuv420p10le -c:v libx264 -preset placebo -qp 0 -an danmachi420.mp4</code>
+    <p>
+        The idea here was creating (nearly) lossless variants with and without chroma subsampling.
+    </p>
+    <p>
+        The "reference" image was obtained by screenshotting "danmachi444.mp4" on mpv.
+    </p>
+    <p>
+        The images under test were obtained by screenshotting "danmachi420.mp4" on mpv using the various chroma resampling shaders.
+    </p>
+    <p>
+        mpv options remains the same with the exception that we don't need <inline_code>--window-scale=2.0</inline_code> anymore. Since we're comparing chroma here, the images weren't converted to grayscale.
+    </p>
+    <h3 id="chroma_results">Chroma Results</h3>
+    <p>
+        <table>
+            <tbody>
+              <tr>
+                <td>Shader/Filter</td>
+                <td>MAE</td>
+                <td>PSNR</td>
+                <td>SSIM</td>
+                <td>MS-SSIM</td>
+                <td></td>
+                <td>MAE (N)</td>
+                <td>PSNR (N)</td>
+                <td>SSIM (N)</td>
+                <td>MS-SSIM (N)</td>
+                <td></td>
+                <td>Mean</td>
+              </tr>
+              <tr>
+                <td>krigbilateral</td>
+                <td>0.0025</td>
+                <td>41.1124</td>
+                <td>0.9941</td>
+                <td>0.9994</td>
+                <td></td>
+                <td>1.0000</td>
+                <td>1.0000</td>
+                <td>1.0000</td>
+                <td>1.0000</td>
+                <td></td>
+                <td>1.0000</td>
+              </tr>
+              <tr>
+                <td>FastBilateral</td>
+                <td>0.0028</td>
+                <td>40.0376</td>
+                <td>0.9925</td>
+                <td>0.9991</td>
+                <td></td>
+                <td>0.5973</td>
+                <td>0.4479</td>
+                <td>0.4715</td>
+                <td>0.6175</td>
+                <td></td>
+                <td>0.5335</td>
+              </tr>
+              <tr>
+                <td>JointBilateral</td>
+                <td>0.0029</td>
+                <td>39.9786</td>
+                <td>0.9923</td>
+                <td>0.9990</td>
+                <td></td>
+                <td>0.4964</td>
+                <td>0.4176</td>
+                <td>0.4033</td>
+                <td>0.5301</td>
+                <td></td>
+                <td>0.4619</td>
+              </tr>
+              <tr>
+                <td>polar_lanczos</td>
+                <td>0.0032</td>
+                <td>39.1656</td>
+                <td>0.9911</td>
+                <td>0.9987</td>
+                <td></td>
+                <td>0.0000</td>
+                <td>0.0000</td>
+                <td>0.0000</td>
+                <td>0.0000</td>
+                <td></td>
+                <td>0.0000</td>
+              </tr>
+            </tbody>
+        </table>
+    </p>
+    <h3 id="chroma_commentary">Chroma Commentary</h3>
+    <p>
+        As expected, the bilateral filters are all capable of getting closer to the ground truth than polar Lanczos. KrigBilateral is the best scorer here, which was also expected given it's the slowest shader.
+    </p>
+    <p>
+        FastBilateral scoring higher than JointBilateral might seem weird at first, but at their default settings (with <inline_code>intensity_coeff = 64.0</inline_code>) this can happen sometimes. JointBilateral takes a neighbourhood 
+        of 16 chroma pixels while FastBilateral only uses the 4 surrounding pixels. This much greater radius allows JointBilateral to "look far away", which is usually beneficial but can also work against it when the surrounding pixels 
+        are close together in luminance but far apart in chromaticity.
+    </p>
+    <p>
+        My personal advice here is that there's little point in using JointBilateral over FastBilateral, even when it does better the difference is usually negligible. Krig is also better than both of them at the expense of being much slower to run 
+        (about an order of magnitude slower than FastBilateral), but if your hardware can handle it then that's a non-issue.
+    </p>
+    <p>
+        The table also shows us that, if you use polar Lanczos as the baseline, Joint/Fast Bilateral are pretty much half-way as good as KrigBilateral. The shaders would be much closer together in the final mean if I had included faster 
+        options such as bilinear and box, but there's little reason to use those to scale chroma unless you're really trying to save on resources.
+    </p>
+    <p>
+        The only other thing I'd like to point out here is that the difference between these 3 shaders and the built-in solutions gets bigger when you use luma prescalers, since they use luma information as a guide.
+    </p>
+    <h3 id="antiring">Antiring</h3>
+    <p>
+        Antiringing solutions is a topic that I hadn't covered in the previous iteration of this page, but now that we have more than a single option we can also compare them.
+    </p>
+    <p>
+        In short, antiringing filters attempt to remove overshoots generated by sharp resampling filters when they meet a sharp intensity delta. What is commonly referred to as ringing is simply consequential to the filter's impulse response.
+    </p>
+    <p>
+        The following image shows this very well:
+    </p>
+    <p>
+        <img src="./images/mpv_upscaling/antiring/ar_comparison.png" alt="ar_comparison" class="center" width="900" height="300">
+    </p>
+    <p>
+        The negative weights in the filter are there for it to be able to quickly respond to high-frequency transitions, but it makes the filter overshoot a little bit before reaching its final destination. The "intensity" of the ringing is 
+        directly related to the magnitude of the secondary lobes. The second lobe, which is almost always negative, is responsible for the overshooting in can see in this example, but filters with more lobes ring once per lobe, and the ringing can 
+        be "positive" as well (within the range set by the original pixels) with positive lobes. The "length" of the rings is directly related to the length of the lobes, which is why filters like polar Lanczos have "longer" rings (the zero crossings 
+        don't fall exactly at the integers, but rather slightly after them).
+    </p>
+    <h3 id="antiring_methodology">Antiring Methodology</h3>
+    <p>
+        The methodology here almost is equal to the one used for upsampling, with the only difference being that we have to include <inline_code>--scale-antiring</inline_code> to use mpv's (or libplacebo's) native AR solution. We also don't have to convert to grayscale 
+        this time since the shaders support RGB images just fine.
+    </p>
+    <p>
+        AR is only really necessary when you're using sharp filters, it makes no sense alongside blurry filters because blurry filters don't ring hard enough for it to be noticeable. Polar Lanczos is a relatively blurry filter, and it's probably not 
+        the best candidate to test this with, however, it's also the most popular polar choice so using something else probably wouldn't be very useful to a lot of people... There are a few sharp memes that are worth trying with AR though if you feel adventurous, 
+        but enerally speaking I think orthogonal lanczos and polar lanczos are pretty balanced.
+    </p>
+    <p>
+        It's also worth mentioning that mpv uses different AR techniques for orthogonal and polar filters, but I'll name them both "_ar" for simplicity.
+    </p>
+    <p>
+        I'm including <a href="https://github.com/Artoriuz/glsl-pixel-clipper">my AR shaders</a> in this comparison because I think they're very good at keeping everything but the overshoots intact, which does create some weird artifacts with sharp transitions sometimes, 
+        specially if you use them at ludicrous scaling factors, but the output is generally clean enough on real content.
+    </p>
+    <h3 id="antiring_results">Antiring Results</h3>
+    <p>
+        <table>
+            <tbody>
+              <tr>
+                <td>Filter</td>
+                <td>MAE</td>
+                <td>PSNR</td>
+                <td>SSIM</td>
+                <td>MS-SSIM</td>
+                <td></td>
+                <td>MAE (N)</td>
+                <td>PSNR (N)</td>
+                <td>SSIM (N)</td>
+                <td>MS-SSIM (N)</td>
+                <td></td>
+                <td>Mean</td>
+              </tr>
+              <tr>
+                <td>lanczos_pc4_100</td>
+                <td>0.0045</td>
+                <td>38.4763</td>
+                <td>0.9831</td>
+                <td>0.9985</td>
+                <td></td>
+                <td>1.0000</td>
+                <td>0.9917</td>
+                <td>1.0000</td>
+                <td>0.9052</td>
+                <td></td>
+                <td>0.9742</td>
+              </tr>
+              <tr>
+                <td>lanczos_pc4_75</td>
+                <td>0.0046</td>
+                <td>38.4828</td>
+                <td>0.9830</td>
+                <td>0.9985</td>
+                <td></td>
+                <td>0.9595</td>
+                <td>0.9970</td>
+                <td>0.9820</td>
+                <td>0.9400</td>
+                <td></td>
+                <td>0.9696</td>
+              </tr>
+              <tr>
+                <td>lanczos_pc4_50</td>
+                <td>0.0047</td>
+                <td>38.4633</td>
+                <td>0.9827</td>
+                <td>0.9986</td>
+                <td></td>
+                <td>0.8656</td>
+                <td>0.9810</td>
+                <td>0.9252</td>
+                <td>0.9708</td>
+                <td></td>
+                <td>0.9356</td>
+              </tr>
+              <tr>
+                <td>lanczos_pc12_100</td>
+                <td>0.0046</td>
+                <td>38.4865</td>
+                <td>0.9827</td>
+                <td>0.9985</td>
+                <td></td>
+                <td>0.8785</td>
+                <td>1.0000</td>
+                <td>0.9247</td>
+                <td>0.9392</td>
+                <td></td>
+                <td>0.9356</td>
+              </tr>
+              <tr>
+                <td>lanczos_pc12_75</td>
+                <td>0.0047</td>
+                <td>38.4782</td>
+                <td>0.9826</td>
+                <td>0.9986</td>
+                <td></td>
+                <td>0.8490</td>
+                <td>0.9932</td>
+                <td>0.9080</td>
+                <td>0.9606</td>
+                <td></td>
+                <td>0.9277</td>
+              </tr>
+              <tr>
+                <td>lanczos_pc12_50</td>
+                <td>0.0047</td>
+                <td>38.4522</td>
+                <td>0.9824</td>
+                <td>0.9986</td>
+                <td></td>
+                <td>0.7875</td>
+                <td>0.9720</td>
+                <td>0.8652</td>
+                <td>0.9810</td>
+                <td></td>
+                <td>0.9014</td>
+              </tr>
+              <tr>
+                <td>lanczos_ar_50</td>
+                <td>0.0047</td>
+                <td>38.3433</td>
+                <td>0.9826</td>
+                <td>0.9985</td>
+                <td></td>
+                <td>0.8445</td>
+                <td>0.8833</td>
+                <td>0.8959</td>
+                <td>0.9221</td>
+                <td></td>
+                <td>0.8864</td>
+              </tr>
+              <tr>
+                <td>lanczos_ar_75</td>
+                <td>0.0046</td>
+                <td>38.2819</td>
+                <td>0.9827</td>
+                <td>0.9984</td>
+                <td></td>
+                <td>0.9069</td>
+                <td>0.8332</td>
+                <td>0.9150</td>
+                <td>0.8578</td>
+                <td></td>
+                <td>0.8782</td>
+              </tr>
+              <tr>
+                <td>lanczos_ar_100</td>
+                <td>0.0046</td>
+                <td>38.1854</td>
+                <td>0.9826</td>
+                <td>0.9983</td>
+                <td></td>
+                <td>0.9200</td>
+                <td>0.7545</td>
+                <td>0.8971</td>
+                <td>0.7848</td>
+                <td></td>
+                <td>0.8391</td>
+              </tr>
+              <tr>
+                <td>lanczos</td>
+                <td>0.0048</td>
+                <td>38.3682</td>
+                <td>0.9819</td>
+                <td>0.9986</td>
+                <td></td>
+                <td>0.6477</td>
+                <td>0.9035</td>
+                <td>0.7435</td>
+                <td>1.0000</td>
+                <td></td>
+                <td>0.8237</td>
+              </tr>
+              <tr>
+                <td>polar_lanczos_pc4_100</td>
+                <td>0.0048</td>
+                <td>38.0367</td>
+                <td>0.9817</td>
+                <td>0.9982</td>
+                <td></td>
+                <td>0.7189</td>
+                <td>0.6333</td>
+                <td>0.7049</td>
+                <td>0.6973</td>
+                <td></td>
+                <td>0.6886</td>
+              </tr>
+              <tr>
+                <td>polar_lanczos_pc4_75</td>
+                <td>0.0048</td>
+                <td>38.0387</td>
+                <td>0.9816</td>
+                <td>0.9983</td>
+                <td></td>
+                <td>0.6737</td>
+                <td>0.6350</td>
+                <td>0.6829</td>
+                <td>0.7259</td>
+                <td></td>
+                <td>0.6794</td>
+              </tr>
+              <tr>
+                <td>polar_lanczos_pc12_100</td>
+                <td>0.0049</td>
+                <td>38.0394</td>
+                <td>0.9813</td>
+                <td>0.9983</td>
+                <td></td>
+                <td>0.5989</td>
+                <td>0.6356</td>
+                <td>0.6284</td>
+                <td>0.7247</td>
+                <td></td>
+                <td>0.6469</td>
+              </tr>
+              <tr>
+                <td>polar_lanczos_pc4_50</td>
+                <td>0.0049</td>
+                <td>38.0185</td>
+                <td>0.9813</td>
+                <td>0.9983</td>
+                <td></td>
+                <td>0.5775</td>
+                <td>0.6185</td>
+                <td>0.6235</td>
+                <td>0.7506</td>
+                <td></td>
+                <td>0.6425</td>
+              </tr>
+              <tr>
+                <td>polar_lanczos_pc12_75</td>
+                <td>0.0049</td>
+                <td>38.0308</td>
+                <td>0.9812</td>
+                <td>0.9983</td>
+                <td></td>
+                <td>0.5668</td>
+                <td>0.6285</td>
+                <td>0.6100</td>
+                <td>0.7416</td>
+                <td></td>
+                <td>0.6367</td>
+              </tr>
+              <tr>
+                <td>polar_lanczos_pc12_50</td>
+                <td>0.0049</td>
+                <td>38.0061</td>
+                <td>0.9810</td>
+                <td>0.9983</td>
+                <td></td>
+                <td>0.5011</td>
+                <td>0.6084</td>
+                <td>0.5641</td>
+                <td>0.7566</td>
+                <td></td>
+                <td>0.6076</td>
+              </tr>
+              <tr>
+                <td>polar_lanczos</td>
+                <td>0.0050</td>
+                <td>37.9266</td>
+                <td>0.9804</td>
+                <td>0.9983</td>
+                <td></td>
+                <td>0.3513</td>
+                <td>0.5436</td>
+                <td>0.4438</td>
+                <td>0.7677</td>
+                <td></td>
+                <td>0.5266</td>
+              </tr>
+              <tr>
+                <td>polar_lanczos_ar_50</td>
+                <td>0.0050</td>
+                <td>37.7414</td>
+                <td>0.9805</td>
+                <td>0.9980</td>
+                <td></td>
+                <td>0.4390</td>
+                <td>0.3926</td>
+                <td>0.4499</td>
+                <td>0.5096</td>
+                <td></td>
+                <td>0.4478</td>
+              </tr>
+              <tr>
+                <td>polar_lanczos_ar_75</td>
+                <td>0.0051</td>
+                <td>37.5336</td>
+                <td>0.9797</td>
+                <td>0.9977</td>
+                <td></td>
+                <td>0.3047</td>
+                <td>0.2232</td>
+                <td>0.2849</td>
+                <td>0.2863</td>
+                <td></td>
+                <td>0.2748</td>
+              </tr>
+              <tr>
+                <td>polar_lanczos_ar_100</td>
+                <td>0.0053</td>
+                <td>37.2597</td>
+                <td>0.9783</td>
+                <td>0.9973</td>
+                <td></td>
+                <td>0.0000</td>
+                <td>0.0000</td>
+                <td>0.0000</td>
+                <td>0.0000</td>
+                <td></td>
+                <td>0.0000</td>
+              </tr>
+            </tbody>
+        </table>
+    </p>
+    <h3 id="antiring_commentary">Antiring Commentary</h3>
+    <p>
+        When it comes to the AR solutions we have available today, libplacebo's native AR is better at keeping gradients smooth at the expense of blurrying the image a little bit, which explains why Pixel Clipper scores higher than it.
+    </p>
+    <p>
+        mpv's native AR solution for orthogonal filters shouldn't blur anything though, and I believe PixelClipper is only scoring higher than it because mpv applies its antiring twice, once per orthogonal pass. This means that the second pass 
+        won't have access to the overshoots created by the first pass, which is theoretically a good thing but actually ends up hurting the filter's reconstruction quality. Pixel Clipper is only applied after scaling is done, so it's completely 
+        oblivious to the entire scaling process. It simply clamps the HR pixels to the intensity bounds set by the surrounding LR pixels.
+    </p>
+    <p>
+        I think this is pretty much a pick your poison kind of situation, though my judgement might be biased.
+    </p>
+    <h3 id="downsampling_antiring">Downsampling Antiring</h3>
+    <p>
+        Pixel Clipper actually has a downsampling variant as well, which I believe is probably less broken than mpv's native <inline_code>--dscale-antiring</inline_code> solution. My aim here is to evaluate whether using AR 
+        when downsampling helps at all, so I'll skip comparing it against the old native solution and I'll only run it at full strength.
+    </p>
+    <p>
+        I'm only including orthogonal mitchell, catrom and spline36 and lanczos in this section, as these are the most popular choices for downsampling. 
+        The following image was used for the downsampling tests:
+    </p>
+    <img src="./images/mpv_upscaling/downsampling/highres.png" alt="yurucamp" class="center" width="960" height="540">
+    <h3 id="downsampling_antiring_methodology">Downsampling Antiring Methodology</h3>
+    <p>
+        My current method to evaluate downsampling filters is to concede that at 0.5x linear light box is as good as it gets, since in this case we're just averaging 4 pixels together. 
+        We can't use box itself for other scaling factors though, so the aim is to find a filter that produces a similar result but is also usable at any other arbitrary scaling factor.
+    </p>
+    <p>
+        To eliminate any differences caused by how differently mpv and ImageMagick perform linear light conversion, the box reference was also obtained using mpv.
+    </p>
+    <p>
+        The images were basically generated using the following command:
+    </p>
+    <code>mpv --no-config --vo=gpu-next --no-hidpi-window-scale --window-scale=0.5 --pause=yes --screenshot-format=png --linear-downscaling --correct-downscaling --deband=no --dither-depth=no --screenshot-high-bit-depth=no --dscale=filter --glsl-shader="PixelClipper_downscaling.glsl" higres.png</code>
+    <h3 id="downsampling_antiring_results">Downsampling Antiring Results</h3>
+    <p>
+        <table>
+            <tbody>
+              <tr>
+                <td>Filter</td>
+                <td>MAE</td>
+                <td>PSNR</td>
+                <td>SSIM</td>
+                <td>MS-SSIM</td>
+                <td></td>
+                <td>MAE (N)</td>
+                <td>PSNR (N)</td>
+                <td>SSIM (N)</td>
+                <td>MS-SSIM (N)</td>
+                <td></td>
+                <td>Mean</td>
+              </tr>
+              <tr>
+                <td>catrom_pc</td>
+                <td>0.0026</td>
+                <td>42.0780</td>
+                <td>0.9955</td>
+                <td>0.9996</td>
+                <td></td>
+                <td>1.0000</td>
+                <td>1.0000</td>
+                <td>1.0000</td>
+                <td>1.0000</td>
+                <td></td>
+                <td>1.0000</td>
+              </tr>
+              <tr>
+                <td>lanczos_pc</td>
+                <td>0.0027</td>
+                <td>42.0482</td>
+                <td>0.9950</td>
+                <td>0.9994</td>
+                <td></td>
+                <td>0.8790</td>
+                <td>0.9932</td>
+                <td>0.8957</td>
+                <td>0.8036</td>
+                <td></td>
+                <td>0.8929</td>
+              </tr>
+              <tr>
+                <td>spline36_pc</td>
+                <td>0.0028</td>
+                <td>41.8381</td>
+                <td>0.9949</td>
+                <td>0.9995</td>
+                <td></td>
+                <td>0.8468</td>
+                <td>0.9449</td>
+                <td>0.8750</td>
+                <td>0.8317</td>
+                <td></td>
+                <td>0.8746</td>
+              </tr>
+              <tr>
+                <td>catrom</td>
+                <td>0.0030</td>
+                <td>40.5637</td>
+                <td>0.9948</td>
+                <td>0.9994</td>
+                <td></td>
+                <td>0.7095</td>
+                <td>0.6523</td>
+                <td>0.8451</td>
+                <td>0.7859</td>
+                <td></td>
+                <td>0.7482</td>
+              </tr>
+              <tr>
+                <td>spline36</td>
+                <td>0.0038</td>
+                <td>38.3021</td>
+                <td>0.9923</td>
+                <td>0.9991</td>
+                <td></td>
+                <td>0.0906</td>
+                <td>0.1329</td>
+                <td>0.3205</td>
+                <td>0.2044</td>
+                <td></td>
+                <td>0.1871</td>
+              </tr>
+              <tr>
+                <td>mitchell_pc</td>
+                <td>0.0038</td>
+                <td>38.1842</td>
+                <td>0.9908</td>
+                <td>0.9990</td>
+                <td></td>
+                <td>0.1057</td>
+                <td>0.1059</td>
+                <td>0.0135</td>
+                <td>0.0195</td>
+                <td></td>
+                <td>0.0612</td>
+              </tr>
+              <tr>
+                <td>lanczos</td>
+                <td>0.0039</td>
+                <td>37.7231</td>
+                <td>0.9917</td>
+                <td>0.9990</td>
+                <td></td>
+                <td>0.0000</td>
+                <td>0.0000</td>
+                <td>0.2069</td>
+                <td>0.0000</td>
+                <td></td>
+                <td>0.0517</td>
+              </tr>
+              <tr>
+                <td>mitchell</td>
+                <td>0.0038</td>
+                <td>38.1312</td>
+                <td>0.9907</td>
+                <td>0.9990</td>
+                <td></td>
+                <td>0.0669</td>
+                <td>0.0937</td>
+                <td>0.0000</td>
+                <td>0.0092</td>
+                <td></td>
+                <td>0.0425</td>
+              </tr>
+            </tbody>
+        </table>
+    </p>
+    <h3 id="downsampling_antiring_commentary">Downsampling Antiring Commentary</h3>
+    <p>
+        The first thing we can see is that AR seems to be a net-positive in general. All filters scored higher with Pixel Clipper, with the sharpest filter in the comparison (Lanczos) seeing the biggest improvement. 
+    </p>
+    <p>
+        Catrom is the highest scoring filter with and without AR, so it's easy to recommend this unless you really prefer the softer look of mitchell.
+    </p>
+    <p>
+        Mitchell itself also saw a small improvement with AR, but using AR with mitchell is completely unnecessary and you're unlikely to notice the difference.
+    </p>
+    <h3 id="outro">Outro</h3>
+    <p>
+        I want to make it clear though that you shouldn't take the results as gospel. Mathematical image quality metrics do not always correlate perfectly with how humans perceive image quality, 
+        and your personal preference is entirely subjective. You should take this page as what it is, a research that produces numbers, but you should not take these numbers for granted before 
+        understanding what they actually mean.
+    </p>
+</section>
         <br>
         <br>
         <nav>
