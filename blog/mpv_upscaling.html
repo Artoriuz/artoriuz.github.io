@@ -62,7 +62,7 @@
             <li><a href="https://gist.github.com/agyild/82219c545228d70c5604f865ce0b0ce5">FSR</a></li>
             <br>
             I've also added polar Lanczos to the mix just to have a reference point, but feel free to send me any other shaders you would like to get scored. 
-            Also note that the Anime4K author recommends using multiple shaders together, but I'm only interested in the upscaling CNNs here.
+            For Anime4K I'm using the <a href="">https://github.com/bloc97/Anime4K/blob/815b122284304e6e1e244a8cf6a160eeaa07040c/GLSL_Instructions.md</a>"C" mode which is defined as <inline_code>Upscale_Denoise -> Upscale</inline_code>.
         </p>
         <p>
             The test image is downsampled with:
@@ -107,12 +107,12 @@
                 <td>0.9872</td>
                 <td>0.9990</td>
                 <td></td>
-                <td>0.9924</td>
+                <td>0.9932</td>
                 <td>1.0000</td>
-                <td>0.9087</td>
+                <td>0.9210</td>
                 <td>1.0000</td>
                 <td></td>
-                <td>0.9753</td>
+                <td>0.9786</td>
               </tr>
               <tr>
                 <td>FSRCNNX_x2_8-0-4-1</td>
@@ -122,11 +122,11 @@
                 <td>0.9987</td>
                 <td></td>
                 <td>1.0000</td>
-                <td>0.9834</td>
+                <td>0.9847</td>
                 <td>1.0000</td>
-                <td>0.8512</td>
+                <td>0.9026</td>
                 <td></td>
-                <td>0.9587</td>
+                <td>0.9718</td>
               </tr>
               <tr>
                 <td>ravu-zoom-r2</td>
@@ -135,12 +135,12 @@
                 <td>0.9866</td>
                 <td>0.9989</td>
                 <td></td>
-                <td>0.9221</td>
-                <td>0.8953</td>
-                <td>0.8591</td>
-                <td>0.9564</td>
+                <td>0.9307</td>
+                <td>0.9033</td>
+                <td>0.8782</td>
+                <td>0.9714</td>
                 <td></td>
-                <td>0.9082</td>
+                <td>0.9209</td>
               </tr>
               <tr>
                 <td>ravu-zoom-ar-r3</td>
@@ -149,12 +149,12 @@
                 <td>0.9869</td>
                 <td>0.9985</td>
                 <td></td>
-                <td>0.9695</td>
-                <td>0.8322</td>
-                <td>0.8911</td>
-                <td>0.7464</td>
+                <td>0.9729</td>
+                <td>0.8450</td>
+                <td>0.9059</td>
+                <td>0.8339</td>
                 <td></td>
-                <td>0.8598</td>
+                <td>0.8894</td>
               </tr>
               <tr>
                 <td>FSRCNNX_x2_16-0-4-1</td>
@@ -163,12 +163,12 @@
                 <td>0.9873</td>
                 <td>0.9984</td>
                 <td></td>
-                <td>0.8801</td>
-                <td>0.7928</td>
-                <td>0.9247</td>
-                <td>0.7270</td>
+                <td>0.8933</td>
+                <td>0.8087</td>
+                <td>0.9349</td>
+                <td>0.8212</td>
                 <td></td>
-                <td>0.8312</td>
+                <td>0.8645</td>
               </tr>
               <tr>
                 <td>ravu-zoom-ar-r2</td>
@@ -177,12 +177,12 @@
                 <td>0.9860</td>
                 <td>0.9984</td>
                 <td></td>
-                <td>0.9049</td>
-                <td>0.7547</td>
-                <td>0.8079</td>
-                <td>0.7377</td>
+                <td>0.9153</td>
+                <td>0.7734</td>
+                <td>0.8339</td>
+                <td>0.8282</td>
                 <td></td>
-                <td>0.8013</td>
+                <td>0.8377</td>
               </tr>
               <tr>
                 <td>nnedi3-nns64-win8x6</td>
@@ -191,26 +191,12 @@
                 <td>0.9841</td>
                 <td>0.9973</td>
                 <td></td>
-                <td>0.7085</td>
-                <td>0.5610</td>
-                <td>0.6512</td>
-                <td>0.1644</td>
+                <td>0.7406</td>
+                <td>0.5946</td>
+                <td>0.6984</td>
+                <td>0.4527</td>
                 <td></td>
-                <td>0.5213</td>
-              </tr>
-              <tr>
-                <td>FSR</td>
-                <td>0.0051</td>
-                <td>39.0008</td>
-                <td>0.9817</td>
-                <td>0.9981</td>
-                <td></td>
-                <td>0.3916</td>
-                <td>0.6240</td>
-                <td>0.4552</td>
-                <td>0.5658</td>
-                <td></td>
-                <td>0.5092</td>
+                <td>0.6216</td>
               </tr>
               <tr>
                 <td>nnedi3-nns32-win8x6</td>
@@ -219,12 +205,26 @@
                 <td>0.9836</td>
                 <td>0.9972</td>
                 <td></td>
-                <td>0.6776</td>
-                <td>0.5292</td>
-                <td>0.6105</td>
-                <td>0.1197</td>
+                <td>0.7131</td>
+                <td>0.5652</td>
+                <td>0.6633</td>
+                <td>0.4235</td>
                 <td></td>
-                <td>0.4843</td>
+                <td>0.5913</td>
+              </tr>
+              <tr>
+                <td>FSR</td>
+                <td>0.0051</td>
+                <td>39.0008</td>
+                <td>0.9817</td>
+                <td>0.9981</td>
+                <td></td>
+                <td>0.4585</td>
+                <td>0.6528</td>
+                <td>0.5290</td>
+                <td>0.7157</td>
+                <td></td>
+                <td>0.5890</td>
               </tr>
               <tr>
                 <td>polar_lanczos</td>
@@ -233,82 +233,82 @@
                 <td>0.9806</td>
                 <td>0.9980</td>
                 <td></td>
-                <td>0.4426</td>
-                <td>0.4343</td>
-                <td>0.3575</td>
-                <td>0.4935</td>
+                <td>0.5039</td>
+                <td>0.4776</td>
+                <td>0.4445</td>
+                <td>0.6683</td>
                 <td></td>
-                <td>0.4320</td>
+                <td>0.5236</td>
               </tr>
               <tr>
-                <td>Anime4K_Upscale_CNN_x2_S</td>
-                <td>0.0054</td>
-                <td>36.7883</td>
-                <td>0.9795</td>
-                <td>0.9974</td>
-                <td></td>
-                <td>0.2346</td>
-                <td>0.2161</td>
-                <td>0.2677</td>
-                <td>0.2351</td>
-                <td></td>
-                <td>0.2384</td>
-              </tr>
-              <tr>
-                <td>Anime4K_Upscale_CNN_x2_VL</td>
+                <td>Anime4K_C_S</td>
                 <td>0.0056</td>
-                <td>36.0632</td>
-                <td>0.9791</td>
-                <td>0.9971</td>
-                <td></td>
-                <td>0.1771</td>
-                <td>0.0824</td>
-                <td>0.2320</td>
-                <td>0.0420</td>
-                <td></td>
-                <td>0.1334</td>
-              </tr>
-              <tr>
-                <td>Anime4K_Upscale_CNN_x2_UL</td>
-                <td>0.0056</td>
-                <td>35.8242</td>
-                <td>0.9787</td>
-                <td>0.9970</td>
-                <td></td>
-                <td>0.1562</td>
-                <td>0.0383</td>
-                <td>0.2046</td>
-                <td>0.0198</td>
-                <td></td>
-                <td>0.1047</td>
-              </tr>
-              <tr>
-                <td>Anime4K_Upscale_CNN_x2_L</td>
-                <td>0.0058</td>
-                <td>35.6164</td>
-                <td>0.9769</td>
+                <td>36.3773</td>
+                <td>0.9783</td>
                 <td>0.9972</td>
                 <td></td>
-                <td>0.0629</td>
-                <td>0.0000</td>
-                <td>0.0485</td>
-                <td>0.1052</td>
+                <td>0.2547</td>
+                <td>0.2061</td>
+                <td>0.2774</td>
+                <td>0.4196</td>
                 <td></td>
-                <td>0.0541</td>
+                <td>0.2895</td>
               </tr>
               <tr>
-                <td>Anime4K_Upscale_CNN_x2_M</td>
-                <td>0.0060</td>
-                <td>35.7087</td>
-                <td>0.9763</td>
-                <td>0.9970</td>
+                <td>Anime4K_C_L</td>
+                <td>0.0058</td>
+                <td>35.9398</td>
+                <td>0.9767</td>
+                <td>0.9968</td>
+                <td></td>
+                <td>0.1610</td>
+                <td>0.1316</td>
+                <td>0.1638</td>
+                <td>0.2977</td>
+                <td></td>
+                <td>0.1885</td>
+              </tr>
+              <tr>
+                <td>Anime4K_C_VL</td>
+                <td>0.0059</td>
+                <td>35.6782</td>
+                <td>0.9766</td>
+                <td>0.9963</td>
+                <td></td>
+                <td>0.1153</td>
+                <td>0.0871</td>
+                <td>0.1573</td>
+                <td>0.1305</td>
+                <td></td>
+                <td>0.1225</td>
+              </tr>
+              <tr>
+                <td>Anime4K_C_M</td>
+                <td>0.0062</td>
+                <td>35.3010</td>
+                <td>0.9744</td>
+                <td>0.9962</td>
                 <td></td>
                 <td>0.0000</td>
-                <td>0.0170</td>
+                <td>0.0229</td>
                 <td>0.0000</td>
+                <td>0.1077</td>
+                <td></td>
+                <td>0.0326</td>
+              </tr>
+              <tr>
+                <td>Anime4K_C_UL</td>
+                <td>0.0061</td>
+                <td>35.1667</td>
+                <td>0.9750</td>
+                <td>0.9959</td>
+                <td></td>
+                <td>0.0321</td>
+                <td>0.0000</td>
+                <td>0.0438</td>
                 <td>0.0000</td>
                 <td></td>
-                <td>0.0043</td>
+                <td>0.0190</td>
               </tr>
             </tbody>
           </table>
