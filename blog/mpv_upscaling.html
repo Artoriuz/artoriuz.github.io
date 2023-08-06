@@ -56,6 +56,7 @@
         <p>
             The following shaders were "benchmarked":
             <li><a href="https://github.com/bjin/mpv-prescalers">RAVU</a></li>
+            <li><a href="https://github.com/bjin/mpv-prescalers">NNEDI3</a></li>
             <li><a href="https://github.com/igv/FSRCNN-TensorFlow">FSRCNNX</a></li>
             <li><a href="https://github.com/bloc97/Anime4K">Anime4K</a></li>
             <li><a href="https://gist.github.com/agyild/82219c545228d70c5604f865ce0b0ce5">FSR</a></li>
@@ -78,6 +79,9 @@
             The images were then upsampled back with:
         </p>
         <code>mpv --no-config --vo=gpu-next --no-hidpi-window-scale --window-scale=2.0 --pause=yes --screenshot-format=png --sigmoid-upscaling --deband=no --dither-depth=no --screenshot-high-bit-depth=no --glsl-shader="path/to/meme/shader" downscaled.png</code>
+        <p>
+          Unfortunately, for NEEDI3 we have to switch back to <inline_code>--vo=gpu</inline_code> so we can use <inline_code>--no-scaler-resizes-only</inline_code> to fix the half-pixel shift introduced by the shader.
+        </p>
         <h3 id="upsampling_results">Upsampling Results</h3>
         <p>
           <table>
@@ -181,6 +185,20 @@
                 <td>0.8013</td>
               </tr>
               <tr>
+                <td>nnedi3-nns64-win8x6</td>
+                <td>0.0044</td>
+                <td>38.6590</td>
+                <td>0.9841</td>
+                <td>0.9973</td>
+                <td></td>
+                <td>0.7085</td>
+                <td>0.5610</td>
+                <td>0.6512</td>
+                <td>0.1644</td>
+                <td></td>
+                <td>0.5213</td>
+              </tr>
+              <tr>
                 <td>FSR</td>
                 <td>0.0051</td>
                 <td>39.0008</td>
@@ -193,6 +211,20 @@
                 <td>0.5658</td>
                 <td></td>
                 <td>0.5092</td>
+              </tr>
+              <tr>
+                <td>nnedi3-nns32-win8x6</td>
+                <td>0.0045</td>
+                <td>38.4867</td>
+                <td>0.9836</td>
+                <td>0.9972</td>
+                <td></td>
+                <td>0.6776</td>
+                <td>0.5292</td>
+                <td>0.6105</td>
+                <td>0.1197</td>
+                <td></td>
+                <td>0.4843</td>
               </tr>
               <tr>
                 <td>polar_lanczos</td>
