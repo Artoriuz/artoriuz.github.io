@@ -120,4 +120,8 @@ body {
     font: monospace;
     color: coral;
    }
-   
+   @media (prefers-color-scheme: dark) {
+    * {
+      color-scheme: dark;
+    }
+  }
