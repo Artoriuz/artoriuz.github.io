@@ -332,6 +332,218 @@
     <p>
       ravu-zoom-ar-r3 seems to be the clear winner here when it comes to reconstruction, beating even FSRCNNX which is a CNN. The numbers are incredibly close though, so if you're looking for a shader it wouldn't hurt to them both of them to a test drive.
     </p>
+    <h3 id="fractional_upsampling">Fractional Upsampling</h3>
+    <p>
+      While doing these tests at 2x makes sense since we can use a box filter to downsample, most people aren't always doubling their content. Scaling "performance" at lower scaling factors, such as 1.5x or 1.33x, are usually more interesting 
+      because this corresponds to 720p->1080p and 1080p->1440p, respectively. This section is supposed to better represent a real world scenario when you don't have a 4K display or don't watch comically low-resolution content.
+    </p>
+    <h3 id="fractional_upsampling_methodology">Fractional Upsampling Methodology</h3>
+    <p>
+      Unfortunately, some of my choices here are only explained in the following sections. You'll have to bear with me and trust this makes (some) sense, as the alternative would be placing the fractional upsampling section at the end of the page 
+      instead of here, its most logical position.
+    </p>
+    <p>
+      In short, the entire methodology stays the same with a few modifications:
+      <ol>
+        <li>Downsampling was done from 1080p to 720p using catmull_rom + <a href="https://github.com/Artoriuz/glsl-pixel-clipper">PixelClipper</a>.</li>
+        <li>The doublers were also downsampled with catmull_rom + PixelClipper.</li>
+        <li>I've removed Anime4K from this because this is too far removed from what the devs intended it to be used for.</li>
+        <li>I've also added one of my memes, a 2-lobes sinc + AR (which is also PixelClipper in this case). This combination can sometimes be as sharp as the shaders, but it's prone to aliasing at higher scaling factors.</li>
+      </ol>
+    </p>
+    <h3 id="fractional_upsampling_methodology">Fractional Upsampling Results</h3>
+    <p>
+      <table>
+        <tbody>
+          <tr>
+            <td>Shader/Filter</td>
+            <td>MAE</td>
+            <td>PSNR</td>
+            <td>SSIM</td>
+            <td>MS-SSIM</td>
+            <td></td>
+            <td>MAE (N)</td>
+            <td>PSNR (N)</td>
+            <td>SSIM (N)</td>
+            <td>MS-SSIM (N)</td>
+            <td></td>
+            <td>Mean</td>
+          </tr>
+          <tr>
+            <td>FSRCNNX_x2_8-0-4-1_catrom_pc</td>
+            <td>0.0028</td>
+            <td>44.0656</td>
+            <td>0.9929</td>
+            <td>0.9992</td>
+            <td></td>
+            <td>1.0000</td>
+            <td>0.9702</td>
+            <td>0.9894</td>
+            <td>1.0000</td>
+            <td></td>
+            <td>0.9899</td>
+          </tr>
+          <tr>
+            <td>FSRCNNX_x2_16-0-4-1_catrom_pc</td>
+            <td>0.0030</td>
+            <td>44.1704</td>
+            <td>0.9930</td>
+            <td>0.9992</td>
+            <td></td>
+            <td>0.9244</td>
+            <td>1.0000</td>
+            <td>1.0000</td>
+            <td>0.9810</td>
+            <td></td>
+            <td>0.9764</td>
+          </tr>
+          <tr>
+            <td>ravu-zoom-r3</td>
+            <td>0.0030</td>
+            <td>43.7155</td>
+            <td>0.9920</td>
+            <td>0.9992</td>
+            <td></td>
+            <td>0.9222</td>
+            <td>0.8708</td>
+            <td>0.8647</td>
+            <td>0.9980</td>
+            <td></td>
+            <td>0.9139</td>
+          </tr>
+          <tr>
+            <td>ravu-zoom-ar-r3</td>
+            <td>0.0028</td>
+            <td>43.6141</td>
+            <td>0.9922</td>
+            <td>0.9991</td>
+            <td></td>
+            <td>0.9872</td>
+            <td>0.8420</td>
+            <td>0.8885</td>
+            <td>0.8551</td>
+            <td></td>
+            <td>0.8932</td>
+          </tr>
+          <tr>
+            <td>ravu-zoom-ar-r2</td>
+            <td>0.0029</td>
+            <td>43.2579</td>
+            <td>0.9918</td>
+            <td>0.9990</td>
+            <td></td>
+            <td>0.9363</td>
+            <td>0.7408</td>
+            <td>0.8280</td>
+            <td>0.8219</td>
+            <td></td>
+            <td>0.8318</td>
+          </tr>
+          <tr>
+            <td>sinc2_pc4</td>
+            <td>0.0030</td>
+            <td>43.4463</td>
+            <td>0.9916</td>
+            <td>0.9990</td>
+            <td></td>
+            <td>0.8920</td>
+            <td>0.7944</td>
+            <td>0.7979</td>
+            <td>0.7624</td>
+            <td></td>
+            <td>0.8116</td>
+          </tr>
+          <tr>
+            <td>ravu-zoom-r2</td>
+            <td>0.0031</td>
+            <td>43.1801</td>
+            <td>0.9915</td>
+            <td>0.9991</td>
+            <td></td>
+            <td>0.8505</td>
+            <td>0.7187</td>
+            <td>0.7818</td>
+            <td>0.8936</td>
+            <td></td>
+            <td>0.8111</td>
+          </tr>
+          <tr>
+            <td>nnedi3-nns664-win8x6_catrom_pc</td>
+            <td>0.0032</td>
+            <td>42.6491</td>
+            <td>0.9915</td>
+            <td>0.9989</td>
+            <td></td>
+            <td>0.7989</td>
+            <td>0.5679</td>
+            <td>0.7866</td>
+            <td>0.6980</td>
+            <td></td>
+            <td>0.7128</td>
+          </tr>
+          <tr>
+            <td>nnedi3-nns32-win8x6_catrom_pc</td>
+            <td>0.0032</td>
+            <td>42.5229</td>
+            <td>0.9914</td>
+            <td>0.9989</td>
+            <td></td>
+            <td>0.7742</td>
+            <td>0.5321</td>
+            <td>0.7674</td>
+            <td>0.6716</td>
+            <td></td>
+            <td>0.6863</td>
+          </tr>
+          <tr>
+            <td>polar_lanczos</td>
+            <td>0.0035</td>
+            <td>41.4071</td>
+            <td>0.9894</td>
+            <td>0.9988</td>
+            <td></td>
+            <td>0.5959</td>
+            <td>0.2152</td>
+            <td>0.4805</td>
+            <td>0.5951</td>
+            <td></td>
+            <td>0.4717</td>
+          </tr>
+          <tr>
+            <td>FSR</td>
+            <td>0.0045</td>
+            <td>40.6494</td>
+            <td>0.9861</td>
+            <td>0.9982</td>
+            <td></td>
+            <td>0.0000</td>
+            <td>0.0000</td>
+            <td>0.0000</td>
+            <td>0.0000</td>
+            <td></td>
+            <td>0.0000</td>
+          </tr>
+        </tbody>
+      </table>
+    </p>
+    <h3 id="fractional_upsampling_commentary">Fractional Upsampling Commentary</h3>
+    <p>
+      Unlike in the 2x test, the new ravu-zoom variants weren't capable of dethroning FSRCNNX this time. Which may sound a bit ironic considering ravu-zoom can output to the target resolution directly while FSRCNNX can't.
+    </p>
+    <p>
+      The numbers are all closer together at 1.5x, which shows that your choice of scaler becomes less relevant as you decrease the scaling factor.
+    </p>
+    <p>
+      It's a bit funny to see FSR get worse here, since a lower scaling factor corresponds to a higher quality preset in AMD's terms, but I think the problem is just that the shader is too sharp. The RCAS step hurts more than it helps here.
+    </p>
+    <p>
+      The 2-lobes sinc + PixelClipper scored so high it becomes difficult to recommend any of these shaders unless you are really sensitive to aliasing and can't stand how it looks. However, keep in mind this is an unhinged sinc which is hilariously sharp, it can 
+      always be made softer with a window, and in this case I recommend starting with Kaiser (which will still keep it quite sharp). mpv doesn't allow you to set a window for sinc, so just replace the filter with lanczos (radius=2) if you're going to use a window.
+    </p>
+    <p>
+      Polar Lanczos actually managed to score higher than FSR here, but it's still in a different class when compared to basically anything else. This is to be somewhat expected since polar Lanczos is a relatively blurry filter, its strenghts 
+      are mostly tied to hiding aliasing which isn't really a major factor at 1.5x.
+    </p>
     <h3 id="chroma_shaders">Chroma Shaders</h3>
     <p>
         Using shaders to upsample chroma is an old meme, as igv ported Shiandow's KrigBilateral to mpv years ago. KrigBilateral finds the correlation between luma and chroma, and then maps the missing values based on that. 
