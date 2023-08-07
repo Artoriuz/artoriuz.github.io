@@ -538,7 +538,8 @@
     </p>
     <p>
       The 2-lobes sinc + Pixel Clipper scored so high it becomes difficult to recommend any of these shaders unless you are really sensitive to aliasing and can't stand how it looks. However, keep in mind this is an unhinged sinc which is hilariously sharp, it can 
-      always be made softer with a window, and in this case I recommend starting with Kaiser (which will still keep it quite sharp). mpv doesn't allow you to set a window for sinc, so just replace the filter with lanczos (radius=2) if you're going to use a window.
+      always be made softer with a window, and in this case I recommend starting with Kaiser (which will still keep it quite sharp). mpv doesn't allow you to set a window for sinc, so just replace the filter with lanczos (radius=2) if you're going to use a window. 
+      Please note that I don't actually recommend using this with sources that are naturally a bit blurry. The filter will very aggressively sharpen everything and the AR shader can only remove overshoots, not all the extra sharpening.
     </p>
     <p>
       Polar Lanczos actually managed to score higher than FSR here, but it's still in a different class when compared to basically anything else. This is to be somewhat expected since polar Lanczos is a relatively blurry filter, its strenghts 
