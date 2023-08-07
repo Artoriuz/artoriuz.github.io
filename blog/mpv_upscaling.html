@@ -345,10 +345,10 @@
     <p>
       In short, the entire methodology stays the same with a few modifications:
       <ol>
-        <li>Downsampling was done from 1080p to 720p using catmull_rom + <a href="https://github.com/Artoriuz/glsl-pixel-clipper">PixelClipper</a>.</li>
-        <li>The doublers were also downsampled with catmull_rom + PixelClipper.</li>
+        <li>Downsampling was done from 1080p to 720p using catmull_rom + <a href="https://github.com/Artoriuz/glsl-pixel-clipper">Pixel Clipper</a>.</li>
+        <li>The doublers were also downsampled with catmull_rom + Pixel Clipper.</li>
         <li>I've removed Anime4K from this because this is too far removed from what the devs intended it to be used for.</li>
-        <li>I've also added one of my memes, a 2-lobes sinc + AR (which is also PixelClipper in this case). This combination can sometimes be as sharp as the shaders, but it's prone to aliasing at higher scaling factors.</li>
+        <li>I've also added one of my memes, a 2-lobes sinc + AR (which is also Pixel Clipper in this case). This combination can sometimes be as sharp as the shaders, but it's prone to aliasing at higher scaling factors.</li>
       </ol>
     </p>
     <h3 id="fractional_upsampling_methodology">Fractional Upsampling Results</h3>
@@ -537,7 +537,7 @@
       It's a bit funny to see FSR get worse here, since a lower scaling factor corresponds to a higher quality preset in AMD's terms, but I think the problem is just that the shader is too sharp. The RCAS step hurts more than it helps here.
     </p>
     <p>
-      The 2-lobes sinc + PixelClipper scored so high it becomes difficult to recommend any of these shaders unless you are really sensitive to aliasing and can't stand how it looks. However, keep in mind this is an unhinged sinc which is hilariously sharp, it can 
+      The 2-lobes sinc + Pixel Clipper scored so high it becomes difficult to recommend any of these shaders unless you are really sensitive to aliasing and can't stand how it looks. However, keep in mind this is an unhinged sinc which is hilariously sharp, it can 
       always be made softer with a window, and in this case I recommend starting with Kaiser (which will still keep it quite sharp). mpv doesn't allow you to set a window for sinc, so just replace the filter with lanczos (radius=2) if you're going to use a window.
     </p>
     <p>
@@ -1028,7 +1028,7 @@
         When it comes to the AR solutions we have available today, libplacebo's native AR is better at keeping gradients smooth at the expense of blurrying the image a little bit, which explains why Pixel Clipper scores higher than it.
     </p>
     <p>
-        mpv's native AR solution for orthogonal filters shouldn't blur anything though, and I believe PixelClipper is only scoring higher than it because mpv applies its antiring twice, once per orthogonal pass. This means that the second pass 
+        mpv's native AR solution for orthogonal filters shouldn't blur anything though, and I believe Pixel Clipper is only scoring higher than it because mpv applies its antiring twice, once per orthogonal pass. This means that the second pass 
         won't have access to the overshoots created by the first pass, which is theoretically a good thing but actually ends up hurting the filter's reconstruction quality. Pixel Clipper is only applied after scaling is done, so it's completely 
         oblivious to the entire scaling process. It simply clamps the HR pixels to the intensity bounds set by the surrounding LR pixels.
     </p>
@@ -1056,7 +1056,7 @@
     <p>
         The images were basically generated using the following command:
     </p>
-    <code>mpv --no-config --vo=gpu-next --no-hidpi-window-scale --window-scale=0.5 --pause=yes --screenshot-format=png --linear-downscaling --correct-downscaling --deband=no --dither-depth=no --screenshot-high-bit-depth=no --dscale=filter --glsl-shader="PixelClipper_downscaling.glsl" higres.png</code>
+    <code>mpv --no-config --vo=gpu-next --no-hidpi-window-scale --window-scale=0.5 --pause=yes --screenshot-format=png --linear-downscaling --correct-downscaling --deband=no --dither-depth=no --screenshot-high-bit-depth=no --dscale=filter --glsl-shader="Pixel Clipper_downscaling.glsl" higres.png</code>
     <h3 id="downsampling_antiring_results">Downsampling Antiring Results</h3>
     <p>
         <table>
