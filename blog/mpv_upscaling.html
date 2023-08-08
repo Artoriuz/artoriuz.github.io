@@ -63,7 +63,7 @@
               <li><a href="https://gist.github.com/agyild/82219c545228d70c5604f865ce0b0ce5">FSR</a></li>
             </ol>
             I've also added polar Lanczos to the mix just to have a reference point, but feel free to send me any other shaders you would like to get scored. 
-            For Anime4K I'm using the <a href="">https://github.com/bloc97/Anime4K/blob/815b122284304e6e1e244a8cf6a160eeaa07040c/GLSL_Instructions.md</a>"C" mode which is defined as <inline_code>Upscale_Denoise -> Upscale</inline_code>.
+            For Anime4K I'm using the <a href="https://github.com/bloc97/Anime4K/blob/815b122284304e6e1e244a8cf6a160eeaa07040c/GLSL_Instructions.md">"C" mode</a> which is defined as <inline_code>Upscale_Denoise -> Upscale</inline_code>.
         </p>
         <p>
             The test image is downsampled with:
@@ -1032,13 +1032,13 @@
         how similar the solutions look considering how different the mechanisms are.
     </p>
     <p>
-      The only caveat is that libplacebo's AR is still a bit blurrier at similar strength, so you probably have to dial it down a little bit to preserve sharpness (0.75 seems to be a good starting point).
-    </p>
-    <p>
+      The only caveat is that libplacebo's AR is still a bit blurrier at similar strength, so you probably have to dial it down a little bit to preserve sharpness (0.75 seems to be a good starting point). 
       Libplacebo's AR is also still a bit slower than Pixel Clipper, but if you can run polar filters I don't expect polar AR to be a big problem. 
     </p>
     <p>
-      It really looks like you can't go wrong with either option, so just pick your poison.
+      It really looks like you can't go wrong with either option, so just pick your poison. Libplacebo's AR, however, is the most sophisticated algorithm here. It is supposed to be better and it's likely that haasn will keep polishing it. 
+      Pixel Clipper is very simple, it simply clips, which can create some instantaneous transitions sometimes. Libplacebo's AR uses the first lobe of the resampling filter so it's naturally smooth and mostly free of high-frequency artifacts 
+      (again, at the expense of being slightly blurrier).
     </p>
     <p>
         mpv's native AR solution for orthogonal filters shouldn't blur anything though, and I believe Pixel Clipper is only scoring higher than it because mpv applies its antiring twice, once per orthogonal pass. This means that the second pass 
