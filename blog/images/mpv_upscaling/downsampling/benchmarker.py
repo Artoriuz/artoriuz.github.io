@@ -36,7 +36,7 @@ reference = cv2.imread('./box.png', cv2.IMREAD_COLOR).astype("float") / 255.0
 
 filelist = sorted(glob.glob('./*.png'))
 for myFile in filelist:
-    if not "campu" in myFile:
+    if not "highres" in myFile:
         image = cv2.imread(myFile, cv2.IMREAD_COLOR).astype("float") / 255.0
         # image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY, 0).astype(float) / 255.0
 
