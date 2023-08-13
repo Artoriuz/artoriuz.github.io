@@ -331,7 +331,7 @@
         It's nice to see that bjin came back from the dead with gold. The new ravu variants perform much better than their previous incarnations and they're also free of the half-pixel shift problem.
     </p>
     <p>
-      ravu-zoom-ar-r3 seems to be the clear winner here when it comes to reconstruction, beating even FSRCNNX which is a CNN. The numbers are incredibly close though, so if you're looking for a shader it wouldn't hurt to them both of them to a test drive.
+        ravu-zoom-ar-r3 seems to be the clear winner here when it comes to reconstruction, beating even FSRCNNX which is a CNN. The numbers are incredibly close though, so if you're looking for a shader it wouldn't hurt to take both of them to a test drive.
     </p>
     <h3 id="fractional_upsampling">Fractional Upsampling</h3>
     <p>
@@ -529,22 +529,26 @@
     </p>
     <h3 id="fractional_upsampling_commentary">Fractional Upsampling Commentary</h3>
     <p>
-      Unlike in the 2x test, the new ravu-zoom variants weren't capable of dethroning FSRCNNX this time. Which may sound a bit ironic considering ravu-zoom can output to the target resolution directly while FSRCNNX can't.
+        Unlike in the 2x test, the new ravu-zoom variants weren't capable of dethroning FSRCNNX this time. Which may sound a bit ironic considering ravu-zoom can output to the target resolution directly while FSRCNNX can't.
     </p>
     <p>
-      The numbers are all closer together at 1.5x, which shows that your choice of scaler becomes less relevant as you decrease the scaling factor.
+        The numbers are all closer together at 1.5x, which shows that your choice of scaler becomes less relevant as you decrease the scaling factor.
     </p>
     <p>
-      It's a bit funny to see FSR get worse here, since a lower scaling factor corresponds to a higher quality preset in AMD's terms, but I think the problem is just that the shader is too sharp. The RCAS step hurts more than it helps here.
+        It's a bit funny to see FSR get worse here, since a lower scaling factor corresponds to a higher quality preset in AMD's terms, but I think the problem is just that the shader is too sharp. The RCAS step hurts more than it helps here.
     </p>
     <p>
-      The 2-lobes sinc + Pixel Clipper scored so high it becomes difficult to recommend any of these shaders unless you are really sensitive to aliasing and can't stand how it looks. However, keep in mind this is an unhinged sinc which is hilariously sharp, it can 
-      always be made softer with a window, and in this case I recommend starting with Kaiser (which will still keep it quite sharp). mpv doesn't allow you to set a window for sinc, so just replace the filter with lanczos (radius=2) if you're going to use a window. 
-      Please note that I don't actually recommend using this with sources that are naturally a bit blurry. The filter will very aggressively sharpen everything and the AR shader can only remove overshoots, not all the extra sharpening.
+        The 2-lobes sinc + Pixel Clipper scored so high it becomes difficult to recommend any of these shaders unless you are really sensitive to aliasing and can't stand how it looks. However, keep in mind this is an unhinged sinc which is hilariously sharp, it can 
+        always be made softer with a window, and in this case I recommend starting with Kaiser (which will still keep it quite sharp). mpv doesn't allow you to set a window for sinc, so just replace the filter with lanczos (radius=2) if you're going to use a window. 
+        Please note that I don't actually recommend using this with sources that are naturally a bit blurry. The filter will very aggressively sharpen everything and the AR shader can only remove overshoots, not all the extra sharpening.
     </p>
     <p>
-      Polar lanczos actually managed to score higher than FSR here, but it's still in a different class when compared to basically anything else. This is to be somewhat expected since polar lanczos is a relatively blurry filter, its strenghts 
-      are mostly tied to hiding aliasing which isn't really a major factor at 1.5x.
+        Polar lanczos actually managed to score higher than FSR here, but it's still in a different class when compared to basically anything else. This is to be somewhat expected since polar lanczos is a relatively blurry filter, its strenghts 
+        are mostly tied to hiding aliasing which isn't really a major factor at 1.5x.
+    </p>
+    <p>
+        In my opinion using any of these shaders at 1.5x is probably unnecessary, since you can get good enough results with normal filters. If you really want to use a shader though, I'd probably stick to ravu-zoom since it can output to the target 
+        resolution directly.
     </p>
     <h3 id="chroma_shaders">Chroma Shaders</h3>
     <p>
@@ -553,7 +557,7 @@
     </p>
     <p>
         There's a different technique, usually called Joint or Cross Bilateral, that simply uses luma as an extra weighting factor. In short, chromatic information from pixels with similar luminosities is preferred. <a href="">I've written a shader that 
-        implements this idea</a> mostly to learn GLSL, but it ended up being quite useful as it's much faster than KrigBilateral while still keeping a clear lead over classic methods.
+        implements this idea</a> mostly to learn GLSL, but it ended up being quite useful as it's much faster than KrigBilateral while still keeping a lead over classic methods.
     </p>
     <p>
         In any case, my goal here is to compare these chroma shaders against polar lanczos, which I'm using as a reference point.
@@ -686,7 +690,14 @@
         options such as bilinear and box, but there's little reason to use those to scale chroma unless you're really trying to save on resources.
     </p>
     <p>
-        The only other thing I'd like to point out here is that the difference between these 3 shaders and the built-in solutions gets bigger when you use luma prescalers, since they use luma information as a guide.
+        It's also worth mentioning that you should almost always call these chroma shaders after prescaling luma if you're using a luma prescaler (like FSRCNNX or RAVU), as this will allow the shaders to map chroma to the final resolution directly.
+    </p>
+    <p>
+        While the shaders do produce better numbers in general, they can also produce weird artifacts sometimes. A normal resampling filter is much more "stable" in the sense that you know what you'll get, even if they smear a little bit 
+        and are incapable of perfectly mapping chroma to luma "tightly".
+    </p>
+    <p>
+      To be honest, the best advice here is to skip these shaders (all three of them) as they're unlikely to make a meaningful difference with real content.
     </p>
     <h3 id="antiring">Antiring</h3>
     <p>
@@ -1029,16 +1040,10 @@
     <p>
         Previously, this section talked about the different strengths and weaknesses of Pixel Clipper and libplacebo's AR, but that's not really neccessary anymore. 
         Libplacebo's AR has been <a href="https://code.videolan.org/videolan/libplacebo/-/commit/7fb12078b8f0e212f1cc3f5631fb891b3a08ca1c">recently updated</a> and it looks great now. It's actually shocking 
-        how similar the solutions look considering how different the mechanisms are.
+        how similar the solutions look at 2x considering how different the mechanisms are.
     </p>
     <p>
-      The only caveat is that libplacebo's AR is still a bit blurrier at similar strength, so you probably have to dial it down a little bit to preserve sharpness (0.75 seems to be a good starting point). 
-      Libplacebo's AR is also still a bit slower than Pixel Clipper, but if you can run polar filters I don't expect polar AR to be a big problem. 
-    </p>
-    <p>
-      It really looks like you can't go wrong with either option, so just pick your poison. Libplacebo's AR, however, is the most sophisticated algorithm here. It is supposed to be better and it's likely that haasn will keep polishing it. 
-      Pixel Clipper is very simple, it simply clips, which can create some instantaneous transitions sometimes. Libplacebo's AR uses the first lobe of the resampling filter so it's naturally smooth and mostly free of high-frequency artifacts 
-      (again, at the expense of being slightly blurrier).
+        The only caveat is that libplacebo's AR is still a bit blurrier at similar strength, so you probably have to dial it down a little bit to preserve sharpness (0.75 seems to be a good starting point). 
     </p>
     <p>
         mpv's native AR solution for orthogonal filters shouldn't blur anything though, and I believe Pixel Clipper is only scoring higher than it because mpv applies its antiring twice, once per orthogonal pass. This means that the second pass 
@@ -1046,7 +1051,11 @@
         oblivious to the entire scaling process. It simply clamps the HR pixels to the intensity bounds set by the surrounding LR pixels.
     </p>
     <p>
-        I've personally started using Pixel Clipper with orthogonal filters recently but then again the difference isn't that big, the built-in solution also works well enough.
+        I've personally started using Pixel Clipper with orthogonal filters recently but then again the difference isn't that big, the built-in solution works well enough.
+    </p>
+    <p>
+        As the table shows, the improvement AR brings is extremely minor, while it's a nice to have it's also entirely skippable. I'd argue most people would never notice the difference when using "balanced" filters such as ortho/polar lanczos, 
+        specially if the source is naturally noisy. Also, while ringing is obviously numerically bad, humans can sometimes even enjoy some minor ringing, as it makes things look perceptually sharper. 
     </p>
     <h3 id="downsampling_antiring">Downsampling Antiring</h3>
     <p>
@@ -1354,7 +1363,9 @@
     </p>
     <p>
         It's also good to see that libplacebo's AR seems to work even better when downsampling, as it can remove ringing without introducing any significant blur. 
-        I can wholeheartedly recommend it if you're using polar filters for downsampling, and I'd only use Pixel Clipper with either orthogonal filters or if it's significantly faster on your system.
+    </p>
+    <p>
+        To be fair, downsampling AR only seems to be truly needed with extraordinarily sharp filters.
     </p>
     <h3 id="outro">Outro</h3>
     <p>
