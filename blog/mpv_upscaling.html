@@ -597,79 +597,93 @@
     </p>
     <h3 id="chroma_results">Chroma Results</h3>
     <p>
-        <table>
-            <tbody>
-              <tr>
-                <td>Shader/Filter</td>
-                <td>MAE</td>
-                <td>PSNR</td>
-                <td>SSIM</td>
-                <td>MS-SSIM</td>
-                <td></td>
-                <td>MAE (N)</td>
-                <td>PSNR (N)</td>
-                <td>SSIM (N)</td>
-                <td>MS-SSIM (N)</td>
-                <td></td>
-                <td>Mean</td>
-              </tr>
-              <tr>
-                <td>krigbilateral</td>
-                <td>0.0025</td>
-                <td>41.1124</td>
-                <td>0.9941</td>
-                <td>0.9994</td>
-                <td></td>
-                <td>1.0000</td>
-                <td>1.0000</td>
-                <td>1.0000</td>
-                <td>1.0000</td>
-                <td></td>
-                <td>1.0000</td>
-              </tr>
-              <tr>
-                <td>FastBilateral</td>
-                <td>0.0028</td>
-                <td>40.0376</td>
-                <td>0.9925</td>
-                <td>0.9991</td>
-                <td></td>
-                <td>0.5973</td>
-                <td>0.4479</td>
-                <td>0.4715</td>
-                <td>0.6175</td>
-                <td></td>
-                <td>0.5335</td>
-              </tr>
-              <tr>
-                <td>JointBilateral</td>
-                <td>0.0029</td>
-                <td>39.9786</td>
-                <td>0.9923</td>
-                <td>0.9990</td>
-                <td></td>
-                <td>0.4964</td>
-                <td>0.4176</td>
-                <td>0.4033</td>
-                <td>0.5301</td>
-                <td></td>
-                <td>0.4619</td>
-              </tr>
-              <tr>
-                <td>polar_lanczos</td>
-                <td>0.0032</td>
-                <td>39.1656</td>
-                <td>0.9911</td>
-                <td>0.9987</td>
-                <td></td>
-                <td>0.0000</td>
-                <td>0.0000</td>
-                <td>0.0000</td>
-                <td>0.0000</td>
-                <td></td>
-                <td>0.0000</td>
-              </tr>
-            </tbody>
+      <table>
+        <tbody>
+          <tr>
+            <td>Shader/Filter</td>
+            <td>MAE</td>
+            <td>PSNR</td>
+            <td>SSIM</td>
+            <td>MS-SSIM</td>
+            <td></td>
+            <td>MAE (N)</td>
+            <td>PSNR (N)</td>
+            <td>SSIM (N)</td>
+            <td>MS-SSIM (N)</td>
+            <td></td>
+            <td>Mean</td>
+          </tr>
+          <tr>
+            <td>krigbilateral</td>
+            <td>0.0025</td>
+            <td>41.1124</td>
+            <td>0.9941</td>
+            <td>0.9994</td>
+            <td></td>
+            <td>1.0000</td>
+            <td>1.0000</td>
+            <td>1.0000</td>
+            <td>1.0000</td>
+            <td></td>
+            <td>1.0000</td>
+          </tr>
+          <tr>
+            <td>jointbilateral</td>
+            <td>0.0027</td>
+            <td>40.2050</td>
+            <td>0.9928</td>
+            <td>0.9992</td>
+            <td></td>
+            <td>0.7349</td>
+            <td>0.6413</td>
+            <td>0.6460</td>
+            <td>0.7951</td>
+            <td></td>
+            <td>0.7044</td>
+          </tr>
+          <tr>
+            <td>fastbilateral</td>
+            <td>0.0027</td>
+            <td>40.1569</td>
+            <td>0.9928</td>
+            <td>0.9991</td>
+            <td></td>
+            <td>0.7521</td>
+            <td>0.6223</td>
+            <td>0.6454</td>
+            <td>0.7100</td>
+            <td></td>
+            <td>0.6824</td>
+          </tr>
+          <tr>
+            <td>polar_lanczos</td>
+            <td>0.0032</td>
+            <td>39.1656</td>
+            <td>0.9911</td>
+            <td>0.9987</td>
+            <td></td>
+            <td>0.1331</td>
+            <td>0.2305</td>
+            <td>0.1715</td>
+            <td>0.0655</td>
+            <td></td>
+            <td>0.1501</td>
+          </tr>
+          <tr>
+            <td>bilinear</td>
+            <td>0.0033</td>
+            <td>38.5826</td>
+            <td>0.9905</td>
+            <td>0.9986</td>
+            <td></td>
+            <td>0.0000</td>
+            <td>0.0000</td>
+            <td>0.0000</td>
+            <td>0.0000</td>
+            <td></td>
+            <td>0.0000</td>
+          </tr>
+        </tbody>
         </table>
     </p>
     <h3 id="chroma_commentary">Chroma Commentary</h3>
@@ -677,17 +691,7 @@
         As expected, the bilateral filters are all capable of getting closer to the ground truth than polar lanczos. KrigBilateral is the best scorer here, which was also expected given it's the slowest shader.
     </p>
     <p>
-        FastBilateral scoring higher than JointBilateral might seem weird at first, but at their default settings (with <inline_code>intensity_coeff = 64.0</inline_code>) this can happen sometimes. JointBilateral takes a neighbourhood 
-        of 16 chroma pixels while FastBilateral only uses the 4 surrounding pixels. This much greater radius allows JointBilateral to "look far away", which is usually beneficial but can also work against it when the surrounding pixels 
-        are close together in luminance but far apart in chromaticity.
-    </p>
-    <p>
-        My personal advice here is that there's little point in using JointBilateral over FastBilateral, even when it does better the difference is usually negligible. Krig is also better than both of them at the expense of being much slower to run 
-        (about an order of magnitude slower than FastBilateral), but if your hardware can handle it then that's a non-issue.
-    </p>
-    <p>
-        The table also shows us that, if you use polar lanczos as the baseline, Joint/Fast Bilateral are pretty much half-way as good as KrigBilateral. The shaders would be much closer together in the final mean if I had included faster 
-        options such as bilinear and box, but there's little reason to use those to scale chroma unless you're really trying to save on resources.
+        Both JointBilateral and FastBilateral seem to be roughly ~70% as good as Krig, with Joint having a small lead over Fast.
     </p>
     <p>
         It's also worth mentioning that you should almost always call these chroma shaders after prescaling luma if you're using a luma prescaler (like FSRCNNX or RAVU), as this will allow the shaders to map chroma to the final resolution directly.
@@ -697,7 +701,8 @@
         and are incapable of perfectly mapping chroma to luma "tightly".
     </p>
     <p>
-      To be honest, the best advice here is to skip these shaders (all three of them) as they're unlikely to make a meaningful difference with real content.
+        To be honest, the best advice here is to skip these shaders (all three of them) as they're unlikely to make a meaningful difference with real content when you're only doubling chroma. If you are using a luma doubler, however, then performance 
+        likely isn't an issue and at 4x the differences start to be somewhat noticeable.
     </p>
     <h3 id="antiring">Antiring</h3>
     <p>
