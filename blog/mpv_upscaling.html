@@ -767,8 +767,8 @@
     </p>
     <h3 id="chroma_commentary">Chroma Commentary</h3>
     <p>
-        As expected, the bilateral filters are all capable of getting closer to the ground truth than polar lanczos. Some variants of CfL prediction actually ended up scoring higher than KrigBilateral in this test, 
-        which was unexpected.
+        As expected, the bilateral filters are all capable of getting closer to the ground truth than orthogonal/polar lanczos. Some variants of CfL prediction actually ended up scoring higher than KrigBilateral in this test, 
+        which was unexpected. I'm also relatively surprised to see polar lanczos beat orthogonal lanczos, as this rarely happens due to the sharpness difference.
     </p>
     <p>
         JointBilateral and FastBilateral seem to be in the middle of the pack here, with Joint having a small lead over Fast. All other shaders are ahead of them though.
