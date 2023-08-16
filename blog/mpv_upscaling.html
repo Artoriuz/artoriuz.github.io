@@ -552,12 +552,17 @@
     </p>
     <h3 id="chroma_shaders">Chroma Shaders</h3>
     <p>
-        Using shaders to upsample chroma is an old meme, as igv ported Shiandow's KrigBilateral to mpv years ago. KrigBilateral finds the correlation between luma and chroma, and then maps the missing values based on that. 
+        Using shaders to upsample chroma is an old meme, as igv ported Shiandow's KrigBilateral to mpv years ago. KrigBilateral implements kringing interpolation, which is commonly used in geostatistics.
         You can read more about it <a href="https://en.wikipedia.org/wiki/Kriging">here</a>.
     </p>
     <p>
-        There's a different technique, usually called Joint or Cross Bilateral, that simply uses luma as an extra weighting factor. In short, chromatic information from pixels with similar luminosities is preferred. <a href="">I've written a shader that 
+        There's a different technique, usually called Joint Bilateral, that simply uses luma as an extra weighting factor. In short, chromatic information from pixels with similar luminosities is preferred. <a href="">I've written a shader that 
         implements this idea</a> mostly to learn GLSL, but it ended up being quite useful as it's much faster than KrigBilateral while still keeping a lead over classic methods.
+    </p>
+    <p>
+        I've actually also written <a href="https://github.com/Artoriuz/glsl-chroma-from-luma-prediction">another meme shader</a> for this, basically taking inspiration from <a href="https://arxiv.org/abs/1711.03951">this paper</a>. In short, Chroma from 
+        Luma prediction is a technique that applies linear regression to map missing chromaticities based on the known luminosities. This doesn't always work, and it's generally very unstable, but the shader employs a few tricks to make the artifacts 
+        less noticeable. In theory, kriging should be better than this as it also takes pixel distance into account, but I was curious to know whether a simple linear regression would work so I ended up writing the shaders anyway.
     </p>
     <p>
         In any case, my goal here is to compare these chroma shaders against polar lanczos, which I'm using as a reference point.
@@ -614,18 +619,74 @@
             <td>Mean</td>
           </tr>
           <tr>
+            <td>cfl_4tap</td>
+            <td>0.0025</td>
+            <td>41.0440</td>
+            <td>0.9943</td>
+            <td>0.9994</td>
+            <td></td>
+            <td>1.0000</td>
+            <td>0.9730</td>
+            <td>1.0000</td>
+            <td>1.0000</td>
+            <td></td>
+            <td>0.9932</td>
+          </tr>
+          <tr>
             <td>krigbilateral</td>
             <td>0.0025</td>
             <td>41.1124</td>
             <td>0.9941</td>
             <td>0.9994</td>
             <td></td>
+            <td>0.9224</td>
             <td>1.0000</td>
-            <td>1.0000</td>
-            <td>1.0000</td>
-            <td>1.0000</td>
+            <td>0.9473</td>
+            <td>0.9984</td>
             <td></td>
-            <td>1.0000</td>
+            <td>0.9670</td>
+          </tr>
+          <tr>
+            <td>cfl_mix</td>
+            <td>0.0026</td>
+            <td>41.0592</td>
+            <td>0.9942</td>
+            <td>0.9993</td>
+            <td></td>
+            <td>0.8986</td>
+            <td>0.9790</td>
+            <td>0.9734</td>
+            <td>0.9617</td>
+            <td></td>
+            <td>0.9532</td>
+          </tr>
+          <tr>
+            <td>cfl_12tap</td>
+            <td>0.0027</td>
+            <td>40.6884</td>
+            <td>0.9938</td>
+            <td>0.9993</td>
+            <td></td>
+            <td>0.7529</td>
+            <td>0.8324</td>
+            <td>0.8635</td>
+            <td>0.8799</td>
+            <td></td>
+            <td>0.8322</td>
+          </tr>
+          <tr>
+            <td>cfl_16tap</td>
+            <td>0.0028</td>
+            <td>40.4799</td>
+            <td>0.9934</td>
+            <td>0.9992</td>
+            <td></td>
+            <td>0.6330</td>
+            <td>0.7500</td>
+            <td>0.7834</td>
+            <td>0.7986</td>
+            <td></td>
+            <td>0.7413</td>
           </tr>
           <tr>
             <td>jointbilateral</td>
@@ -634,12 +695,12 @@
             <td>0.9928</td>
             <td>0.9992</td>
             <td></td>
-            <td>0.7349</td>
+            <td>0.6779</td>
             <td>0.6413</td>
-            <td>0.6460</td>
-            <td>0.7951</td>
+            <td>0.6120</td>
+            <td>0.7938</td>
             <td></td>
-            <td>0.7044</td>
+            <td>0.6813</td>
           </tr>
           <tr>
             <td>fastbilateral</td>
@@ -648,12 +709,12 @@
             <td>0.9928</td>
             <td>0.9991</td>
             <td></td>
-            <td>0.7521</td>
+            <td>0.6937</td>
             <td>0.6223</td>
-            <td>0.6454</td>
-            <td>0.7100</td>
+            <td>0.6114</td>
+            <td>0.7089</td>
             <td></td>
-            <td>0.6824</td>
+            <td>0.6591</td>
           </tr>
           <tr>
             <td>polar_lanczos</td>
@@ -662,12 +723,12 @@
             <td>0.9911</td>
             <td>0.9987</td>
             <td></td>
-            <td>0.1331</td>
+            <td>0.1228</td>
             <td>0.2305</td>
-            <td>0.1715</td>
-            <td>0.0655</td>
+            <td>0.1625</td>
+            <td>0.0654</td>
             <td></td>
-            <td>0.1501</td>
+            <td>0.1453</td>
           </tr>
           <tr>
             <td>bilinear</td>
@@ -684,14 +745,18 @@
             <td>0.0000</td>
           </tr>
         </tbody>
-        </table>
+      </table>
     </p>
     <h3 id="chroma_commentary">Chroma Commentary</h3>
     <p>
-        As expected, the bilateral filters are all capable of getting closer to the ground truth than polar lanczos. KrigBilateral is the best scorer here, which was also expected given it's the slowest shader.
+        As expected, the bilateral filters are all capable of getting closer to the ground truth than polar lanczos. The 4-tap variant of CfL prediction actually ended up scoring higher than KrigBilateral in this test, which was unexpected.
     </p>
     <p>
-        Both JointBilateral and FastBilateral seem to be roughly ~70% as good as Krig, with Joint having a small lead over Fast.
+        Both JointBilateral and FastBilateral seem to be roughly ~70% as good as Krig, with Joint having a small lead over Fast. All CfL variants are ahead of them though. The biggest advantage of Fast/Joint Bilateral over CfL is that they're much more stable 
+        and mathematically incapable of overshooting. So you can expect a relatively clean output, albeit probably blurrier in comparison.
+    </p>
+    <p>
+        CfL actually works alongside your <inline_code>--cscale</inline_code> of choice, so you kinda change how it looks a little bit changing the filter. I ran it with lanczos but feel free to use anything else.
     </p>
     <p>
         It's also worth mentioning that you should almost always call these chroma shaders after prescaling luma if you're using a luma prescaler (like FSRCNNX or RAVU), as this will allow the shaders to map chroma to the final resolution directly.
@@ -701,7 +766,7 @@
         and are incapable of perfectly mapping chroma to luma "tightly".
     </p>
     <p>
-        To be honest, the best advice here is to skip these shaders (all three of them) as they're unlikely to make a meaningful difference with real content when you're only doubling chroma. If you are using a luma doubler, however, then performance 
+        To be honest, the best advice here is to skip these shaders (all of them) as they're unlikely to make a meaningful difference with real content when you're only doubling chroma. If you are using a luma doubler, however, then performance 
         likely isn't an issue and at 4x the differences start to be somewhat noticeable.
     </p>
     <h3 id="antiring">Antiring</h3>
