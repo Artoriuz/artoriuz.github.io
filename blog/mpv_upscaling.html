@@ -565,7 +565,7 @@
         less noticeable. In theory, kriging should be better than this as it also takes pixel distance into account, but I was curious to know whether a simple linear regression would work so I ended up writing the shaders anyway.
     </p>
     <p>
-        In any case, my goal here is to compare these chroma shaders against polar lanczos, which I'm using as a reference point.
+        In any case, my goal here is to compare these chroma shaders against polar/orthogonal lanczos, which I'm using as reference points.
     </p>
     <h3 id="chroma_methodology">Chroma Methodology</h3>
     <p>
@@ -573,29 +573,33 @@
         to work with, so we have to create one on our own.
     </p>
     <p>
-        I've semi-arbitrarily decided to use a downsampled version of <a href="https://twitter.com/fujinoomori/status/1576159422040064001">this danmachi fanart</a>. This image is particularly good at showing the difference between these shaders 
-        because it's full of pixel-to-pixel chromatic deviations, specially in the red areas. I might change this to a different test image at a later date, but for now it'll do.
+        I've semi-arbitrarily decided to use a downsampled screenshot from Hibike! Euphonium. This is what the original test image looks like:
     </p>
     <p>
-        This is what the original test image looks like:
+        <img src="./images/mpv_upscaling/chroma/reference.png" alt="chroma_reference" class="center" width="960" height="518">
     </p>
     <p>
-        <img src="./images/mpv_upscaling/chroma/reference.png" alt="chroma_reference" class="center" width="620" height="666">
+        In order to preserve the chroma planes, the screenshot was taken with:
+    </p>
+    <code>--dscale=box --cscale=box --deband=no --dither-depth=no --no-hidpi-window-scale --window-scale=0.5</code>
+    <p>
+        The rationale is that box won't interpolate the values so we can safely do 2.0x -> 0.5x without any information loss. The image will still get chroma subsampled later anyway so this step isn't exactly crucial, but it's good to 
+        preserve as much chromatic information as possible.
     </p>
     <p>
         Two versions of the image were created using FFmpeg:
     </p>
-    <code>ffmpeg -i downscaled.png -pix_fmt yuv444p10le -c:v libx264 -preset placebo -qp 0 -an danmachi444.mp4</code>
+    <code>ffmpeg -i downscaled.png -pix_fmt yuv444p10le -c:v libx264 -preset placebo -qp 0 -an hibike444.mp4</code>
     <br>
-    <code>ffmpeg -i downscaled.png -pix_fmt yuv420p10le -c:v libx264 -preset placebo -qp 0 -an danmachi420.mp4</code>
+    <code>ffmpeg -i downscaled.png -pix_fmt yuv420p10le -c:v libx264 -preset placebo -qp 0 -an hibike420.mp4</code>
     <p>
         The idea here was creating (nearly) lossless variants with and without chroma subsampling.
     </p>
     <p>
-        The "reference" image was obtained by screenshotting "danmachi444.mp4" on mpv.
+        The "reference" image was obtained by screenshotting "hibike444.mp4" on mpv.
     </p>
     <p>
-        The images under test were obtained by screenshotting "danmachi420.mp4" on mpv using the various chroma resampling shaders.
+        The images under test were obtained by screenshotting "hibike420.mp4" on mpv using the various chroma resampling shaders.
     </p>
     <p>
         mpv options remains the same with the exception that we don't need <inline_code>--window-scale=2.0</inline_code> anymore. Since we're comparing chroma here, the images weren't converted to grayscale.
@@ -620,161 +624,178 @@
           </tr>
           <tr>
             <td>cfl_4tap</td>
-            <td>0.0025</td>
-            <td>41.0440</td>
-            <td>0.9943</td>
-            <td>0.9994</td>
+            <td>9.41E-04</td>
+            <td>51.0104</td>
+            <td>0.9980</td>
+            <td>0.9996</td>
             <td></td>
             <td>1.0000</td>
-            <td>0.9730</td>
+            <td>1.0000</td>
             <td>1.0000</td>
             <td>1.0000</td>
             <td></td>
-            <td>0.9932</td>
-          </tr>
-          <tr>
-            <td>krigbilateral</td>
-            <td>0.0025</td>
-            <td>41.1124</td>
-            <td>0.9941</td>
-            <td>0.9994</td>
-            <td></td>
-            <td>0.9224</td>
             <td>1.0000</td>
-            <td>0.9473</td>
-            <td>0.9984</td>
-            <td></td>
-            <td>0.9670</td>
           </tr>
           <tr>
             <td>cfl_mix</td>
-            <td>0.0026</td>
-            <td>41.0592</td>
-            <td>0.9942</td>
-            <td>0.9993</td>
+            <td>1.02E-03</td>
+            <td>50.8475</td>
+            <td>0.9979</td>
+            <td>0.9995</td>
             <td></td>
-            <td>0.8986</td>
-            <td>0.9790</td>
-            <td>0.9734</td>
-            <td>0.9617</td>
+            <td>0.8443</td>
+            <td>0.9463</td>
+            <td>0.9026</td>
+            <td>0.9322</td>
             <td></td>
-            <td>0.9532</td>
+            <td>0.9063</td>
+          </tr>
+          <tr>
+            <td>krigbilateral</td>
+            <td>1.03E-03</td>
+            <td>51.0087</td>
+            <td>0.9977</td>
+            <td>0.9996</td>
+            <td></td>
+            <td>0.8082</td>
+            <td>0.9994</td>
+            <td>0.7875</td>
+            <td>0.9910</td>
+            <td></td>
+            <td>0.8965</td>
           </tr>
           <tr>
             <td>cfl_12tap</td>
-            <td>0.0027</td>
-            <td>40.6884</td>
-            <td>0.9938</td>
-            <td>0.9993</td>
+            <td>1.06E-03</td>
+            <td>50.3955</td>
+            <td>0.9977</td>
+            <td>0.9995</td>
             <td></td>
-            <td>0.7529</td>
-            <td>0.8324</td>
-            <td>0.8635</td>
-            <td>0.8799</td>
+            <td>0.7583</td>
+            <td>0.7974</td>
+            <td>0.7695</td>
+            <td>0.8469</td>
             <td></td>
-            <td>0.8322</td>
+            <td>0.7930</td>
           </tr>
           <tr>
             <td>cfl_16tap</td>
-            <td>0.0028</td>
-            <td>40.4799</td>
-            <td>0.9934</td>
-            <td>0.9992</td>
+            <td>1.12E-03</td>
+            <td>49.9846</td>
+            <td>0.9975</td>
+            <td>0.9995</td>
             <td></td>
-            <td>0.6330</td>
-            <td>0.7500</td>
-            <td>0.7834</td>
-            <td>0.7986</td>
+            <td>0.6340</td>
+            <td>0.6621</td>
+            <td>0.6276</td>
+            <td>0.7333</td>
             <td></td>
-            <td>0.7413</td>
-          </tr>
-          <tr>
-            <td>jointbilateral</td>
-            <td>0.0027</td>
-            <td>40.2050</td>
-            <td>0.9928</td>
-            <td>0.9992</td>
-            <td></td>
-            <td>0.6779</td>
-            <td>0.6413</td>
-            <td>0.6120</td>
-            <td>0.7938</td>
-            <td></td>
-            <td>0.6813</td>
+            <td>0.6642</td>
           </tr>
           <tr>
             <td>fastbilateral</td>
-            <td>0.0027</td>
-            <td>40.1569</td>
-            <td>0.9928</td>
-            <td>0.9991</td>
+            <td>1.26E-03</td>
+            <td>49.2835</td>
+            <td>0.9972</td>
+            <td>0.9994</td>
             <td></td>
-            <td>0.6937</td>
-            <td>0.6223</td>
-            <td>0.6114</td>
-            <td>0.7089</td>
+            <td>0.3308</td>
+            <td>0.4311</td>
+            <td>0.3426</td>
+            <td>0.5503</td>
             <td></td>
-            <td>0.6591</td>
+            <td>0.4137</td>
+          </tr>
+          <tr>
+            <td>jointbilateral</td>
+            <td>1.29E-03</td>
+            <td>49.1986</td>
+            <td>0.9971</td>
+            <td>0.9994</td>
+            <td></td>
+            <td>0.2563</td>
+            <td>0.4032</td>
+            <td>0.2450</td>
+            <td>0.5030</td>
+            <td></td>
+            <td>0.3519</td>
           </tr>
           <tr>
             <td>polar_lanczos</td>
-            <td>0.0032</td>
-            <td>39.1656</td>
-            <td>0.9911</td>
-            <td>0.9987</td>
+            <td>1.31E-03</td>
+            <td>48.6640</td>
+            <td>0.9971</td>
+            <td>0.9991</td>
             <td></td>
-            <td>0.1228</td>
-            <td>0.2305</td>
-            <td>0.1625</td>
-            <td>0.0654</td>
+            <td>0.2173</td>
+            <td>0.2270</td>
+            <td>0.2970</td>
+            <td>0.0000</td>
             <td></td>
-            <td>0.1453</td>
+            <td>0.1853</td>
+          </tr>
+          <tr>
+            <td>lanczos</td>
+            <td>1.34E-03</td>
+            <td>48.6891</td>
+            <td>0.9971</td>
+            <td>0.9992</td>
+            <td></td>
+            <td>0.1646</td>
+            <td>0.2353</td>
+            <td>0.2640</td>
+            <td>0.0062</td>
+            <td></td>
+            <td>0.1675</td>
           </tr>
           <tr>
             <td>bilinear</td>
-            <td>0.0033</td>
-            <td>38.5826</td>
-            <td>0.9905</td>
-            <td>0.9986</td>
+            <td>1.42E-03</td>
+            <td>47.9748</td>
+            <td>0.9968</td>
+            <td>0.9992</td>
             <td></td>
             <td>0.0000</td>
             <td>0.0000</td>
             <td>0.0000</td>
-            <td>0.0000</td>
+            <td>0.0024</td>
             <td></td>
-            <td>0.0000</td>
+            <td>0.0006</td>
           </tr>
         </tbody>
       </table>
     </p>
     <h3 id="chroma_commentary">Chroma Commentary</h3>
     <p>
-        As expected, the bilateral filters are all capable of getting closer to the ground truth than polar lanczos. The 4-tap variant of CfL prediction actually ended up scoring higher than KrigBilateral in this test, which was unexpected.
+        As expected, the bilateral filters are all capable of getting closer to the ground truth than polar lanczos. Some variants of CfL prediction actually ended up scoring higher than KrigBilateral in this test, 
+        which was unexpected.
     </p>
     <p>
-        Both JointBilateral and FastBilateral seem to be roughly ~70% as good as Krig, with Joint having a small lead over Fast. All CfL variants are ahead of them though. The biggest advantage of Fast/Joint Bilateral over CfL is that they're much more stable 
-        and mathematically incapable of overshooting. So you can expect a relatively clean output, albeit probably blurrier in comparison.
+        JointBilateral and FastBilateral seem to be in the middle of the pack here, with Joint having a small lead over Fast. All other shaders are ahead of them though.
+        The biggest advantage of Fast/Joint Bilateral over CfL or Krig is that they're much more stable and mathematically incapable of overshooting. So you can expect a relatively clean output, albeit probably blurrier in comparison.
     </p>
     <p>
         CfL actually works alongside your <inline_code>--cscale</inline_code> of choice, so you kinda change how it looks a little bit changing the filter. I ran it with lanczos but feel free to use anything else.
     </p>
     <p>
-        It's also worth mentioning that you should almost always call these chroma shaders after prescaling luma if you're using a luma prescaler (like FSRCNNX or RAVU), as this will allow the shaders to map chroma to the final resolution directly.
+        It's also worth mentioning that you should almost always call these chroma shaders after prescaling luma if you're using a luma prescaler (like FSRCNNX or RAVU), 
+        as this will allow the shaders to map chroma to the final resolution directly.
     </p>
     <p>
-        While the shaders do produce better numbers in general, they can also produce weird artifacts sometimes. A normal resampling filter is much more "stable" in the sense that you know what you'll get, even if they smear a little bit 
-        and are incapable of perfectly mapping chroma to luma "tightly".
+        While the shaders do produce better numbers in general, they can also produce weird artifacts sometimes. 
+        A normal resampling filter is much more "stable" in the sense that you know what you'll get, even if they smear a little bit and are incapable of perfectly mapping chroma to luma "tightly".
     </p>
     <p>
-        To be honest, the best advice here is to skip these shaders (all of them) as they're unlikely to make a meaningful difference with real content when you're only doubling chroma. If you are using a luma doubler, however, then performance 
-        likely isn't an issue and at 4x the differences start to be somewhat noticeable.
+        To be honest, the best advice here is to skip these shaders (all of them) as they're unlikely to make a meaningful difference with real content when you're only doubling chroma. 
+        If you are using a luma doubler, however, then performance likely isn't an issue and at 4x the differences start to be somewhat noticeable.
     </p>
     <h3 id="antiring">Antiring</h3>
     <p>
         Antiringing solutions is a topic that I hadn't covered in the previous iteration of this page, but now that we have more than a single option we can also compare them.
     </p>
     <p>
-        In short, antiringing filters attempt to remove overshoots generated by sharp resampling filters when they meet a sharp intensity delta. What is commonly referred to as ringing is simply consequential to the filter's impulse response.
+        In short, antiringing filters attempt to remove overshoots generated by sharp resampling filters when they meet a sharp intensity delta. 
+        What is commonly referred to as ringing is simply consequential to the filter's impulse response.
     </p>
     <p>
         The following image shows this very well:
