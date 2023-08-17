@@ -557,7 +557,7 @@
     </p>
     <p>
         There's a different technique, usually called Joint Bilateral, that simply uses luma as an extra weighting factor. In short, chromatic information from pixels with similar luminosities is preferred. <a href="">I've written a shader that 
-        implements this idea</a> mostly to learn GLSL, but it ended up being quite useful as it's much faster than KrigBilateral while still keeping a lead over classic methods.
+        implements this idea</a> mostly to learn GLSL, but it ended up being quite useful as it's much faster than KrigBilateral while still keeping a nice lead over classic methods sometimes (depends on content).
     </p>
     <p>
         I've actually also written <a href="https://github.com/Artoriuz/glsl-chroma-from-luma-prediction">another meme shader</a> for this, basically taking inspiration from <a href="https://arxiv.org/abs/1711.03951">this paper</a>. In short, Chroma from 
