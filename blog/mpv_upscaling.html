@@ -569,40 +569,35 @@
     </p>
     <h3 id="chroma_methodology">Chroma Methodology</h3>
     <p>
-        This test is a little different and it requires a slightly more elaborate process. The first problem with this is that, with real video content, we rarely get a 4:4:4 copy. This means that we generally don't have a reference point 
-        to work with, so we have to create one on our own.
+        This test is a little different and it requires a slightly more elaborate process. The first problem with this is that, with real video content, we rarely get a 4:4:4 copy. 
+        This means that we generally don't have a reference point to work with, so we have to create one on our own.
     </p>
     <p>
-        I've semi-arbitrarily decided to use a downsampled screenshot from Hibike! Euphonium. This is what the original frame looks like:
+        I've semi-arbitrarily decided to use a downsampled screenshot from the 4k version of Kimi no Na wa. This is what the downscaled frame looks like:
     </p>
     <p>
-        <img src="./images/mpv_upscaling/chroma/highres.png" alt="chroma_reference" class="center" width="960" height="518">
+        <img src="./images/mpv_upscaling/chroma/original.png" alt="chroma_reference" class="center" width="960" height="540">
     </p>
     <p>
-        In order to preserve the chroma planes, the downsampled screenshot was taken with:
-    </p>
-    <code>--dscale=box --cscale=box --deband=no --dither-depth=no --no-hidpi-window-scale --window-scale=0.5</code>
-    <p>
-        The rationale is that box won't interpolate the values so we can safely do 2.0x -> 0.5x without any information loss. The image will still get chroma subsampled later anyway so this step isn't exactly crucial, but it's good to 
-        preserve as much chromatic information as possible.
+        In order to preserve the chroma planes, the downsampled screenshot was taken using <a href="./images/mpv_upscaling/chroma/luma_downscaler.glsl">this shader</a> to avoid having to resample chroma.
     </p>
     <p>
         Two versions of the image were created using FFmpeg:
     </p>
-    <code>ffmpeg -i downscaled.png -pix_fmt yuv444p10le -c:v libx264 -preset placebo -qp 0 -an hibike444.mp4</code>
+    <code>ffmpeg -i reference.png -pix_fmt yuv444p10le -c:v libx265 -preset placebo -x265-params lossless=1 yourname444.mp4</code>
     <br>
-    <code>ffmpeg -i downscaled.png -pix_fmt yuv420p10le -c:v libx264 -preset placebo -qp 0 -an hibike420.mp4</code>
+    <code>ffmpeg -i reference.png -pix_fmt yuv420p10le -c:v libx265 -preset placebo -x265-params lossless=1 yourname420.mp4</code>
     <p>
-        The idea here was creating (nearly) lossless variants with and without chroma subsampling.
+        The idea here was creating (nearly) lossless variants with and without chroma subsampling. Please note that this doesn't seem to preserve the primaries correctly so the output video doesn't match the input image entirely.
     </p>
     <p>
-        The "reference" image was obtained by screenshotting "hibike444.mp4" on mpv.
+        The "reference" image was obtained by screenshotting "yourname444.mp4" on mpv.
     </p>
     <p>
-        The images under test were obtained by screenshotting "hibike420.mp4" on mpv using the various chroma resampling shaders.
+        The images under test were obtained by screenshotting "yourname420.mp4" on mpv using the various chroma resampling shaders.
     </p>
     <p>
-        mpv options remains the same with the exception that we don't need <inline_code>--window-scale=2.0</inline_code> anymore. Since we're comparing chroma here, the images weren't converted to grayscale.
+        mpv options remains the same with the exception that we don't need <inline_code>--window-scale=2.0</inline_code> anymore, and since we're comparing chroma here, the images weren't converted to grayscale.
     </p>
     <h3 id="chroma_results">Chroma Results</h3>
     <p>
@@ -624,9 +619,9 @@
           </tr>
           <tr>
             <td>cfl_4tap</td>
-            <td>9.41E-04</td>
-            <td>51.0104</td>
-            <td>0.9980</td>
+            <td>0.0015</td>
+            <td>48.5037</td>
+            <td>0.9968</td>
             <td>0.9996</td>
             <td></td>
             <td>1.0000</td>
@@ -638,141 +633,146 @@
           </tr>
           <tr>
             <td>cfl_mix</td>
-            <td>1.02E-03</td>
-            <td>50.8475</td>
-            <td>0.9979</td>
+            <td>0.0017</td>
+            <td>48.1647</td>
+            <td>0.9966</td>
             <td>0.9995</td>
             <td></td>
-            <td>0.8443</td>
-            <td>0.9463</td>
-            <td>0.9026</td>
-            <td>0.9322</td>
+            <td>0.7061</td>
+            <td>0.8500</td>
+            <td>0.8112</td>
+            <td>0.7823</td>
             <td></td>
-            <td>0.9063</td>
+            <td>0.7874</td>
           </tr>
           <tr>
             <td>krigbilateral</td>
-            <td>1.03E-03</td>
-            <td>51.0087</td>
-            <td>0.9977</td>
+            <td>0.0016</td>
+            <td>48.0584</td>
+            <td>0.9965</td>
             <td>0.9996</td>
             <td></td>
-            <td>0.8082</td>
-            <td>0.9994</td>
-            <td>0.7875</td>
-            <td>0.9910</td>
+            <td>0.7693</td>
+            <td>0.8030</td>
+            <td>0.6716</td>
+            <td>0.8727</td>
             <td></td>
-            <td>0.8965</td>
+            <td>0.7792</td>
           </tr>
           <tr>
             <td>cfl_12tap</td>
-            <td>1.06E-03</td>
-            <td>50.3955</td>
-            <td>0.9977</td>
+            <td>0.0018</td>
+            <td>47.4755</td>
+            <td>0.9963</td>
             <td>0.9995</td>
             <td></td>
-            <td>0.7583</td>
-            <td>0.7974</td>
-            <td>0.7695</td>
-            <td>0.8469</td>
+            <td>0.4527</td>
+            <td>0.5452</td>
+            <td>0.4381</td>
+            <td>0.5351</td>
             <td></td>
-            <td>0.7930</td>
-          </tr>
-          <tr>
-            <td>cfl_16tap</td>
-            <td>1.12E-03</td>
-            <td>49.9846</td>
-            <td>0.9975</td>
-            <td>0.9995</td>
-            <td></td>
-            <td>0.6340</td>
-            <td>0.6621</td>
-            <td>0.6276</td>
-            <td>0.7333</td>
-            <td></td>
-            <td>0.6642</td>
-          </tr>
-          <tr>
-            <td>fastbilateral</td>
-            <td>1.26E-03</td>
-            <td>49.2835</td>
-            <td>0.9972</td>
-            <td>0.9994</td>
-            <td></td>
-            <td>0.3308</td>
-            <td>0.4311</td>
-            <td>0.3426</td>
-            <td>0.5503</td>
-            <td></td>
-            <td>0.4137</td>
-          </tr>
-          <tr>
-            <td>jointbilateral</td>
-            <td>1.29E-03</td>
-            <td>49.1986</td>
-            <td>0.9971</td>
-            <td>0.9994</td>
-            <td></td>
-            <td>0.2563</td>
-            <td>0.4032</td>
-            <td>0.2450</td>
-            <td>0.5030</td>
-            <td></td>
-            <td>0.3519</td>
-          </tr>
-          <tr>
-            <td>polar_lanczos</td>
-            <td>1.31E-03</td>
-            <td>48.6640</td>
-            <td>0.9971</td>
-            <td>0.9991</td>
-            <td></td>
-            <td>0.2173</td>
-            <td>0.2270</td>
-            <td>0.2970</td>
-            <td>0.0000</td>
-            <td></td>
-            <td>0.1853</td>
+            <td>0.4928</td>
           </tr>
           <tr>
             <td>lanczos</td>
-            <td>1.34E-03</td>
-            <td>48.6891</td>
-            <td>0.9971</td>
-            <td>0.9992</td>
+            <td>0.0018</td>
+            <td>47.1755</td>
+            <td>0.9965</td>
+            <td>0.9994</td>
             <td></td>
-            <td>0.1646</td>
-            <td>0.2353</td>
-            <td>0.2640</td>
-            <td>0.0062</td>
+            <td>0.3855</td>
+            <td>0.4125</td>
+            <td>0.6601</td>
+            <td>0.2760</td>
             <td></td>
-            <td>0.1675</td>
+            <td>0.4335</td>
+          </tr>
+          <tr>
+            <td>polar_lanczos</td>
+            <td>0.0018</td>
+            <td>47.0847</td>
+            <td>0.9964</td>
+            <td>0.9994</td>
+            <td></td>
+            <td>0.3304</td>
+            <td>0.3724</td>
+            <td>0.6088</td>
+            <td>0.2114</td>
+            <td></td>
+            <td>0.3808</td>
+          </tr>
+          <tr>
+            <td>fastbilateral</td>
+            <td>0.0018</td>
+            <td>46.7015</td>
+            <td>0.9960</td>
+            <td>0.9994</td>
+            <td></td>
+            <td>0.2582</td>
+            <td>0.2029</td>
+            <td>0.2112</td>
+            <td>0.4364</td>
+            <td></td>
+            <td>0.2772</td>
+          </tr>
+          <tr>
+            <td>cfl_16tap</td>
+            <td>0.0019</td>
+            <td>46.9027</td>
+            <td>0.9959</td>
+            <td>0.9994</td>
+            <td></td>
+            <td>0.1161</td>
+            <td>0.2919</td>
+            <td>0.0829</td>
+            <td>0.2254</td>
+            <td></td>
+            <td>0.1791</td>
+          </tr>
+          <tr>
+            <td>jointbilateral</td>
+            <td>0.0019</td>
+            <td>46.5899</td>
+            <td>0.9958</td>
+            <td>0.9994</td>
+            <td></td>
+            <td>0.1089</td>
+            <td>0.1535</td>
+            <td>0.0000</td>
+            <td>0.3971</td>
+            <td></td>
+            <td>0.1649</td>
           </tr>
           <tr>
             <td>bilinear</td>
-            <td>1.42E-03</td>
-            <td>47.9748</td>
-            <td>0.9968</td>
-            <td>0.9992</td>
+            <td>0.0020</td>
+            <td>46.2429</td>
+            <td>0.9958</td>
+            <td>0.9993</td>
             <td></td>
             <td>0.0000</td>
             <td>0.0000</td>
+            <td>0.0083</td>
             <td>0.0000</td>
-            <td>0.0024</td>
             <td></td>
-            <td>0.0006</td>
+            <td>0.0021</td>
           </tr>
         </tbody>
       </table>
     </p>
     <h3 id="chroma_commentary">Chroma Commentary</h3>
     <p>
-        As expected, the bilateral filters are all capable of getting closer to the ground truth than orthogonal/polar lanczos. Some variants of CfL prediction actually ended up scoring higher than KrigBilateral in this test, 
-        which was unexpected. I'm also relatively surprised to see polar lanczos beat orthogonal lanczos, as this rarely happens due to the sharpness difference.
+        Previous iterations of this page showed that FastBilateral and JointBilateral were good alternatives to normal resampling filters since they produce less colour bleed (smearing) and are capable of better tightening chroma 
+        to luma on wild pixel-to-pixel magnitude transitions. However, since the spatial filters employed (triangle and gaussian, respectively), aren't sharp filters by nature, when luma is relatively homogeneous in a given surface 
+        these filters can get kinda soft and undetailed. In short, you can expect them to greatly outperform conventional filters on incredibly-detailed content, but the story seems to be a bit different with real anime content.
     </p>
     <p>
-        JointBilateral and FastBilateral seem to be in the middle of the pack here, with Fast having a small lead over Joint. All other shaders are ahead of them though.
-        The biggest advantage of Fast/Joint Bilateral over CfL or Krig is that they're much more stable and mathematically incapable of overshooting. So you can expect a relatively clean output, albeit probably blurrier in comparison.
+        It's worth mentioning, however, that they're not exactly bad by any means, I just don't think they're worth using over something like lanczos (specially with AR).
+    </p>
+    <p>
+        KrigBilateral, the shader I expected to be the best performer here, actually loses to 2 CfL variants. CfL employs a linear-regression to find the missing chromaticities based on the known luminosities, with a few other tricks 
+        to make this operation relatively stable, and as we can see it seems to work relatively well. Kringing is actually supposed to be more sophisticated and generally safer, but it doesn't seem to matter on real anime content, 
+        at least not for those distortion metrics.
     </p>
     <p>
         CfL actually works alongside your <inline_code>--cscale</inline_code> of choice, so you kinda change how it looks a little bit changing the filter. I ran it with lanczos but feel free to use anything else.
