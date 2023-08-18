@@ -62,7 +62,7 @@
               <li><a href="https://github.com/bloc97/Anime4K">Anime4K</a></li>
               <li><a href="https://gist.github.com/agyild/82219c545228d70c5604f865ce0b0ce5">FSR</a></li>
             </ol>
-            I've also added polar lanczos to the mix just to have a reference point, but feel free to send me any other shaders you would like to get scored. 
+            I've also added orthogonal and polar lanczos to the mix just to have a reference point, but feel free to send me any other shaders you would like to get scored. 
             For Anime4K I'm using the <a href="https://github.com/bloc97/Anime4K/blob/815b122284304e6e1e244a8cf6a160eeaa07040c/GLSL_Instructions.md">"C" mode</a> which is defined as <inline_code>Upscale_Denoise -> Upscale</inline_code>.
         </p>
         <p>
@@ -103,7 +103,7 @@
               </tr>
               <tr>
                 <td>ravu-zoom-ar-r3</td>
-                <td>0.0034</td>
+                <td>3.44E-03</td>
                 <td>41.2143</td>
                 <td>0.9889</td>
                 <td>0.9987</td>
@@ -117,7 +117,7 @@
               </tr>
               <tr>
                 <td>ravu-zoom-r3</td>
-                <td>0.0038</td>
+                <td>3.79E-03</td>
                 <td>41.0404</td>
                 <td>0.9872</td>
                 <td>0.9990</td>
@@ -131,7 +131,7 @@
               </tr>
               <tr>
                 <td>FSRCNNX_x2_8-0-4-1</td>
-                <td>0.0038</td>
+                <td>3.77E-03</td>
                 <td>40.9503</td>
                 <td>0.9882</td>
                 <td>0.9987</td>
@@ -145,7 +145,7 @@
               </tr>
               <tr>
                 <td>ravu-zoom-ar-r2</td>
-                <td>0.0036</td>
+                <td>3.63E-03</td>
                 <td>40.5841</td>
                 <td>0.9877</td>
                 <td>0.9987</td>
@@ -159,7 +159,7 @@
               </tr>
               <tr>
                 <td>ravu-zoom-r2</td>
-                <td>0.0039</td>
+                <td>3.94E-03</td>
                 <td>40.4724</td>
                 <td>0.9866</td>
                 <td>0.9989</td>
@@ -173,7 +173,7 @@
               </tr>
               <tr>
                 <td>FSRCNNX_x2_16-0-4-1</td>
-                <td>0.0040</td>
+                <td>4.03E-03</td>
                 <td>39.9168</td>
                 <td>0.9873</td>
                 <td>0.9984</td>
@@ -186,8 +186,36 @@
                 <td>0.8210</td>
               </tr>
               <tr>
+                <td>EASU</td>
+                <td>4.33E-03</td>
+                <td>38.8482</td>
+                <td>0.9841</td>
+                <td>0.9981</td>
+                <td></td>
+                <td>0.6785</td>
+                <td>0.6088</td>
+                <td>0.6664</td>
+                <td>0.7317</td>
+                <td></td>
+                <td>0.6713</td>
+              </tr>
+              <tr>
+                <td>lanczos</td>
+                <td>4.67E-03</td>
+                <td>38.6816</td>
+                <td>0.9826</td>
+                <td>0.9984</td>
+                <td></td>
+                <td>0.5566</td>
+                <td>0.5812</td>
+                <td>0.5631</td>
+                <td>0.8072</td>
+                <td></td>
+                <td>0.6270</td>
+              </tr>
+              <tr>
                 <td>nnedi3-nns64-win8x4</td>
-                <td>0.0044</td>
+                <td>4.41E-03</td>
                 <td>38.6337</td>
                 <td>0.9839</td>
                 <td>0.9973</td>
@@ -201,7 +229,7 @@
               </tr>
               <tr>
                 <td>nnedi3-nns32-win8x4</td>
-                <td>0.0045</td>
+                <td>4.46E-03</td>
                 <td>38.5214</td>
                 <td>0.9835</td>
                 <td>0.9973</td>
@@ -215,7 +243,7 @@
               </tr>
               <tr>
                 <td>FSR</td>
-                <td>0.0051</td>
+                <td>5.10E-03</td>
                 <td>39.0008</td>
                 <td>0.9817</td>
                 <td>0.9981</td>
@@ -229,7 +257,7 @@
               </tr>
               <tr>
                 <td>polar_lanczos</td>
-                <td>0.0050</td>
+                <td>4.99E-03</td>
                 <td>37.9718</td>
                 <td>0.9806</td>
                 <td>0.9980</td>
@@ -243,7 +271,7 @@
               </tr>
               <tr>
                 <td>Anime4K_C_S</td>
-                <td>0.0056</td>
+                <td>5.60E-03</td>
                 <td>36.3773</td>
                 <td>0.9783</td>
                 <td>0.9972</td>
@@ -257,7 +285,7 @@
               </tr>
               <tr>
                 <td>Anime4K_C_L</td>
-                <td>0.0058</td>
+                <td>5.83E-03</td>
                 <td>35.9398</td>
                 <td>0.9767</td>
                 <td>0.9968</td>
@@ -271,7 +299,7 @@
               </tr>
               <tr>
                 <td>Anime4K_C_VL</td>
-                <td>0.0059</td>
+                <td>5.94E-03</td>
                 <td>35.6782</td>
                 <td>0.9766</td>
                 <td>0.9963</td>
@@ -285,7 +313,7 @@
               </tr>
               <tr>
                 <td>Anime4K_C_M</td>
-                <td>0.0062</td>
+                <td>6.23E-03</td>
                 <td>35.3010</td>
                 <td>0.9744</td>
                 <td>0.9962</td>
@@ -299,7 +327,7 @@
               </tr>
               <tr>
                 <td>Anime4K_C_UL</td>
-                <td>0.0061</td>
+                <td>6.15E-03</td>
                 <td>35.1667</td>
                 <td>0.9750</td>
                 <td>0.9959</td>
@@ -316,7 +344,7 @@
         </p>
     <h3 id="upsampling_commentary">Upsampling Commentary</h3>
     <p>
-        The funniest thing about these results is that, according to distortion metrics, Anime4K is actually worse at "recreating the ground truth" than polar lanczos. 
+        The funniest thing about these results is that, according to distortion metrics, Anime4K is actually worse at "recreating the ground truth" than simple resampling filters. 
         The problem seems to be that the shader is too sharp, it does not only ring but also makes the lines thinner. This isn't necessarily bad depending on how blurry your source is, but my test image here isn't 
         blurry at all.
     </p>
@@ -328,6 +356,9 @@
         The overly-sharp shaders would probably do much better on perceptual metrics, I'll evaluate whether adding a few of them to the benchmarking script makes sense on a later date.
     </p>
     <p>
+        EASU (which is FSR without RCAS) actually scores way better than FSR, and I think it's probably a good option if you're looking for an efficient shader.
+    </p>
+    <p>
         It's nice to see that bjin came back from the dead with gold. The new ravu variants perform much better than their previous incarnations and they're also free of the half-pixel shift problem.
     </p>
     <p>
@@ -335,13 +366,13 @@
     </p>
     <h3 id="fractional_upsampling">Fractional Upsampling</h3>
     <p>
-      While doing these tests at 2x makes sense since we can use a box filter to downsample, most people aren't always doubling their content. Scaling "performance" at lower scaling factors, such as 1.5x or 1.33x, are usually more interesting 
-      because this corresponds to 720p->1080p and 1080p->1440p, respectively. This section is supposed to better represent a real world scenario when you don't have a 4K display or don't watch comically low-resolution content.
+        While doing these tests at 2x makes sense since we can use a box filter to downsample, most people aren't always doubling their content. Scaling "performance" at lower scaling factors, such as 1.5x or 1.33x, are usually more interesting 
+        because this corresponds to 720p->1080p and 1080p->1440p, respectively. This section is supposed to better represent a real world scenario when you don't have a 4K display or don't watch comically low-resolution content.
     </p>
     <h3 id="fractional_upsampling_methodology">Fractional Upsampling Methodology</h3>
     <p>
-      Unfortunately, some of my choices here are only explained in the following sections. You'll have to bear with me and trust this makes (some) sense, as the alternative would be placing the fractional upsampling section at the end of the page 
-      instead of here, its most logical position.
+        Unfortunately, some of my choices here are only explained in the following sections. You'll have to bear with me and trust this makes (some) sense, as the alternative would be placing the fractional upsampling section at the end of the page 
+        instead of here, its most logical position.
     </p>
     <p>
       In short, the entire methodology stays the same with a few modifications:
@@ -349,7 +380,6 @@
         <li>Downsampling was done from 1080p to 720p using catmull_rom + <a href="https://github.com/Artoriuz/glsl-pixel-clipper">Pixel Clipper</a>.</li>
         <li>The doublers were also downsampled with catmull_rom + Pixel Clipper.</li>
         <li>I've removed Anime4K from this because this is too far removed from what the devs intended it to be used for.</li>
-        <li>I've also added one of my memes, a 2-lobes sinc + AR (which is also Pixel Clipper in this case). This combination can sometimes be as sharp as the shaders, but it's prone to aliasing at higher scaling factors.</li>
       </ol>
     </p>
     <h3 id="fractional_upsampling_methodology">Fractional Upsampling Results</h3>
@@ -372,10 +402,10 @@
           </tr>
           <tr>
             <td>FSRCNNX_x2_8-0-4-1_catrom_pc</td>
-            <td>0.0028</td>
+            <td>2.82E-03</td>
             <td>44.0656</td>
             <td>0.9929</td>
-            <td>0.99919</td>
+            <td>0.9992</td>
             <td></td>
             <td>0.9946</td>
             <td>0.9702</td>
@@ -386,10 +416,10 @@
           </tr>
           <tr>
             <td>FSRCNNX_x2_16-0-4-1_catrom_pc</td>
-            <td>0.0030</td>
+            <td>2.95E-03</td>
             <td>44.1704</td>
             <td>0.9930</td>
-            <td>0.99917</td>
+            <td>0.9992</td>
             <td></td>
             <td>0.9194</td>
             <td>1.0000</td>
@@ -400,10 +430,10 @@
           </tr>
           <tr>
             <td>ravu-zoom-ar-r3</td>
-            <td>0.0028</td>
+            <td>2.81E-03</td>
             <td>43.8118</td>
             <td>0.9924</td>
-            <td>0.99910</td>
+            <td>0.9991</td>
             <td></td>
             <td>1.0000</td>
             <td>0.8982</td>
@@ -414,10 +444,10 @@
           </tr>
           <tr>
             <td>ravu-zoom-r3</td>
-            <td>0.0030</td>
+            <td>2.96E-03</td>
             <td>43.7155</td>
             <td>0.9920</td>
-            <td>0.99919</td>
+            <td>0.9992</td>
             <td></td>
             <td>0.9172</td>
             <td>0.8708</td>
@@ -428,10 +458,10 @@
           </tr>
           <tr>
             <td>ravu-zoom-ar-r2</td>
-            <td>0.0029</td>
+            <td>2.89E-03</td>
             <td>43.4334</td>
             <td>0.9920</td>
-            <td>0.99906</td>
+            <td>0.9991</td>
             <td></td>
             <td>0.9567</td>
             <td>0.7907</td>
@@ -441,25 +471,11 @@
             <td>0.8665</td>
           </tr>
           <tr>
-            <td>sinc2_pc</td>
-            <td>0.0030</td>
-            <td>43.4463</td>
-            <td>0.9916</td>
-            <td>0.99896</td>
-            <td></td>
-            <td>0.8871</td>
-            <td>0.7944</td>
-            <td>0.7979</td>
-            <td>0.7624</td>
-            <td></td>
-            <td>0.8104</td>
-          </tr>
-          <tr>
             <td>ravu-zoom-r2</td>
-            <td>0.0031</td>
+            <td>3.08E-03</td>
             <td>43.1801</td>
             <td>0.9915</td>
-            <td>0.99909</td>
+            <td>0.9991</td>
             <td></td>
             <td>0.8459</td>
             <td>0.7187</td>
@@ -470,10 +486,10 @@
           </tr>
           <tr>
             <td>nnedi3-nns64-win8x4_catrom_pc</td>
-            <td>0.0032</td>
+            <td>3.21E-03</td>
             <td>42.5336</td>
             <td>0.9913</td>
-            <td>0.99890</td>
+            <td>0.9989</td>
             <td></td>
             <td>0.7716</td>
             <td>0.5351</td>
@@ -484,10 +500,10 @@
           </tr>
           <tr>
             <td>nnedi3-nns32-win8x4_catrom_pc</td>
-            <td>0.0032</td>
+            <td>3.21E-03</td>
             <td>42.5250</td>
             <td>0.9913</td>
-            <td>0.99890</td>
+            <td>0.9989</td>
             <td></td>
             <td>0.7688</td>
             <td>0.5327</td>
@@ -497,11 +513,39 @@
             <td>0.6895</td>
           </tr>
           <tr>
+            <td>lanczos</td>
+            <td>3.44E-03</td>
+            <td>41.9800</td>
+            <td>0.9902</td>
+            <td>0.9989</td>
+            <td></td>
+            <td>0.6382</td>
+            <td>0.3779</td>
+            <td>0.5939</td>
+            <td>0.6798</td>
+            <td></td>
+            <td>0.5725</td>
+          </tr>
+          <tr>
+            <td>EASU</td>
+            <td>3.28E-03</td>
+            <td>41.7860</td>
+            <td>0.9902</td>
+            <td>0.9987</td>
+            <td></td>
+            <td>0.7328</td>
+            <td>0.3228</td>
+            <td>0.5998</td>
+            <td>0.5315</td>
+            <td></td>
+            <td>0.5467</td>
+          </tr>
+          <tr>
             <td>polar_lanczos</td>
-            <td>0.0035</td>
+            <td>3.52E-03</td>
             <td>41.4071</td>
             <td>0.9894</td>
-            <td>0.99880</td>
+            <td>0.9988</td>
             <td></td>
             <td>0.5927</td>
             <td>0.2152</td>
@@ -512,10 +556,10 @@
           </tr>
           <tr>
             <td>FSR</td>
-            <td>0.0045</td>
+            <td>4.55E-03</td>
             <td>40.6494</td>
             <td>0.9861</td>
-            <td>0.99823</td>
+            <td>0.9982</td>
             <td></td>
             <td>0.0000</td>
             <td>0.0000</td>
@@ -535,20 +579,12 @@
         The numbers are all closer together at 1.5x, which shows that your choice of scaler becomes less relevant as you decrease the scaling factor.
     </p>
     <p>
-        It's a bit funny to see FSR get worse here, since a lower scaling factor corresponds to a higher quality preset in AMD's terms, but I think the problem is just that the shader is too sharp. The RCAS step hurts more than it helps here.
+        It's a bit funny to see FSR get worse here, since a lower scaling factor corresponds to a higher quality preset in AMD's terms, but I think the problem is just that the shader is too sharp. 
+        EASU is on top of it again but it's lower than lanczos this time. If you're going to use EASU maybe configure it to only fire up at 2x or higher.
     </p>
     <p>
-        The 2-lobes sinc + Pixel Clipper scored so high it becomes difficult to recommend any of these shaders unless you are really sensitive to aliasing and can't stand how it looks. However, keep in mind this is an unhinged sinc which is hilariously sharp, it can 
-        always be made softer with a window, and in this case I recommend starting with Kaiser (which will still keep it quite sharp). mpv doesn't allow you to set a window for sinc, so just replace the filter with lanczos (radius=2) if you're going to use a window. 
-        Please note that I don't actually recommend using this with sources that are naturally a bit blurry. The filter will very aggressively sharpen everything and the AR shader can only remove overshoots, not all the extra sharpening.
-    </p>
-    <p>
-        Polar lanczos actually managed to score higher than FSR here, but it's still in a different class when compared to basically anything else. This is to be somewhat expected since polar lanczos is a relatively blurry filter, its strenghts 
-        are mostly tied to hiding aliasing which isn't really a major factor at 1.5x.
-    </p>
-    <p>
-        In my opinion using any of these shaders at 1.5x is probably unnecessary, since you can get good enough results with normal filters. If you really want to use a shader though, I'd probably stick to ravu-zoom since it can output to the target 
-        resolution directly.
+        In my opinion using any of these shaders at 1.5x is probably unnecessary, since you can get good enough results with normal filters. 
+        If you really want to use a shader though, I'd probably stick to ravu-zoom since it can output to the target resolution directly.
     </p>
     <h3 id="chroma_shaders">Chroma Shaders</h3>
     <p>
