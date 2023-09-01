@@ -246,9 +246,10 @@
             orthogonal LanczosSharp ended up on top of the table, an option that shouldn't even be in the comparison. If you want to give it a try on mpv, you can use <inline_code>--scale=lanczos --scale-blur=0.9812505644269356</inline_code>.
         </p>
         <p>
-            The second surprise is that Polar_Catrom is at the second place with the best scores for both SSIM and MS-SSIM. Polar_Catrom is an extremely sharp filter and I really like it when paired with AR. 
-            Since it only rings once when it overshoots or undershoots, it's trivial to remove all ringing if we just clip the output of each pixel to the limits of the input pixels inside the window. 
-            <a href="https://github.com/Artoriuz/glsl-pixel-clipper/">I have actually written a shader for it</a>. If you want to give the filter a try on mpv, you can use <inline_code>--scale=ewa_robidoux --scale-param1=0 --scale-param2=0.5</inline_code>.
+            The second surprise is that Polar_Catrom is at the second place with the best scores for both SSIM and MS-SSIM. Polar_Catrom is an extremely sharp filter, albeit with too much aliasing and ringing.
+            Since it only rings once (when it overshoots), it's trivial to remove all ringing if we just clip the output of each pixel to the limits set by the surrounding input pixels. 
+            <a href="https://github.com/Artoriuz/glsl-pixel-clipper/">I have actually written a shader for it</a>, but you can also just use libplacebo's native AR now. 
+            If you want to give the filter a try on mpv, you can use <inline_code>--scale=ewa_robidoux --scale-param1=0 --scale-param2=0.5</inline_code>.
         </p>
         <p>
             The third surprise is that there are some Lanczos variants on top of the baseline Lanczos: Hamming, Cosine and Welch. For the last two all you gotta do is set <inline_code>--scale=lanczos --scale-window=window</inline_code>, 
