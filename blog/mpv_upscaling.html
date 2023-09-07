@@ -1568,6 +1568,184 @@
         It's also worth mentioning that downsampling AR only makes sense when you're using a sharp filter. Blurry filters such as mitchell do not benefit nearly as much from this (since there's almost no ringing to remove), and the remark that some 
         mild ringing can be perceived as a positive thing by the human eye is also valid here. Personally I'd say you probably need some AR for anything sharper than catrom, but catrom itself is still perfectly usable without AR.
     </p>
+    <h3 id="performance">Performance Benchmarks</h3>
+    <p>
+        Benchmarking mpv performance is a bit tricky due to a few things:
+        <ol>
+            <li>
+                Due to the relatively cheap load, it's difficult to predict at which power state the GPU will stay at while we benchmark. To virtually increase the load, in an attempt to level the ground, 
+                we can cheese mpv into outputting frames as quickly as possible, but that's not necessarily representative of a real-world scenario.
+            </li>
+            <li>
+                Hardware, OS, drivers, display servers, etc... All of those things affect mpv performance in complex ways that are usually unpredictable, so even if my benchmarks were perfect they'd still only be relevant for those with similar systems.
+            </li>
+        </ol>
+    </p>
+    <p>
+        In any case, the following numbers were produced with these mpv settings with a 720p anime episode (~24 minutes long video) on a 5600X+6600XT+Windows 11:
+        <br>
+        <br>
+        <code>
+            Measure-Command { mpv --no-config --profile=gpu-hq --vo=gpu-next --gpu-api=vulkan --audio=no --untimed=yes --video-sync=display-desync --vulkan-swap-mode=immediate --window-scale=2.0 --fullscreen=yes }
+        </code>
+    </p>
+    <p>
+        <table>
+            <tbody>
+              <tr>
+                <td>Filter/Shader</td>
+                <td>Time (Seconds)</td>
+                <td>Relative to lanczos</td>
+              </tr>
+              <tr>
+                <td>lanczos</td>
+                <td>64.9159</td>
+                <td>1.0000</td>
+              </tr>
+              <tr>
+                <td>fastbilateral</td>
+                <td>65.6387</td>
+                <td>1.0111</td>
+              </tr>
+              <tr>
+                <td>jointbilateral</td>
+                <td>67.0375</td>
+                <td>1.0327</td>
+              </tr>
+              <tr>
+                <td>cfl_4</td>
+                <td>68.9878</td>
+                <td>1.0627</td>
+              </tr>
+              <tr>
+                <td>cfl_12</td>
+                <td>70.3758</td>
+                <td>1.0841</td>
+              </tr>
+              <tr>
+                <td>cfl_16</td>
+                <td>71.1033</td>
+                <td>1.0953</td>
+              </tr>
+              <tr>
+                <td>ravu-lite-r2</td>
+                <td>71.7049</td>
+                <td>1.1046</td>
+              </tr>
+              <tr>
+                <td>EASU</td>
+                <td>72.2429</td>
+                <td>1.1129</td>
+              </tr>
+              <tr>
+                <td>ravu-lite-ar-r2</td>
+                <td>73.2253</td>
+                <td>1.1280</td>
+              </tr>
+              <tr>
+                <td>krigbilateral</td>
+                <td>73.5019</td>
+                <td>1.1323</td>
+              </tr>
+              <tr>
+                <td>cfl_mix</td>
+                <td>73.9723</td>
+                <td>1.1395</td>
+              </tr>
+              <tr>
+                <td>polar_lanczos</td>
+                <td>74.1704</td>
+                <td>1.1426</td>
+              </tr>
+              <tr>
+                <td>ravu-lite-r3</td>
+                <td>75.0162</td>
+                <td>1.1556</td>
+              </tr>
+              <tr>
+                <td>ravu-lite-ar-r3</td>
+                <td>75.0826</td>
+                <td>1.1566</td>
+              </tr>
+              <tr>
+                <td>ravu-zoom-r2</td>
+                <td>75.8479</td>
+                <td>1.1684</td>
+              </tr>
+              <tr>
+                <td>ravu-lite-r4</td>
+                <td>80.0770</td>
+                <td>1.2335</td>
+              </tr>
+              <tr>
+                <td>ravu-lite-ar-r4</td>
+                <td>80.2809</td>
+                <td>1.2367</td>
+              </tr>
+              <tr>
+                <td>ravu-zoom-ar-r2</td>
+                <td>81.1942</td>
+                <td>1.2508</td>
+              </tr>
+              <tr>
+                <td>FSR</td>
+                <td>81.2454</td>
+                <td>1.2515</td>
+              </tr>
+              <tr>
+                <td>polar_lanczos_ar</td>
+                <td>87.0285</td>
+                <td>1.3406</td>
+              </tr>
+              <tr>
+                <td>ravu-zoom-r3</td>
+                <td>94.1121</td>
+                <td>1.4498</td>
+              </tr>
+              <tr>
+                <td>polar_lanczos_pixelclipper</td>
+                <td>99.4084</td>
+                <td>1.5313</td>
+              </tr>
+              <tr>
+                <td>ravu-zoom-ar-r3</td>
+                <td>101.2508</td>
+                <td>1.5597</td>
+              </tr>
+              <tr>
+                <td>FSRCNNX_x2_8-0-4-1</td>
+                <td>106.5095</td>
+                <td>1.6407</td>
+              </tr>
+              <tr>
+                <td>nnedi3-nns32-win8x4</td>
+                <td>113.1699</td>
+                <td>1.7433</td>
+              </tr>
+              <tr>
+                <td>nnedi3-nns64-win8x4</td>
+                <td>160.4440</td>
+                <td>2.4716</td>
+              </tr>
+              <tr>
+                <td>FSRCNNX_x2_16-0-4-1</td>
+                <td>252.5824</td>
+                <td>3.8909</td>
+              </tr>
+            </tbody>
+        </table>
+    </p>
+    <p>
+        Please keep in mind that the choice of built-in filter doesn't matter that much as the weights get stored in a LUT, so something like lanczos and spline36 (gpu-hq default) have virtually identical performance. In short, filters 
+        with larger radii will obviously be slower, polar filters are slower than their orthogonal counterparts and AR obviously also makes things slower.
+    </p>
+    <p>
+        For the shaders, the number are more or less what I expected, but it's nice to see that in the grand scheme of things these shaders don't really slow the playback down that much. Good old polar lanczos with AR is already as slow as most shaders.
+    </p>
+    <p>
+        Still though, the conclusion here seems to be that if you're running mpv on a semi-decent computer, these shaders will never be a problem. For reference, lanczos averaged ~1320 fps while FSRCNNX_x2_16-0-4-1 averaged ~340 fps (total number of frames / time taken). 
+        Please note that you can make it go even faster with hwdec, but <inline_code>--d3d11-sync-interval=0</inline_code> doesn't seem to work in fullscreen, so it is what it is. Until AMD fixes Vulkan hwdec in their drivers this is probably the best I can provide.
+    </p>
     <h3 id="outro">Outro</h3>
     <p>
         I want to make it clear though that you shouldn't take the results as gospel. Mathematical image quality metrics do not always correlate perfectly with how humans perceive image quality, 
