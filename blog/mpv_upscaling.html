@@ -80,9 +80,6 @@
             The images were then upsampled back with:
         </p>
         <code>mpv --no-config --vo=gpu-next --no-hidpi-window-scale --window-scale=2.0 --pause=yes --screenshot-format=png --sigmoid-upscaling --deband=no --dither-depth=no --screenshot-high-bit-depth=no --glsl-shader="path/to/meme/shader" downscaled.png</code>
-        <p>
-          Unfortunately, for NEEDI3 we have to switch back to <inline_code>--vo=gpu</inline_code> so we can use <inline_code>--no-scaler-resizes-only</inline_code> to fix the half-pixel shift introduced by the shader.
-        </p>
         <h3 id="upsampling_results">Upsampling Results</h3>
         <p>
           <table>
