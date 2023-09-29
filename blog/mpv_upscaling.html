@@ -951,7 +951,8 @@
         and as it turns out even normal filters like lanczos end up being good enough. Keep in mind this is a very detailed fanart, actual anime frames would make these differences even smaller.
     </p>
     <p>
-        If you really want to use a chroma shader you should probably stick to KrigBilateral, it's better than the other options and it isn't really that slow.
+        If you really want to use a chroma shader you should probably stick to KrigBilateral, it's better than the other options and it isn't really that slow. 
+        If performance matters to you, CfL is probably a good alternative (can't run benchmarks right now, but it's roughly twice as fast on my laptop).
     </p>
     <h3 id="antiring">Antiring</h3>
     <p>
@@ -1732,6 +1733,9 @@
         Still though, the conclusion here seems to be that if you're running mpv on a semi-decent computer, these shaders will never be a problem.
         Please note that you can make it go even faster with hardware decoding, but <inline_code>--d3d11-sync-interval=0</inline_code> doesn't seem to work in fullscreen, so it is what it is. 
         Until AMD fixes Vulkan hwdec in their drivers this is probably the best I can provide.
+    </p>
+    <p>
+        CfL numbers are currently out of date, but the new shader with a single pass is only marginally slower than the old 12 tap shader.
     </p>
     <h3 id="outro">Outro</h3>
     <p>
