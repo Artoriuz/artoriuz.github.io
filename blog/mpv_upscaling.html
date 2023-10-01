@@ -818,17 +818,17 @@
           </tr>
           <tr>
             <td>cfl</td>
-            <td>1.15E-03</td>
-            <td>48.0598</td>
-            <td>0.9964</td>
+            <td>1.14E-03</td>
+            <td>48.2183</td>
+            <td>0.9965</td>
             <td>0.9997</td>
             <td></td>
-            <td>0.9727</td>
-            <td>0.9144</td>
+            <td>1.0000</td>
+            <td>0.9780</td>
             <td>1.0000</td>
             <td>1.0000</td>
             <td></td>
-            <td>0.9718</td>
+            <td>0.9945</td>
           </tr>
           <tr>
             <td>krigbilateral</td>
@@ -837,12 +837,12 @@
             <td>0.9962</td>
             <td>0.9997</td>
             <td></td>
+            <td>0.9995</td>
             <td>1.0000</td>
-            <td>1.0000</td>
-            <td>0.8850</td>
-            <td>0.8926</td>
+            <td>0.8624</td>
+            <td>0.8577</td>
             <td></td>
-            <td>0.9444</td>
+            <td>0.9299</td>
           </tr>
           <tr>
             <td>cfl12</td>
@@ -851,12 +851,12 @@
             <td>0.9963</td>
             <td>0.9997</td>
             <td></td>
-            <td>0.8388</td>
+            <td>0.8383</td>
             <td>0.8830</td>
-            <td>0.9499</td>
-            <td>0.9370</td>
+            <td>0.9257</td>
+            <td>0.9005</td>
             <td></td>
-            <td>0.9022</td>
+            <td>0.8869</td>
           </tr>
           <tr>
             <td>cfl4</td>
@@ -865,12 +865,12 @@
             <td>0.9962</td>
             <td>0.9997</td>
             <td></td>
-            <td>0.9333</td>
+            <td>0.9328</td>
             <td>0.7194</td>
-            <td>0.8812</td>
-            <td>0.8769</td>
+            <td>0.8587</td>
+            <td>0.8427</td>
             <td></td>
-            <td>0.8527</td>
+            <td>0.8384</td>
           </tr>
           <tr>
             <td>lanczos</td>
@@ -879,12 +879,12 @@
             <td>0.9956</td>
             <td>0.9996</td>
             <td></td>
-            <td>0.7573</td>
+            <td>0.7569</td>
             <td>0.5469</td>
-            <td>0.5665</td>
-            <td>0.7548</td>
+            <td>0.5521</td>
+            <td>0.7254</td>
             <td></td>
-            <td>0.6564</td>
+            <td>0.6453</td>
           </tr>
           <tr>
             <td>polar_lanczossharp</td>
@@ -893,12 +893,12 @@
             <td>0.9954</td>
             <td>0.9996</td>
             <td></td>
-            <td>0.6409</td>
+            <td>0.6405</td>
             <td>0.4720</td>
-            <td>0.4889</td>
-            <td>0.6639</td>
+            <td>0.4764</td>
+            <td>0.6380</td>
             <td></td>
-            <td>0.5664</td>
+            <td>0.5567</td>
           </tr>
           <tr>
             <td>jointbilateral</td>
@@ -907,12 +907,12 @@
             <td>0.9953</td>
             <td>0.9996</td>
             <td></td>
-            <td>0.5262</td>
+            <td>0.5259</td>
             <td>0.4702</td>
-            <td>0.4392</td>
-            <td>0.5552</td>
+            <td>0.4280</td>
+            <td>0.5335</td>
             <td></td>
-            <td>0.4977</td>
+            <td>0.4894</td>
           </tr>
           <tr>
             <td>fastbilateral</td>
@@ -921,12 +921,12 @@
             <td>0.9953</td>
             <td>0.9996</td>
             <td></td>
-            <td>0.4954</td>
+            <td>0.4951</td>
             <td>0.4237</td>
-            <td>0.4427</td>
-            <td>0.4291</td>
+            <td>0.4314</td>
+            <td>0.4124</td>
             <td></td>
-            <td>0.4477</td>
+            <td>0.4406</td>
           </tr>
           <tr>
             <td>bilinear</td>
@@ -951,7 +951,8 @@
         and as it turns out even normal filters like lanczos end up being good enough. Keep in mind this is a very detailed fanart, actual anime frames would make these differences even smaller.
     </p>
     <p>
-        If you really want to use a chroma shader you should probably stick to KrigBilateral or CfL Prediction.
+        If you really want to use a chroma shader you should probably stick to KrigBilateral or CfL Prediction. Krig is an older and more tested shader, so you know what to expect. CfL produces better numbers but is new 
+        and experimental, so there might be some issues to iron out. Overall they look very similar and the difference is negligible in practice.
     </p>
     <h3 id="antiring">Antiring</h3>
     <p>
