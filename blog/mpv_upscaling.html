@@ -951,12 +951,16 @@
     </p>
     <h3 id="chroma_commentary">Chroma Commentary</h3>
     <p>
-        Assuming the methodology makes sense, there's little reason to use chroma shaders when it comes to anime content. I believe the lack of high-frequency components is severely hindering how effective they can be, 
-        and as it turns out even normal filters like lanczos end up being good enough. Keep in mind this is a very detailed fanart, actual anime frames would make these differences even smaller.
+        In the 2x upscaling section we saw the the PSNR difference between lanczos and the highest scoring shader was of ~3 dB, but this number is only half as big now. 
+        Chroma shaders probably shouldn't be entirely dismissed but it's important to keep in mind the quality improvement they bring is relatively small.
+    </p> 
+    <p>
+        With that said, if you really want to use a chroma shader you should probably stick to KrigBilateral or CfL Prediction. Krig is an older and more tested shader, so you know what to expect. CfL looks sharper and produces better numbers, but it's new 
+        and experimental, so there might be some issues to iron out.
     </p>
     <p>
-        If you really want to use a chroma shader you should probably stick to KrigBilateral or CfL Prediction. Krig is an older and more tested shader, so you know what to expect. CfL looks sharper and produces better numbers, but it's new 
-        and experimental, so there might be some issues to iron out. Overall they look very similar and the difference is mostly negligible in practice.
+        If you're feeling adventurous and want to give CfL a try, the 12-tap variant is generally the safest (fewest visible artifacts) while the 4-tap variant is the most aggressive (most visible artifacts). The main 
+        variant is a combination of the other two in an attempt to achieve a middle ground (mixing them also helps hiding some artifacts though).
     </p>
     <h3 id="antiring">Antiring</h3>
     <p>
