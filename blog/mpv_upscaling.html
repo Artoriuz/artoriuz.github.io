@@ -767,8 +767,7 @@
     </p>
     <p>
         I've actually also written <a href="https://github.com/Artoriuz/glsl-chroma-from-luma-prediction">another meme shader</a> for this, basically taking inspiration from <a href="https://arxiv.org/abs/1711.03951">this paper</a>. In short, Chroma from 
-        Luma prediction is a technique that applies linear regression to map missing chromaticities based on the known luminosities. This doesn't always work, and it's generally very unstable, but the shader employs a few tricks to make the artifacts 
-        less noticeable. In theory, kriging should be better than this as it also takes pixel distance into account, but I was curious to know whether a simple linear regression would work so I ended up writing the shaders anyway.
+        Luma prediction is a technique that applies linear regression to map missing chromaticities based on the known luminosities. There are many tricks involved to make the shader look good though.
     </p>
     <p>
         In any case, my goal here is to compare these chroma shaders against polar/orthogonal lanczos, which I'm using as reference points.
@@ -955,8 +954,8 @@
         Chroma shaders probably shouldn't be entirely dismissed but it's important to keep in mind the quality improvement they bring is relatively small.
     </p> 
     <p>
-        With that said, if you really want to use a chroma shader you should probably stick to KrigBilateral or CfL Prediction. Krig is an older and more tested shader, so you know what to expect. CfL looks sharper and produces better numbers, but it's new 
-        and experimental, so there might be some issues to iron out.
+        With that said, if you really want to use a chroma shader you should probably stick to KrigBilateral or CfL Prediction. krigBilateral is an older and more tested shader, so you know what to expect. CfL looks sharper and produces better numbers, but it's new 
+        and experimental so there might be some issues to iron out.
     </p>
     <p>
         If you're feeling adventurous and want to give CfL a try, the 12-tap variant is generally the safest (fewest visible artifacts) while the 4-tap variant is the most aggressive (most visible artifacts). The main 
