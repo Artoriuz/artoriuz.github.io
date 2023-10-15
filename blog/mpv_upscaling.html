@@ -820,9 +820,9 @@
         </tr>
         <tr>
           <td>cfl</td>
-          <td>1.09E-03</td>
-          <td>49.1130</td>
-          <td>0.9967</td>
+          <td>1.08E-03</td>
+          <td>49.1391</td>
+          <td>0.9968</td>
           <td>0.9997</td>
           <td></td>
           <td>1.0000</td>
@@ -831,34 +831,34 @@
           <td>1.0000</td>
           <td></td>
           <td>1.0000</td>
+        </tr>
+        <tr>
+          <td>cfl4</td>
+          <td>1.08E-03</td>
+          <td>49.0324</td>
+          <td>0.9967</td>
+          <td>0.9997</td>
+          <td></td>
+          <td>0.9787</td>
+          <td>0.9683</td>
+          <td>0.9717</td>
+          <td>0.9802</td>
+          <td></td>
+          <td>0.9747</td>
         </tr>
         <tr>
           <td>cfl12</td>
           <td>1.10E-03</td>
-          <td>48.9692</td>
+          <td>48.9810</td>
           <td>0.9967</td>
           <td>0.9997</td>
           <td></td>
-          <td>0.9494</td>
-          <td>0.9569</td>
-          <td>0.9853</td>
-          <td>0.9751</td>
+          <td>0.9355</td>
+          <td>0.9530</td>
+          <td>0.9649</td>
+          <td>0.9655</td>
           <td></td>
-          <td>0.9667</td>
-        </tr>
-        <tr>
-          <td>cfl4</td>
-          <td>1.10E-03</td>
-          <td>49.0108</td>
-          <td>0.9966</td>
-          <td>0.9997</td>
-          <td></td>
-          <td>0.9641</td>
-          <td>0.9694</td>
-          <td>0.9496</td>
-          <td>0.9685</td>
-          <td></td>
-          <td>0.9629</td>
+          <td>0.9547</td>
         </tr>
         <tr>
           <td>krigbilateral</td>
@@ -867,12 +867,12 @@
           <td>0.9962</td>
           <td>0.9997</td>
           <td></td>
-          <td>0.8209</td>
-          <td>0.7904</td>
-          <td>0.7917</td>
-          <td>0.7800</td>
+          <td>0.8013</td>
+          <td>0.7843</td>
+          <td>0.7602</td>
+          <td>0.7691</td>
           <td></td>
-          <td>0.7958</td>
+          <td>0.7787</td>
         </tr>
         <tr>
           <td>memebilateral</td>
@@ -881,12 +881,12 @@
           <td>0.9961</td>
           <td>0.9997</td>
           <td></td>
-          <td>0.7898</td>
-          <td>0.7873</td>
-          <td>0.7246</td>
-          <td>0.7995</td>
+          <td>0.7709</td>
+          <td>0.7812</td>
+          <td>0.6958</td>
+          <td>0.7883</td>
           <td></td>
-          <td>0.7753</td>
+          <td>0.7590</td>
         </tr>
         <tr>
           <td>lanczos</td>
@@ -895,12 +895,12 @@
           <td>0.9955</td>
           <td>0.9996</td>
           <td></td>
-          <td>0.5386</td>
-          <td>0.3987</td>
-          <td>0.4876</td>
-          <td>0.6007</td>
+          <td>0.5258</td>
+          <td>0.3956</td>
+          <td>0.4682</td>
+          <td>0.5923</td>
           <td></td>
-          <td>0.5064</td>
+          <td>0.4955</td>
         </tr>
         <tr>
           <td>polar_lanczossharp</td>
@@ -909,12 +909,12 @@
           <td>0.9954</td>
           <td>0.9996</td>
           <td></td>
-          <td>0.5303</td>
-          <td>0.3553</td>
-          <td>0.4284</td>
-          <td>0.5266</td>
+          <td>0.5176</td>
+          <td>0.3526</td>
+          <td>0.4114</td>
+          <td>0.5193</td>
           <td></td>
-          <td>0.4602</td>
+          <td>0.4502</td>
         </tr>
         <tr>
           <td>jointbilateral</td>
@@ -923,12 +923,12 @@
           <td>0.9953</td>
           <td>0.9996</td>
           <td></td>
-          <td>0.3998</td>
-          <td>0.3494</td>
-          <td>0.3748</td>
-          <td>0.4351</td>
+          <td>0.3902</td>
+          <td>0.3467</td>
+          <td>0.3599</td>
+          <td>0.4290</td>
           <td></td>
-          <td>0.3898</td>
+          <td>0.3815</td>
         </tr>
         <tr>
           <td>fastbilateral</td>
@@ -937,12 +937,12 @@
           <td>0.9953</td>
           <td>0.9996</td>
           <td></td>
-          <td>0.3876</td>
-          <td>0.3213</td>
-          <td>0.3842</td>
-          <td>0.3399</td>
+          <td>0.3783</td>
+          <td>0.3188</td>
+          <td>0.3689</td>
+          <td>0.3352</td>
           <td></td>
-          <td>0.3583</td>
+          <td>0.3503</td>
         </tr>
         <tr>
           <td>bilinear</td>
@@ -968,11 +968,6 @@
     <p>
         With that said, if you really want to use a chroma shader you should probably stick to KrigBilateral or CfL Prediction. krigBilateral is an older and more tested shader, so you know what to expect. 
         CfL looks sharper and produces better numbers, but it's new and experimental so there might be some issues to iron out.
-    </p>
-    <p>
-        If you're feeling adventurous and want to give CfL a try, the 12-tap variant is generally the safest (less likely to produce awful artifacts) while the 4-tap variant is the most aggressive 
-        (most likely to produce awful artifacts). The main variant is a combination of the other two in an attempt to achieve a middle ground, but mixing them also helps hiding most artifacts 
-        (which is why it scores higher than the 4-tap variant).
     </p>
     <h3 id="antiring">Antiring</h3>
     <p>
