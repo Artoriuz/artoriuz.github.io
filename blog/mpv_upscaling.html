@@ -62,7 +62,7 @@
               <li><a href="https://github.com/bloc97/Anime4K">Anime4K</a></li>
               <li><a href="https://gist.github.com/agyild/82219c545228d70c5604f865ce0b0ce5">FSR</a></li>
             </ol>
-            I've also added orthogonal and polar lanczos to the mix just to have a reference point, but feel free to send me any other shaders you would like to get scored. 
+            I've also added orthogonal and polar lanczossharp to the mix just to have a reference point, but feel free to send me any other shaders you would like to get scored. 
             For Anime4K I'm using the <a href="https://github.com/bloc97/Anime4K/blob/815b122284304e6e1e244a8cf6a160eeaa07040c/GLSL_Instructions.md">"C" mode</a> which is defined as <inline_code>Upscale_Denoise -> Upscale</inline_code>.
         </p>
         <p>
@@ -313,6 +313,20 @@
                 <td>0.5822</td>
               </tr>
               <tr>
+                <td>polar_lanczossharp</td>
+                <td>4.79E-03</td>
+                <td>38.3683</td>
+                <td>0.9818</td>
+                <td>0.9982</td>
+                <td></td>
+                <td>0.5140</td>
+                <td>0.5168</td>
+                <td>0.5102</td>
+                <td>0.7326</td>
+                <td></td>
+                <td>0.5684</td>
+              </tr>
+              <tr>
                 <td>nnedi3-nns32-win8x4</td>
                 <td>4.46E-03</td>
                 <td>38.5214</td>
@@ -339,20 +353,6 @@
                 <td>0.7157</td>
                 <td></td>
                 <td>0.5606</td>
-              </tr>
-              <tr>
-                <td>polar_lanczos</td>
-                <td>4.99E-03</td>
-                <td>37.9718</td>
-                <td>0.9806</td>
-                <td>0.9980</td>
-                <td></td>
-                <td>0.4435</td>
-                <td>0.4528</td>
-                <td>0.4237</td>
-                <td>0.6683</td>
-                <td></td>
-                <td>0.4971</td>
               </tr>
               <tr>
                 <td>Anime4K_C_S</td>
@@ -697,6 +697,20 @@
             <td>0.5725</td>
           </tr>
           <tr>
+            <td>polar_lanczossharp</td>
+            <td>3.41E-03</td>
+            <td>41.7796</td>
+            <td>0.9899</td>
+            <td>0.9989</td>
+            <td></td>
+            <td>0.6535</td>
+            <td>0.3210</td>
+            <td>0.5561</td>
+            <td>0.6567</td>
+            <td></td>
+            <td>0.5468</td>
+          </tr>
+          <tr>
             <td>EASU</td>
             <td>3.28E-03</td>
             <td>41.7860</td>
@@ -709,20 +723,6 @@
             <td>0.5315</td>
             <td></td>
             <td>0.5467</td>
-          </tr>
-          <tr>
-            <td>polar_lanczos</td>
-            <td>3.52E-03</td>
-            <td>41.4071</td>
-            <td>0.9894</td>
-            <td>0.9988</td>
-            <td></td>
-            <td>0.5927</td>
-            <td>0.2152</td>
-            <td>0.4805</td>
-            <td>0.5951</td>
-            <td></td>
-            <td>0.4709</td>
           </tr>
           <tr>
             <td>FSR</td>
@@ -995,9 +995,8 @@
         this time since the shaders support RGB images just fine.
     </p>
     <p>
-        AR is only really necessary when you're using sharp filters, it makes no sense alongside blurry filters because blurry filters don't ring hard enough for it to be noticeable. Polar lanczos is a relatively blurry filter, and it's probably not 
-        the best candidate to test this with, however, it's also the most popular polar choice so using something else probably wouldn't be very useful to a lot of people... There are a few sharp memes that are worth trying with AR though if you feel adventurous, 
-        but enerally speaking I think orthogonal lanczos and polar lanczos are pretty balanced.
+        AR is only really necessary when you're using sharp filters, it makes no sense alongside blurry filters because blurry filters don't ring hard enough for it to be noticeable. There are a few sharp memes that are worth trying with AR though if you feel adventurous, 
+        but enerally speaking I think orthogonal lanczos and polar lanczossharp are pretty well balanced.
     </p>
     <p>
         It's also worth mentioning that mpv uses different AR techniques for orthogonal and polar filters, but I'll name them both "_ar" for simplicity.
@@ -1032,11 +1031,11 @@
             <td>0.9985</td>
             <td></td>
             <td>1.0000</td>
-            <td>0.9818</td>
+            <td>0.9661</td>
             <td>1.0000</td>
-            <td>0.7774</td>
+            <td>0.7102</td>
             <td></td>
-            <td>0.9398</td>
+            <td>0.9191</td>
           </tr>
           <tr>
             <td>lanczos_pc4_75</td>
@@ -1045,26 +1044,12 @@
             <td>0.9830</td>
             <td>0.9985</td>
             <td></td>
-            <td>0.9376</td>
-            <td>0.9934</td>
-            <td>0.9676</td>
-            <td>0.8592</td>
+            <td>0.8964</td>
+            <td>0.9877</td>
+            <td>0.9396</td>
+            <td>0.8167</td>
             <td></td>
-            <td>0.9395</td>
-          </tr>
-          <tr>
-            <td>lanczos_pc4_50</td>
-            <td>4.65E-03</td>
-            <td>38.4633</td>
-            <td>0.9827</td>
-            <td>0.9986</td>
-            <td></td>
-            <td>0.7928</td>
-            <td>0.9584</td>
-            <td>0.8655</td>
-            <td>0.9314</td>
-            <td></td>
-            <td>0.8870</td>
+            <td>0.9101</td>
           </tr>
           <tr>
             <td>lanczos_pc12_100</td>
@@ -1073,12 +1058,26 @@
             <td>0.9827</td>
             <td>0.9985</td>
             <td></td>
-            <td>0.8127</td>
+            <td>0.6892</td>
             <td>1.0000</td>
-            <td>0.8646</td>
-            <td>0.8572</td>
+            <td>0.7474</td>
+            <td>0.8141</td>
             <td></td>
-            <td>0.8837</td>
+            <td>0.8127</td>
+          </tr>
+          <tr>
+            <td>lanczos_pc4_50</td>
+            <td>4.65E-03</td>
+            <td>38.4633</td>
+            <td>0.9827</td>
+            <td>0.9986</td>
+            <td></td>
+            <td>0.6561</td>
+            <td>0.9227</td>
+            <td>0.7490</td>
+            <td>0.9107</td>
+            <td></td>
+            <td>0.8096</td>
           </tr>
           <tr>
             <td>lanczos_pc12_75</td>
@@ -1087,12 +1086,12 @@
             <td>0.9826</td>
             <td>0.9986</td>
             <td></td>
-            <td>0.7672</td>
-            <td>0.9850</td>
-            <td>0.8346</td>
-            <td>0.9075</td>
+            <td>0.6136</td>
+            <td>0.9722</td>
+            <td>0.6913</td>
+            <td>0.8795</td>
             <td></td>
-            <td>0.8736</td>
+            <td>0.7892</td>
           </tr>
           <tr>
             <td>lanczos_pc12_50</td>
@@ -1101,12 +1100,12 @@
             <td>0.9824</td>
             <td>0.9986</td>
             <td></td>
-            <td>0.6723</td>
-            <td>0.9387</td>
-            <td>0.7577</td>
-            <td>0.9554</td>
+            <td>0.4562</td>
+            <td>0.8860</td>
+            <td>0.5478</td>
+            <td>0.9419</td>
             <td></td>
-            <td>0.8310</td>
+            <td>0.7080</td>
           </tr>
           <tr>
             <td>lanczos_ar_50</td>
@@ -1115,12 +1114,40 @@
             <td>0.9826</td>
             <td>0.9985</td>
             <td></td>
-            <td>0.7602</td>
-            <td>0.7442</td>
-            <td>0.8129</td>
-            <td>0.8172</td>
+            <td>0.6021</td>
+            <td>0.5244</td>
+            <td>0.6507</td>
+            <td>0.7620</td>
             <td></td>
-            <td>0.7836</td>
+            <td>0.6348</td>
+          </tr>
+          <tr>
+            <td>polar_lanczossharp_ar_75</td>
+            <td>4.59E-03</td>
+            <td>38.3685</td>
+            <td>0.9827</td>
+            <td>0.9983</td>
+            <td></td>
+            <td>0.8593</td>
+            <td>0.6082</td>
+            <td>0.7309</td>
+            <td>0.2635</td>
+            <td></td>
+            <td>0.6155</td>
+          </tr>
+          <tr>
+            <td>polar_lanczossharp_ar_50</td>
+            <td>4.64E-03</td>
+            <td>38.3834</td>
+            <td>0.9826</td>
+            <td>0.9984</td>
+            <td></td>
+            <td>0.6807</td>
+            <td>0.6575</td>
+            <td>0.6382</td>
+            <td>0.4557</td>
+            <td></td>
+            <td>0.6080</td>
           </tr>
           <tr>
             <td>lanczos_ar_75</td>
@@ -1129,12 +1156,96 @@
             <td>0.9827</td>
             <td>0.9984</td>
             <td></td>
-            <td>0.8564</td>
-            <td>0.6345</td>
-            <td>0.8472</td>
-            <td>0.6661</td>
+            <td>0.7617</td>
+            <td>0.3205</td>
+            <td>0.7147</td>
+            <td>0.5653</td>
             <td></td>
-            <td>0.7511</td>
+            <td>0.5905</td>
+          </tr>
+          <tr>
+            <td>polar_lanczossharp_pc4_75</td>
+            <td>4.66E-03</td>
+            <td>38.3939</td>
+            <td>0.9825</td>
+            <td>0.9984</td>
+            <td></td>
+            <td>0.6288</td>
+            <td>0.6924</td>
+            <td>0.5687</td>
+            <td>0.4671</td>
+            <td></td>
+            <td>0.5893</td>
+          </tr>
+          <tr>
+            <td>polar_lanczossharp_pc4_100</td>
+            <td>4.64E-03</td>
+            <td>38.3808</td>
+            <td>0.9825</td>
+            <td>0.9984</td>
+            <td></td>
+            <td>0.7008</td>
+            <td>0.6488</td>
+            <td>0.6046</td>
+            <td>0.3829</td>
+            <td></td>
+            <td>0.5843</td>
+          </tr>
+          <tr>
+            <td>polar_lanczossharp_pc4_50</td>
+            <td>4.72E-03</td>
+            <td>38.3835</td>
+            <td>0.9822</td>
+            <td>0.9984</td>
+            <td></td>
+            <td>0.4286</td>
+            <td>0.6578</td>
+            <td>0.4164</td>
+            <td>0.5451</td>
+            <td></td>
+            <td>0.5120</td>
+          </tr>
+          <tr>
+            <td>polar_lanczossharp_pc12_100</td>
+            <td>4.72E-03</td>
+            <td>38.3982</td>
+            <td>0.9822</td>
+            <td>0.9984</td>
+            <td></td>
+            <td>0.4290</td>
+            <td>0.7066</td>
+            <td>0.3864</td>
+            <td>0.4734</td>
+            <td></td>
+            <td>0.4989</td>
+          </tr>
+          <tr>
+            <td>polar_lanczossharp_pc12_75</td>
+            <td>4.73E-03</td>
+            <td>38.3954</td>
+            <td>0.9822</td>
+            <td>0.9984</td>
+            <td></td>
+            <td>0.3795</td>
+            <td>0.6974</td>
+            <td>0.3537</td>
+            <td>0.5208</td>
+            <td></td>
+            <td>0.4878</td>
+          </tr>
+          <tr>
+            <td>polar_lanczossharp_ar_100</td>
+            <td>4.60E-03</td>
+            <td>38.3206</td>
+            <td>0.9826</td>
+            <td>0.9982</td>
+            <td></td>
+            <td>0.8193</td>
+            <td>0.4491</td>
+            <td>0.6607</td>
+            <td>0.0000</td>
+            <td></td>
+            <td>0.4823</td>
           </tr>
           <tr>
             <td>lanczos</td>
@@ -1143,12 +1254,12 @@
             <td>0.9819</td>
             <td>0.9986</td>
             <td></td>
-            <td>0.4568</td>
-            <td>0.7886</td>
-            <td>0.5388</td>
+            <td>0.0985</td>
+            <td>0.6070</td>
+            <td>0.1393</td>
             <td>1.0000</td>
             <td></td>
-            <td>0.6961</td>
+            <td>0.4612</td>
           </tr>
           <tr>
             <td>lanczos_ar_100</td>
@@ -1157,152 +1268,40 @@
             <td>0.9826</td>
             <td>0.9983</td>
             <td></td>
-            <td>0.8767</td>
-            <td>0.4622</td>
-            <td>0.8150</td>
-            <td>0.4950</td>
+            <td>0.7953</td>
+            <td>0.0000</td>
+            <td>0.6546</td>
+            <td>0.3424</td>
             <td></td>
-            <td>0.6622</td>
+            <td>0.4481</td>
           </tr>
           <tr>
-            <td>polar_lanczos_ar_75</td>
-            <td>4.73E-03</td>
-            <td>38.0348</td>
-            <td>0.9818</td>
-            <td>0.9982</td>
+            <td>polar_lanczossharp_pc12_50</td>
+            <td>4.77E-03</td>
+            <td>38.3781</td>
+            <td>0.9820</td>
+            <td>0.9984</td>
             <td></td>
-            <td>0.6240</td>
-            <td>0.1933</td>
-            <td>0.5137</td>
-            <td>0.1963</td>
+            <td>0.2522</td>
+            <td>0.6398</td>
+            <td>0.2457</td>
+            <td>0.5696</td>
             <td></td>
-            <td>0.3818</td>
+            <td>0.4268</td>
           </tr>
           <tr>
-            <td>polar_lanczos_pc4_100</td>
-            <td>4.76E-03</td>
-            <td>38.0367</td>
+            <td>polar_lanczossharp</td>
+            <td>4.84E-03</td>
+            <td>38.3164</td>
             <td>0.9817</td>
-            <td>0.9982</td>
-            <td></td>
-            <td>0.5667</td>
-            <td>0.1966</td>
-            <td>0.4694</td>
-            <td>0.2895</td>
-            <td></td>
-            <td>0.3806</td>
-          </tr>
-          <tr>
-            <td>polar_lanczos_pc4_75</td>
-            <td>4.80E-03</td>
-            <td>38.0387</td>
-            <td>0.9816</td>
-            <td>0.9983</td>
-            <td></td>
-            <td>0.4970</td>
-            <td>0.2003</td>
-            <td>0.4300</td>
-            <td>0.3567</td>
-            <td></td>
-            <td>0.3710</td>
-          </tr>
-          <tr>
-            <td>polar_lanczos_ar_50</td>
-            <td>4.81E-03</td>
-            <td>38.0317</td>
-            <td>0.9816</td>
-            <td>0.9983</td>
-            <td></td>
-            <td>0.4771</td>
-            <td>0.1878</td>
-            <td>0.4312</td>
-            <td>0.3372</td>
-            <td></td>
-            <td>0.3583</td>
-          </tr>
-          <tr>
-            <td>polar_lanczos_ar_100</td>
-            <td>4.73E-03</td>
-            <td>38.0045</td>
-            <td>0.9818</td>
-            <td>0.9981</td>
-            <td></td>
-            <td>0.6297</td>
-            <td>0.1392</td>
-            <td>0.5035</td>
-            <td>0.0000</td>
-            <td></td>
-            <td>0.3181</td>
-          </tr>
-          <tr>
-            <td>polar_lanczos_pc12_100</td>
-            <td>4.85E-03</td>
-            <td>38.0394</td>
-            <td>0.9813</td>
-            <td>0.9983</td>
-            <td></td>
-            <td>0.3817</td>
-            <td>0.2015</td>
-            <td>0.3319</td>
-            <td>0.3539</td>
-            <td></td>
-            <td>0.3173</td>
-          </tr>
-          <tr>
-            <td>polar_lanczos_pc4_50</td>
-            <td>4.87E-03</td>
-            <td>38.0185</td>
-            <td>0.9813</td>
-            <td>0.9983</td>
-            <td></td>
-            <td>0.3487</td>
-            <td>0.1642</td>
-            <td>0.3231</td>
-            <td>0.4145</td>
-            <td></td>
-            <td>0.3126</td>
-          </tr>
-          <tr>
-            <td>polar_lanczos_pc12_75</td>
-            <td>4.88E-03</td>
-            <td>38.0308</td>
-            <td>0.9812</td>
-            <td>0.9983</td>
-            <td></td>
-            <td>0.3322</td>
-            <td>0.1861</td>
-            <td>0.2989</td>
-            <td>0.3935</td>
-            <td></td>
-            <td>0.3027</td>
-          </tr>
-          <tr>
-            <td>polar_lanczos_pc12_50</td>
-            <td>4.93E-03</td>
-            <td>38.0061</td>
-            <td>0.9810</td>
-            <td>0.9983</td>
-            <td></td>
-            <td>0.2309</td>
-            <td>0.1421</td>
-            <td>0.2164</td>
-            <td>0.4286</td>
-            <td></td>
-            <td>0.2545</td>
-          </tr>
-          <tr>
-            <td>polar_lanczos</td>
-            <td>5.04E-03</td>
-            <td>37.9266</td>
-            <td>0.9804</td>
-            <td>0.9983</td>
+            <td>0.9985</td>
             <td></td>
             <td>0.0000</td>
+            <td>0.4352</td>
             <td>0.0000</td>
-            <td>0.0000</td>
-            <td>0.4546</td>
+            <td>0.6469</td>
             <td></td>
-            <td>0.1137</td>
+            <td>0.2705</td>
           </tr>
         </tbody>
       </table>
@@ -1394,12 +1393,12 @@
             <td>0.9945</td>
             <td>0.9994</td>
             <td></td>
-            <td>0.8631</td>
-            <td>0.8774</td>
-            <td>0.9283</td>
-            <td>0.9444</td>
+            <td>0.8532</td>
+            <td>0.8748</td>
+            <td>0.9223</td>
+            <td>0.9429</td>
             <td></td>
-            <td>0.9033</td>
+            <td>0.8983</td>
           </tr>
           <tr>
             <td>lanczos_pc_50</td>
@@ -1408,82 +1407,96 @@
             <td>0.9938</td>
             <td>0.9993</td>
             <td></td>
-            <td>0.7272</td>
-            <td>0.6716</td>
-            <td>0.8200</td>
-            <td>0.8176</td>
+            <td>0.7074</td>
+            <td>0.6644</td>
+            <td>0.8048</td>
+            <td>0.8127</td>
             <td></td>
-            <td>0.7591</td>
+            <td>0.7473</td>
           </tr>
           <tr>
-            <td>polar_lanczos_ar_100</td>
-            <td>3.48E-03</td>
-            <td>39.8136</td>
-            <td>0.9924</td>
-            <td>0.9992</td>
+            <td>polar_lanczossharp_ar_100</td>
+            <td>3.28E-03</td>
+            <td>40.3036</td>
+            <td>0.9930</td>
+            <td>0.9993</td>
             <td></td>
-            <td>0.6681</td>
-            <td>0.6193</td>
-            <td>0.6168</td>
-            <td>0.7199</td>
+            <td>0.7381</td>
+            <td>0.6962</td>
+            <td>0.6898</td>
+            <td>0.7798</td>
             <td></td>
-            <td>0.6560</td>
+            <td>0.7260</td>
           </tr>
           <tr>
-            <td>polar_lanczos_pc_100</td>
-            <td>3.63E-03</td>
-            <td>39.6853</td>
+            <td>polar_lanczossharp_pc_100</td>
+            <td>3.45E-03</td>
+            <td>40.1487</td>
+            <td>0.9927</td>
+            <td>0.9993</td>
+            <td></td>
+            <td>0.6562</td>
+            <td>0.6693</td>
+            <td>0.6369</td>
+            <td>0.7703</td>
+            <td></td>
+            <td>0.6832</td>
+          </tr>
+          <tr>
+            <td>polar_lanczossharp_ar_75</td>
+            <td>3.56E-03</td>
+            <td>39.8009</td>
+            <td>0.9926</td>
+            <td>0.9993</td>
+            <td></td>
+            <td>0.6036</td>
+            <td>0.6087</td>
+            <td>0.6265</td>
+            <td>0.7744</td>
+            <td></td>
+            <td>0.6533</td>
+          </tr>
+          <tr>
+            <td>polar_lanczossharp_pc_75</td>
+            <td>3.82E-03</td>
+            <td>39.5368</td>
             <td>0.9921</td>
             <td>0.9992</td>
             <td></td>
-            <td>0.6014</td>
-            <td>0.5974</td>
-            <td>0.5750</td>
-            <td>0.7178</td>
+            <td>0.4812</td>
+            <td>0.5627</td>
+            <td>0.5379</td>
+            <td>0.6968</td>
             <td></td>
-            <td>0.6229</td>
+            <td>0.5697</td>
           </tr>
           <tr>
-            <td>polar_lanczos_ar_75</td>
-            <td>3.76E-03</td>
-            <td>39.3739</td>
-            <td>0.9920</td>
+            <td>polar_lanczossharp_ar_50</td>
+            <td>3.97E-03</td>
+            <td>38.7195</td>
+            <td>0.9917</td>
             <td>0.9992</td>
             <td></td>
-            <td>0.5451</td>
-            <td>0.5444</td>
-            <td>0.5596</td>
-            <td>0.7189</td>
+            <td>0.4127</td>
+            <td>0.4204</td>
+            <td>0.4776</td>
+            <td>0.6237</td>
             <td></td>
-            <td>0.5920</td>
+            <td>0.4836</td>
           </tr>
           <tr>
-            <td>polar_lanczos_pc_75</td>
-            <td>4.00E-03</td>
-            <td>39.1424</td>
-            <td>0.9914</td>
-            <td>0.9992</td>
-            <td></td>
-            <td>0.4375</td>
-            <td>0.5049</td>
-            <td>0.4839</td>
-            <td>0.6504</td>
-            <td></td>
-            <td>0.5192</td>
-          </tr>
-          <tr>
-            <td>polar_lanczos_ar_50</td>
-            <td>4.15E-03</td>
-            <td>38.4096</td>
-            <td>0.9910</td>
+            <td>polar_lanczossharp_pc_50</td>
+            <td>4.17E-03</td>
+            <td>38.4965</td>
+            <td>0.9911</td>
             <td>0.9991</td>
             <td></td>
-            <td>0.3725</td>
-            <td>0.3801</td>
-            <td>0.4261</td>
-            <td>0.5802</td>
+            <td>0.3134</td>
+            <td>0.3816</td>
+            <td>0.3921</td>
+            <td>0.5300</td>
             <td></td>
-            <td>0.4397</td>
+            <td>0.4043</td>
           </tr>
           <tr>
             <td>lanczos</td>
@@ -1492,33 +1505,19 @@
             <td>0.9917</td>
             <td>0.9990</td>
             <td></td>
-            <td>0.4672</td>
-            <td>0.2631</td>
-            <td>0.5215</td>
-            <td>0.4190</td>
+            <td>0.4286</td>
+            <td>0.2469</td>
+            <td>0.4812</td>
+            <td>0.4032</td>
             <td></td>
-            <td>0.4177</td>
+            <td>0.3900</td>
           </tr>
           <tr>
-            <td>polar_lanczos_pc_50</td>
-            <td>4.35E-03</td>
-            <td>38.2089</td>
-            <td>0.9905</td>
-            <td>0.9991</td>
-            <td></td>
-            <td>0.2840</td>
-            <td>0.3459</td>
-            <td>0.3520</td>
-            <td>0.4952</td>
-            <td></td>
-            <td>0.3693</td>
-          </tr>
-          <tr>
-            <td>polar_lanczos</td>
-            <td>4.99E-03</td>
-            <td>36.1789</td>
-            <td>0.9881</td>
-            <td>0.9987</td>
+            <td>polar_lanczossharp</td>
+            <td>4.83E-03</td>
+            <td>36.3049</td>
+            <td>0.9886</td>
+            <td>0.9988</td>
             <td></td>
             <td>0.0000</td>
             <td>0.0000</td>
@@ -1742,7 +1741,7 @@
         with larger radii will obviously be slower, polar filters are slower than their orthogonal counterparts and AR obviously also makes things slower.
     </p>
     <p>
-        For the shaders, the number are more or less what I expected, but it's nice to see that in the grand scheme of things these shaders don't really slow the playback down that much. Good old polar lanczos with AR is already as slow as most shaders.
+        For the shaders, the number are more or less what I expected, but it's nice to see that in the grand scheme of things these shaders don't really slow the playback down that much. Good old polar lanczossharp with AR is already as slow as most shaders.
     </p>
     <p>
         Still though, the conclusion here seems to be that if you're running mpv on a semi-decent computer, these shaders will never be a problem.
