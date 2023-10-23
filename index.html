@@ -74,12 +74,12 @@
         <div class="container">
             <h2 class="heading">About Me</h2>
             <p>
-                I'm an Electrical Engineer passionate about FPGAs, hardware design, embedded systems, fault-tolerant systems, domain-specific architectures, digital signal/image processing and machine learning.
-                <br><br>I hold a BSEE from the Federal University of Rio Grande do Norte (UFRN) and I'm currently pursuing a MSEE at the State University of Campinas (UNICAMP).
-                <br><br>My BS final project was the implementation of a 5-stage pipeline RV32I RISC-V CPU Core written in VHDL.
-                <br><br>I did my internship at the National Institute for Space Research, working at the ARGOS-II Environmental Data Collector Cubesat payload.
-                <br><br>My previous job was as a contractor at Motorola working on image processing for smartphone cameras.
-                <br><br>I'm currently working as a contractor software engineer at Wind River via Encora.
+                I'm an Electrical Engineer passionate about embeddedsignal processing and machine learning.
+                <br>I hold a BSEE from the Federal University of Rio Grande do Norte (UFRN) and I'm currently pursuing a MSEE at the State University of Campinas (UNICAMP).
+                <br>My BS final project was the implementation of a 5-stage pipeline RV32I RISC-V CPU Core written in VHDL.
+                <br>I did my internship at the National Institute for Space Research, working at the ARGOS-II Environmental Data Collector Cubesat payload.
+                <br>My previous job was as a contractor at Motorola working on image processing for smartphone cameras.
+                <br>I'm currently working as a contractor software engineer at Wind River via Encora.
             </p>
         </div>
     </div>
@@ -148,7 +148,7 @@
             <span class="education-date">Ongoing</span>
             <h4>Master of Science in Electrical and Computer Engineering</h4>
             <p>
-                I'm currently studying super-resolution CNNs and ML optimisation techniques for fast inference.
+                I'm currently studying super-resolution CNNs and ML optimisation techniques for fast inference on integrated GPUs.
             </p><br>
             <p>
                 My grad level classes included internet of things, digital signal processing and machine learning.
@@ -181,6 +181,72 @@
         <h2 class="heading">Projects</h2>
         <div class="container">
             <div class="row">
+
+                <div class="project shadow-large">
+                    <div class="project-image">
+                        <img src="images/chroma_from_luma.gif" height=300px width=300px />
+                    </div>
+                    <!-- End .project-image -->
+                    <div class="project-info">
+                        <h3>Chroma From Luma Prediction</h3>
+                        <p>
+                            CfL is a GLSL shader that implements chroma upscaling based on the closed least squares solution for linear regression, inspired by the adoption of the same technique in modern video codecs. 
+                            Since a simple linear regression obviously doesn't take into account pixel distance, the prediction is mixed with the output of a normal resampling filter based on how high the 
+                            correlation between luma and chroma is.
+                        </p>
+                        <a href="https://github.com/Artoriuz/glsl-chroma-from-luma-prediction">View Project</a>
+                    </div>
+                    <!-- End .project-info -->
+                </div>
+                <!-- End .project -->
+
+                <div class="project shadow-large">
+                    <div class="project-image">
+                        <img src="images/jointbilateral.png" height=300px width=300px />
+                    </div>
+                    <!-- End .project-image -->
+                    <div class="project-info">
+                        <h3>Joint Bilateral</h3>
+                        <p>
+                            Joint Bilateral is a simple implementation of joint bilateral chroma upsampling in GLSL. It uses the luma plane as a guide to achieve sharper edges without introducing any ringing.
+                        </p>
+                        <a href="https://github.com/Artoriuz/glsl-joint-bilateral">View Project</a>
+                    </div>
+                    <!-- End .project-info -->
+                </div>
+                <!-- End .project -->
+
+                <div class="project shadow-large">
+                    <div class="project-image">
+                        <img src="images/pixelclipper.png" height=300px width=300px />
+                    </div>
+                    <!-- End .project-image -->
+                    <div class="project-info">
+                        <h3>Pixel Clipper</h3>
+                        <p>
+                            Pixel Clipper is a GLSL shader for anti-ringing. It limits pixel magnitude after resampling to avoid avershooting and haloing. 
+                        </p>
+                        <a href="https://github.com/Artoriuz/glsl-pixel-clipper">View Project</a>
+                    </div>
+                    <!-- End .project-info -->
+                </div>
+                <!-- End .project -->
+
+                <div class="project shadow-large">
+                    <div class="project-image">
+                        <img src="images/osee.png" height=300px width=300px />
+                    </div>
+                    <!-- End .project-image -->
+                    <div class="project-info">
+                        <h3>OSEE</h3>
+                        <p>
+                            OSEE consists of a series of online courses and textbook recommendations that together cover most of the basic Electrical Engineering knowledge, similarly to a bachelor's degree.
+                        </p>
+                        <a href="https://github.com/Artoriuz/OSEE">View Project</a>
+                    </div>
+                    <!-- End .project-info -->
+                </div>
+                <!-- End .project -->
 
                 <div class="project shadow-large">
                     <div class="project-image">
@@ -309,21 +375,17 @@
     <div id="skills">
         <h2 class="heading">Skills</h2>
         <ul>
-            <li>VHDL</li>
-            <li>SystemVerilog</li>
-            <li>FPGA</li>
-            <li>RISC-V</li>
-            <li>ARM/Thumb</li>
-            <li>PIC</li>
-            <li>Microcontrollers</li>
             <li>C</li>
             <li>C++</li>
             <li>Python</li>
+            <li>VHDL</li>
+            <li>FPGA</li>
+            <li>RISC-V</li>
             <li>Keras/Tensorflow</li>
+            <li>Numpy/Scipy</li>
             <li>OpenCV</li>
             <li>Matlab</li>
             <li>Linux</li>
-            <li>FreeBSD</li>
             <li>FreeRTOS</li>
             <li>Internet of Things</li>
             <li>Computer Architecture</li>
