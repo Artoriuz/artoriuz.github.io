@@ -1059,14 +1059,11 @@
     </p>
     <p>
         AR is only really necessary when you're using sharp filters, it makes no sense alongside blurry filters because blurry filters don't ring hard enough for it to be noticeable. There are a few sharp memes that are worth trying with AR though if you feel adventurous, 
-        but enerally speaking I think orthogonal lanczos and polar lanczossharp are pretty well balanced.
+        but enerally speaking I think polar lanczossharp are pretty well balanced (a bit blurry even).
     </p>
     <p>
-        It's also worth mentioning that mpv uses different AR techniques for orthogonal and polar filters, but I'll name them both "_ar" for simplicity.
-    </p>
-    <p>
-        I'm including <a href="https://github.com/Artoriuz/glsl-pixel-clipper">my AR shaders</a> in this comparison because I think they're very good at keeping everything but the overshoots intact, which does create some weird artifacts with sharp transitions sometimes, 
-        specially if you use them at ludicrous scaling factors, but the output is generally clean enough on real content.
+        I'm including <a href="https://github.com/Artoriuz/glsl-pixel-clipper">my AR shader</a> in this comparison because I think it's better at keeping everything but the overshoots intact, which does create some weird artifacts with sharp transitions sometimes, 
+        specially if you use it at ludicrous scaling factors, but the output is generally good enough on real content.
     </p>
     <h3 id="antiring_results">Antiring Results</h3>
     <p>
