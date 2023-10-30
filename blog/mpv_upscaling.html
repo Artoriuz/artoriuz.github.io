@@ -38,12 +38,12 @@
     <section>
         <h3 id="introduction">Introduction</h3>
         <p>
-            This page is meant to be treated as a follow-up to this scaler comparison done with <a href="https://artoriuz.github.io/blog/imagemagick_resampling.html">ImageMagick</a>. I'm only going to talk about niche topics here, 
+            This page is meant to be treated as a follow-up to this scaler comparison done with <a href="https://artoriuz.github.io/blog/imagemagick_resampling.html">ImageMagick</a>. I'm only going to talk about niche topics here,
             so just refer to that other page if you only want to read about scalers.
         </p>
         <h3 id="upsampling_shaders">Upsampling Shaders</h3>
         <p>
-            The mpv community has written several <s>meme</s> shaders you can use to upsample video in real time, and the rationale is that they can potentially achieve higher quality than the built-in methods. I still do not have a good way of 
+            The mpv community has written several <s>meme</s> shaders you can use to upsample video in real time, and the rationale is that they can potentially achieve higher quality than the built-in methods. I still do not have a good way of
             automating mpv tests and therefore I'll have to stick to a single test image, which is still going to be violet.png just because I'm familiarised with it. If this is your first time reading these posts, this is what violet.png looks like:
         </p>
         <p>
@@ -62,12 +62,12 @@
               <li><a href="https://github.com/bloc97/Anime4K">Anime4K</a></li>
               <li><a href="https://gist.github.com/agyild/82219c545228d70c5604f865ce0b0ce5">FSR</a></li>
             </ol>
-            I've also added orthogonal and polar lanczossharp to the mix just to have a reference point, but feel free to send me any other shaders you would like to get scored. 
+            I've also added orthogonal and polar lanczossharp to the mix just to have a reference point, but feel free to send me any other shaders you would like to get scored.
             For Anime4K I'm using the <a href="https://github.com/bloc97/Anime4K/blob/815b122284304e6e1e244a8cf6a160eeaa07040c/GLSL_Instructions.md">"C" mode</a> which is defined as <inline_code>Upscale_Denoise -> Upscale</inline_code>.
         </p>
         <p>
             The test image is downsampled with:
-        </p>                    
+        </p>
         <code>magick convert violet.png -colorspace rgb -filter box -resize 50% -colorspace srgb downscaled.png</code>
         <p>
             It is then converted to grayscale with:
@@ -443,12 +443,12 @@
         </p>
     <h3 id="upsampling_commentary">Upsampling Commentary</h3>
     <p>
-        The funniest thing about these results is that, according to distortion metrics, Anime4K is actually worse at "recreating the ground truth" than simple resampling filters. 
-        The problem seems to be that the shader is too sharp, it does not only ring but also makes the lines thinner. This isn't necessarily bad depending on how blurry your source is, but my test image here isn't 
+        The funniest thing about these results is that, according to distortion metrics, Anime4K is actually worse at "recreating the ground truth" than simple resampling filters.
+        The problem seems to be that the shader is too sharp, it does not only ring but also makes the lines thinner. This isn't necessarily bad depending on how blurry your source is, but my test image here isn't
         blurry at all.
     </p>
     <p>
-        The slower variant of FSRCNNX has also scored worse than its smaller sibling, presumably for the same reason. I don't think igv trained these networks with images that had been downsampled in linear light, so that's probably part 
+        The slower variant of FSRCNNX has also scored worse than its smaller sibling, presumably for the same reason. I don't think igv trained these networks with images that had been downsampled in linear light, so that's probably part
         of the problem.
     </p>
     <p>
@@ -461,17 +461,17 @@
         It's nice to see that bjin came back from the dead with gold. The new ravu variants perform much better than their previous incarnations and they're also free of the half-pixel shift problem.
     </p>
     <p>
-        Ravu-lite-ar-r4 is the best luma-doubler according to the metrics, and it's probably a safe choice if you're looking for a doubler. If you're not only doubling though, ravu-zoom-ar-r3 might be a better option. You can 
+        Ravu-lite-ar-r4 is the best luma-doubler according to the metrics, and it's probably a safe choice if you're looking for a doubler. If you're not only doubling though, ravu-zoom-ar-r3 might be a better option. You can
         also edit their trigger conditions or use auto-profiles.lua to switch between them as needed.
     </p>
     <h3 id="fractional_upsampling">Fractional Upsampling</h3>
     <p>
-        While doing these tests at 2x makes sense since we can use a box filter to downsample, most people aren't always doubling their content. Scaling "performance" at lower scaling factors, such as 1.5x or 1.33x, are usually more interesting 
+        While doing these tests at 2x makes sense since we can use a box filter to downsample, most people aren't always doubling their content. Scaling "performance" at lower scaling factors, such as 1.5x or 1.33x, are usually more interesting
         because this corresponds to 720p->1080p and 1080p->1440p, respectively. This section is supposed to better represent a real world scenario when you don't have a 4K display or don't watch comically low-resolution content.
     </p>
     <h3 id="fractional_upsampling_methodology">Fractional Upsampling Methodology</h3>
     <p>
-        Unfortunately, some of my choices here are only explained in the following sections. You'll have to bear with me and trust this makes (some) sense, as the alternative would be placing the fractional upsampling section at the end of the page 
+        Unfortunately, some of my choices here are only explained in the following sections. You'll have to bear with me and trust this makes (some) sense, as the alternative would be placing the fractional upsampling section at the end of the page
         instead of here, its most logical position.
     </p>
     <p>
@@ -774,18 +774,18 @@
         The numbers are all closer together at 1.5x, which shows that your choice of scaler becomes less relevant as you decrease the scaling factor.
     </p>
     <p>
-        The RAVU variants without AR seem to reliably score higher than the ones with AR, which is a bit interesting. There are 2 things at play here: 
+        The RAVU variants without AR seem to reliably score higher than the ones with AR, which is a bit interesting. There are 2 things at play here:
         <ul>
           <li>The lower scaling factor naturally makes the shaders overshoot less.</li>
           <li>Hermite is a bit blurrier than box, which also makes the shaders overshoot less.</li>
         </ul>
     </p>
     <p>
-        It's a bit funny to see FSR get worse here, since a lower scaling factor corresponds to a higher quality preset in AMD's terms, but I think the problem is just that the shader is too sharp. 
+        It's a bit funny to see FSR get worse here, since a lower scaling factor corresponds to a higher quality preset in AMD's terms, but I think the problem is just that the shader is too sharp.
         EASU is on top of it again but it's lower than lanczos this time. If you're going to use EASU maybe configure it to only fire up at 2x or higher.
     </p>
     <p>
-        It's pretty easy to see that the slightly blurry downsampling step is severely hurting the doublers. This section previously used Catrom + Pixel Clipper to downsample, but honestly that was a bit overkill. Using mpv's default 
+        It's pretty easy to see that the slightly blurry downsampling step is severely hurting the doublers. This section previously used Catrom + Pixel Clipper to downsample, but honestly that was a bit overkill. Using mpv's default
         downsampling filter makes more sense as that's what most users are probably using.
     </p>
     <p>
@@ -797,11 +797,11 @@
         You can read more about it <a href="https://en.wikipedia.org/wiki/Kriging">here</a>.
     </p>
     <p>
-        There's a different technique, usually called Joint Bilateral, that simply uses luma as an extra weighting factor. In short, chromatic information from pixels with similar luminosities is preferred. <a href="">I've written a shader that 
+        There's a different technique, usually called Joint Bilateral, that simply uses luma as an extra weighting factor. In short, chromatic information from pixels with similar luminosities is preferred. <a href="">I've written a shader that
         implements this idea</a> mostly to learn GLSL, but it ended up being quite useful as it's much faster than KrigBilateral while still keeping a nice lead over classic methods sometimes (depends on content).
     </p>
     <p>
-        I've actually also written <a href="https://github.com/Artoriuz/glsl-chroma-from-luma-prediction">another meme shader</a> for this, basically taking inspiration from <a href="https://arxiv.org/abs/1711.03951">this paper</a>. In short, Chroma from 
+        I've actually also written <a href="https://github.com/Artoriuz/glsl-chroma-from-luma-prediction">another meme shader</a> for this, basically taking inspiration from <a href="https://arxiv.org/abs/1711.03951">this paper</a>. In short, Chroma from
         Luma prediction is a technique that applies linear regression to map missing chromaticities based on the known luminosities. There are many tricks involved to make the shader look good though.
     </p>
     <p>
@@ -809,7 +809,7 @@
     </p>
     <h3 id="chroma_methodology">Chroma Methodology</h3>
     <p>
-        This test is a little different and it requires a slightly more elaborate process. The first problem with this is that, with real video content, we rarely get a 4:4:4 copy. 
+        This test is a little different and it requires a slightly more elaborate process. The first problem with this is that, with real video content, we rarely get a 4:4:4 copy.
         This means that we generally don't have a reference point to work with, so we have to create one on our own.
     </p>
     <p>
@@ -854,46 +854,46 @@
           <td>Mean</td>
         </tr>
         <tr>
-          <td>cfl</td>
+          <td>cfl_12+4</td>
           <td>1.09E-03</td>
-          <td>49.0232</td>
+          <td>49.0290</td>
           <td>0.9967</td>
           <td>0.9997</td>
           <td></td>
           <td>1.0000</td>
           <td>1.0000</td>
           <td>1.0000</td>
-          <td>0.9990</td>
+          <td>0.9992</td>
           <td></td>
-          <td>0.9997</td>
+          <td>0.9998</td>
         </tr>
         <tr>
-          <td>cfl12</td>
+          <td>cfl_12</td>
           <td>1.10E-03</td>
-          <td>48.9884</td>
-          <td>0.9966</td>
+          <td>48.9941</td>
+          <td>0.9967</td>
           <td>0.9997</td>
           <td></td>
-          <td>0.9835</td>
+          <td>0.9841</td>
           <td>0.9893</td>
-          <td>0.9928</td>
+          <td>0.9932</td>
           <td>1.0000</td>
           <td></td>
-          <td>0.9914</td>
+          <td>0.9917</td>
         </tr>
         <tr>
-          <td>cfl4</td>
+          <td>cfl_4</td>
           <td>1.11E-03</td>
-          <td>48.8548</td>
+          <td>48.8586</td>
           <td>0.9966</td>
           <td>0.9997</td>
           <td></td>
-          <td>0.9494</td>
-          <td>0.9482</td>
-          <td>0.9544</td>
-          <td>0.9544</td>
+          <td>0.9463</td>
+          <td>0.9476</td>
+          <td>0.9520</td>
+          <td>0.9533</td>
           <td></td>
-          <td>0.9516</td>
+          <td>0.9498</td>
         </tr>
         <tr>
           <td>memebilateral</td>
@@ -902,26 +902,26 @@
           <td>0.9963</td>
           <td>0.9997</td>
           <td></td>
-          <td>0.9223</td>
-          <td>0.9412</td>
-          <td>0.8518</td>
-          <td>0.9192</td>
+          <td>0.9113</td>
+          <td>0.9395</td>
+          <td>0.8456</td>
+          <td>0.9121</td>
           <td></td>
-          <td>0.9086</td>
+          <td>0.9021</td>
         </tr>
         <tr>
           <td>krigbilateral</td>
-          <td>1.14E-03</td>
-          <td>48.4137</td>
-          <td>0.9962</td>
+          <td>1.13E-03</td>
+          <td>48.4081</td>
+          <td>0.9964</td>
           <td>0.9997</td>
           <td></td>
-          <td>0.8452</td>
-          <td>0.8123</td>
-          <td>0.8044</td>
+          <td>0.8623</td>
+          <td>0.8091</td>
+          <td>0.8822</td>
           <td>0.7952</td>
           <td></td>
-          <td>0.8143</td>
+          <td>0.8372</td>
         </tr>
         <tr>
           <td>ravu-zoom-r3-chroma</td>
@@ -930,12 +930,12 @@
           <td>0.9959</td>
           <td>0.9997</td>
           <td></td>
-          <td>0.6938</td>
-          <td>0.6016</td>
-          <td>0.6744</td>
-          <td>0.7978</td>
+          <td>0.6855</td>
+          <td>0.6005</td>
+          <td>0.6694</td>
+          <td>0.7916</td>
           <td></td>
-          <td>0.6919</td>
+          <td>0.6868</td>
         </tr>
         <tr>
           <td>ravu-zoom-r2-chroma</td>
@@ -944,12 +944,12 @@
           <td>0.9959</td>
           <td>0.9997</td>
           <td></td>
-          <td>0.6348</td>
-          <td>0.5699</td>
-          <td>0.6531</td>
-          <td>0.7878</td>
+          <td>0.6273</td>
+          <td>0.5689</td>
+          <td>0.6484</td>
+          <td>0.7817</td>
           <td></td>
-          <td>0.6614</td>
+          <td>0.6565</td>
         </tr>
         <tr>
           <td>lanczos</td>
@@ -958,12 +958,12 @@
           <td>0.9955</td>
           <td>0.9996</td>
           <td></td>
-          <td>0.5546</td>
-          <td>0.4097</td>
-          <td>0.4954</td>
-          <td>0.6124</td>
+          <td>0.5480</td>
+          <td>0.4090</td>
+          <td>0.4918</td>
+          <td>0.6077</td>
           <td></td>
-          <td>0.5180</td>
+          <td>0.5141</td>
         </tr>
         <tr>
           <td>polar_lanczossharp</td>
@@ -972,12 +972,12 @@
           <td>0.9954</td>
           <td>0.9996</td>
           <td></td>
-          <td>0.5460</td>
-          <td>0.3652</td>
-          <td>0.4353</td>
-          <td>0.5369</td>
+          <td>0.5395</td>
+          <td>0.3645</td>
+          <td>0.4321</td>
+          <td>0.5327</td>
           <td></td>
-          <td>0.4708</td>
+          <td>0.4672</td>
         </tr>
         <tr>
           <td>fastbilateral</td>
@@ -986,12 +986,12 @@
           <td>0.9954</td>
           <td>0.9996</td>
           <td></td>
-          <td>0.4205</td>
-          <td>0.3088</td>
-          <td>0.4286</td>
-          <td>0.3721</td>
+          <td>0.4155</td>
+          <td>0.3082</td>
+          <td>0.4255</td>
+          <td>0.3692</td>
           <td></td>
-          <td>0.3825</td>
+          <td>0.3796</td>
         </tr>
         <tr>
           <td>jointbilateral</td>
@@ -1000,12 +1000,12 @@
           <td>0.9954</td>
           <td>0.9996</td>
           <td></td>
-          <td>0.3729</td>
-          <td>0.3469</td>
-          <td>0.4104</td>
-          <td>0.3274</td>
+          <td>0.3685</td>
+          <td>0.3463</td>
+          <td>0.4074</td>
+          <td>0.3249</td>
           <td></td>
-          <td>0.3644</td>
+          <td>0.3618</td>
         </tr>
         <tr>
           <td>bilinear</td>
@@ -1025,11 +1025,11 @@
     </table>
     <h3 id="chroma_commentary">Chroma Commentary</h3>
     <p>
-        In the 2x upscaling section we saw the the PSNR difference between lanczos and the highest scoring shader was of ~3 dB, but this number is only half as big now. 
+        In the 2x upscaling section we saw the the PSNR difference between lanczos and the highest scoring shader was of ~3 dB, but this number is only half as big now.
         Chroma shaders probably shouldn't be entirely dismissed but it's important to keep in mind the quality improvement they bring is relatively small.
-    </p> 
+    </p>
     <p>
-        With that said, if you really want to use a chroma shader you should probably stick to KrigBilateral or CfL Prediction. krigBilateral is an older and more tested shader, so you know what to expect. 
+        With that said, if you really want to use a chroma shader you should probably stick to KrigBilateral or CfL Prediction. krigBilateral is an older and more tested shader, so you know what to expect.
         CfL looks sharper and produces better numbers, but it's new and experimental so there might be some issues to iron out.
     </p>
     <h3 id="antiring">Antiring</h3>
@@ -1037,7 +1037,7 @@
         Antiringing solutions is a topic that I hadn't covered in the previous iteration of this page, but now that we have more than a single option we can also compare them.
     </p>
     <p>
-        In short, antiringing filters attempt to remove overshoots generated by sharp resampling filters when they meet a sharp intensity delta. 
+        In short, antiringing filters attempt to remove overshoots generated by sharp resampling filters when they meet a sharp intensity delta.
         What is commonly referred to as ringing is simply consequential to the filter's impulse response.
     </p>
     <p>
@@ -1047,22 +1047,22 @@
         <img src="./images/mpv_upscaling/antiring/ar_comparison.png" alt="ar_comparison" class="center" width="900" height="300">
     </p>
     <p>
-        The negative weights in the filter are there for it to be able to quickly respond to high-frequency transitions, but it makes the filter overshoot a little bit before reaching its final destination. The "intensity" of the ringing is 
-        directly related to the magnitude of the secondary lobes. The second lobe, which is almost always negative, is responsible for the overshooting in can see in this example, but filters with more lobes ring once per lobe, and the ringing can 
-        be "positive" as well (within the range set by the original pixels) with positive lobes. The "length" of the rings is directly related to the length of the lobes, which is why filters like polar lanczos have "longer" rings (the zero crossings 
+        The negative weights in the filter are there for it to be able to quickly respond to high-frequency transitions, but it makes the filter overshoot a little bit before reaching its final destination. The "intensity" of the ringing is
+        directly related to the magnitude of the secondary lobes. The second lobe, which is almost always negative, is responsible for the overshooting in can see in this example, but filters with more lobes ring once per lobe, and the ringing can
+        be "positive" as well (within the range set by the original pixels) with positive lobes. The "length" of the rings is directly related to the length of the lobes, which is why filters like polar lanczos have "longer" rings (the zero crossings
         don't fall exactly at the integers, but rather slightly after them).
     </p>
     <h3 id="antiring_methodology">Antiring Methodology</h3>
     <p>
-        The methodology here almost is equal to the one used for upsampling, with the only difference being that we have to include <inline_code>--scale-antiring</inline_code> to use mpv's (or libplacebo's) native AR solution. We also don't have to convert to grayscale 
+        The methodology here almost is equal to the one used for upsampling, with the only difference being that we have to include <inline_code>--scale-antiring</inline_code> to use mpv's (or libplacebo's) native AR solution. We also don't have to convert to grayscale
         this time since the shaders support RGB images just fine.
     </p>
     <p>
-        AR is only really necessary when you're using sharp filters, it makes no sense alongside blurry filters because blurry filters don't ring hard enough for it to be noticeable. There are a few sharp memes that are worth trying with AR though if you feel adventurous, 
+        AR is only really necessary when you're using sharp filters, it makes no sense alongside blurry filters because blurry filters don't ring hard enough for it to be noticeable. There are a few sharp memes that are worth trying with AR though if you feel adventurous,
         but enerally speaking I think polar lanczossharp are pretty well balanced (a bit blurry even).
     </p>
     <p>
-        I'm including <a href="https://github.com/Artoriuz/glsl-pixel-clipper">my AR shader</a> in this comparison because I think it's better at keeping everything but the overshoots intact, which does create some weird artifacts with sharp transitions sometimes, 
+        I'm including <a href="https://github.com/Artoriuz/glsl-pixel-clipper">my AR shader</a> in this comparison because I think it's better at keeping everything but the overshoots intact, which does create some weird artifacts with sharp transitions sometimes,
         specially if you use it at ludicrous scaling factors, but the output is generally good enough on real content.
     </p>
     <h3 id="antiring_results">Antiring Results</h3>
@@ -1662,43 +1662,43 @@
     </p>
     <h3 id="antiring_commentary">Antiring Commentary</h3>
     <p>
-        Previously, this section talked about the different strengths and weaknesses of Pixel Clipper and libplacebo's AR, but that's not really neccessary anymore. 
-        Libplacebo's AR has been <a href="https://code.videolan.org/videolan/libplacebo/-/commit/7fb12078b8f0e212f1cc3f5631fb891b3a08ca1c">recently updated</a> and it looks great now. It's actually shocking 
+        Previously, this section talked about the different strengths and weaknesses of Pixel Clipper and libplacebo's AR, but that's not really neccessary anymore.
+        Libplacebo's AR has been <a href="https://code.videolan.org/videolan/libplacebo/-/commit/7fb12078b8f0e212f1cc3f5631fb891b3a08ca1c">recently updated</a> and it looks great now. It's actually shocking
         how similar the solutions look at 2x considering how different the mechanisms are.
     </p>
     <p>
         The only caveat is that libplacebo's AR is still a bit blurrier at similar strengths, so keep that in mind.
     </p>
     <p>
-        As you can see in the table above, the sweetspot for libplacebo's AR seems to be around 0.6 taking all the metrics into account. I could end the commentary here but if you pay attention you can also 
+        As you can see in the table above, the sweetspot for libplacebo's AR seems to be around 0.6 taking all the metrics into account. I could end the commentary here but if you pay attention you can also
         see that 0.6 isn't at the top of any of the individual metrics, but it does score above average on all of them. This is actually pretty interesting as these metrics tell us different things:
     </p>
     <p>
-        If we choose to focus on MAE, the sweetspot seems to be around 0.85. MAE is very good at telling us what is numerically closer to the reference without biasing this towards any specific type of 
+        If we choose to focus on MAE, the sweetspot seems to be around 0.85. MAE is very good at telling us what is numerically closer to the reference without biasing this towards any specific type of
         artifacts (regardless of how humans perceive them).
     </p>
     <p>
-        If you only want to know how bad the worst pixels are you can focus on PSNR instead, and in this case Pixel Clipper seems to be much better than libplacebo's AR (presumably because the latter is smoother). 
+        If you only want to know how bad the worst pixels are you can focus on PSNR instead, and in this case Pixel Clipper seems to be much better than libplacebo's AR (presumably because the latter is smoother).
         The sweetspot seems to be around 0.8 here for PC, and 0.5 for libplacebo's AR.
     </p>
     <p>
-        SSIM is good at telling us about sharpness and the whole structural profile of the picture, it doesn't care too much about brightness or contrast variations but it'll heavily punish blurriness or sharp transitions 
+        SSIM is good at telling us about sharpness and the whole structural profile of the picture, it doesn't care too much about brightness or contrast variations but it'll heavily punish blurriness or sharp transitions
         that shouldn't exist. We can see that Libplacebo's AR is better than PC here (again because it's smoother), with 0.75 strength at the top.
     </p>
     <p>
-        MS-SSIM is just SSIM at different scales to emulate a viewer looking at the picture from different distances. This metric tends to correlate better to the human perception of quality than the other 3, 
-        and if you're not pixel peeping to catch the ringing this is probably a better representation of reality. For this metric, the picture with no AR at all is the top scorer. FIR filters need to overshoot a little 
-        bit to reach some intensity levels and in this case (since polar lanczossharp isn't that sharp to begin with), the ringing doesn't seem to be a big enough problem for it to hurt the score. 
+        MS-SSIM is just SSIM at different scales to emulate a viewer looking at the picture from different distances. This metric tends to correlate better to the human perception of quality than the other 3,
+        and if you're not pixel peeping to catch the ringing this is probably a better representation of reality. For this metric, the picture with no AR at all is the top scorer. FIR filters need to overshoot a little
+        bit to reach some intensity levels and in this case (since polar lanczossharp isn't that sharp to begin with), the ringing doesn't seem to be a big enough problem for it to hurt the score.
         This isn't true for all filters and it might not be true for all scaling factors either, but for polar lanczossharp at 2x you could easily make an argument that AR is probably unnecessary.
     </p>
     <p>
-        To conclude, my opinion is that you can probably skip AR unless you're using a very sharp filter. If you want to use AR though, the ideal strength will depend on the choice of filter, scaling factor and content type, but 
+        To conclude, my opinion is that you can probably skip AR unless you're using a very sharp filter. If you want to use AR though, the ideal strength will depend on the choice of filter, scaling factor and content type, but
         something around 0.6 should be pretty safe (if you want to use PC for the higher PSNR you should probably use it at higher strengths like 0.8).
     </p>
     <h3 id="downsampling_antiring">Downsampling Antiring</h3>
     <p>
-        Pixel Clipper actually has a downsampling variant as well, which I believe is probably less broken than mpv's native <inline_code>--dscale-antiring</inline_code> solution for orthogonal filters. 
-        Libplacebo's new polar AR has been recently enabled for downsampling as well, so we can also test that here. I'm skipping doing these tests at different strengths though, as throwing away unwanted information should be 
+        Pixel Clipper actually has a downsampling variant as well, which I believe is probably less broken than mpv's native <inline_code>--dscale-antiring</inline_code> solution for orthogonal filters.
+        Libplacebo's new polar AR has been recently enabled for downsampling as well, so we can also test that here. I'm skipping doing these tests at different strengths though, as throwing away unwanted information should be
         easier when downsampling.
     </p>
     <p>
@@ -1707,7 +1707,7 @@
     <img src="./images/mpv_upscaling/downsampling/highres.png" alt="yurucamp" class="center" width="960" height="540">
     <h3 id="downsampling_antiring_methodology">Downsampling Antiring Methodology</h3>
     <p>
-        My current method to evaluate downsampling filters is to concede that at 0.5x linear light box is as good as it gets, since in this case we're just averaging 4 pixels together. 
+        My current method to evaluate downsampling filters is to concede that at 0.5x linear light box is as good as it gets, since in this case we're just averaging 4 pixels together.
         We can't use box itself for other scaling factors though, so the aim is to find a filter that produces a similar result but is also usable at any other arbitrary scaling factor.
     </p>
     <p>
@@ -1902,11 +1902,11 @@
         The first thing we can see is that AR seems to be a net-positive in general, and the score differences we see here are much larger than their upsampling counterparts.
     </p>
     <p>
-        It's also good to see that libplacebo's AR seems to work even better when downsampling, as it can remove ringing without introducing any significant blur. This consolidates that there's little reason to use Pixel Clipper over 
-        Libplacebo's native AR if you're using polar filters. 
+        It's also good to see that libplacebo's AR seems to work even better when downsampling, as it can remove ringing without introducing any significant blur. This consolidates that there's little reason to use Pixel Clipper over
+        Libplacebo's native AR if you're using polar filters.
     </p>
     <p>
-        It's also worth mentioning that downsampling AR only makes sense when you're using a sharp filter. Blurry filters such as mitchell do not benefit nearly as much from this (since there's almost no ringing to remove), and the remark that some 
+        It's also worth mentioning that downsampling AR only makes sense when you're using a sharp filter. Blurry filters such as mitchell do not benefit nearly as much from this (since there's almost no ringing to remove), and the remark that some
         mild ringing can be perceived as a positive thing by the human eye is also valid here. Personally I'd say you probably need some AR for anything sharper than catrom, but catrom itself is still perfectly usable without AR.
     </p>
     <h3 id="performance">Performance Benchmarks</h3>
@@ -1914,7 +1914,7 @@
         Benchmarking mpv performance is a bit tricky due to a few things:
         <ol>
             <li>
-                Due to the relatively cheap load, it's difficult to predict at which power state the GPU will stay at while we benchmark. To virtually increase the load, in an attempt to level the ground, 
+                Due to the relatively cheap load, it's difficult to predict at which power state the GPU will stay at while we benchmark. To virtually increase the load, in an attempt to level the ground,
                 we can cheese mpv into outputting frames as quickly as possible, but that's not necessarily representative of a real-world scenario.
             </li>
             <li>
@@ -2105,7 +2105,7 @@
     </table>
     </p>
     <p>
-        Please keep in mind that the choice of built-in filter doesn't matter that much as the weights get stored in a LUT, so something like lanczos and spline36 have virtually identical performance. In short, filters 
+        Please keep in mind that the choice of built-in filter doesn't matter that much as the weights get stored in a LUT, so something like lanczos and spline36 have virtually identical performance. In short, filters
         with larger radii will obviously be slower, polar filters are slower than their orthogonal counterparts and AR obviously also makes things slower.
     </p>
     <p>
@@ -2113,13 +2113,13 @@
     </p>
     <p>
         Still though, the conclusion here seems to be that if you're running mpv on a semi-decent computer, these shaders will never be a problem.
-        Please note that you can make it go even faster with hardware decoding, but <inline_code>--d3d11-sync-interval=0</inline_code> doesn't seem to work in fullscreen, so it is what it is. 
+        Please note that you can make it go even faster with hardware decoding, but <inline_code>--d3d11-sync-interval=0</inline_code> doesn't seem to work in fullscreen, so it is what it is.
         Until AMD fixes Vulkan hwdec in their drivers this is probably the best I can provide.
     </p>
     <h3 id="outro">Outro</h3>
     <p>
-        I want to make it clear though that you shouldn't take the results as gospel. Mathematical image quality metrics do not always correlate perfectly with how humans perceive image quality, 
-        and your personal preference is entirely subjective. You should take this page as what it is, a research that produces numbers, but you should not take these numbers for granted before 
+        I want to make it clear though that you shouldn't take the results as gospel. Mathematical image quality metrics do not always correlate perfectly with how humans perceive image quality,
+        and your personal preference is entirely subjective. You should take this page as what it is, a research that produces numbers, but you should not take these numbers for granted before
         understanding what they actually mean.
     </p>
 </section>
