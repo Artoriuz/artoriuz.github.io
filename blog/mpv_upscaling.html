@@ -1670,11 +1670,11 @@
         The only caveat is that libplacebo's AR is still a bit blurrier at similar strengths, so keep that in mind.
     </p>
     <p>
-        As you can see in the table above the sweetspot for libplacebo's AR seems to be around 0.6. If you pay attention, you can also see that 0.6 doesn't top any of the individual metrics, 
-        but it does score above average on all of them. This is actually pretty interesting as these metrics tell us different things.
+        As you can see in the table above, the sweetspot for libplacebo's AR seems to be around 0.6 taking all the metrics into account. I could end the commentary here but if you pay attention you can also 
+        see that 0.6 isn't at the top of any of the individual metrics, but it does score above average on all of them. This is actually pretty interesting as these metrics tell us different things:
     </p>
     <p>
-        If we choose to focus on MAE, ignoring all other metrics, the sweetspot seems to be around 0.85. MAE is very good at telling us what is numerically closer to the reference without biasing this towards any specific type of 
+        If we choose to focus on MAE, the sweetspot seems to be around 0.85. MAE is very good at telling us what is numerically closer to the reference without biasing this towards any specific type of 
         artifacts (regardless of how humans perceive them).
     </p>
     <p>
@@ -1686,10 +1686,10 @@
         that shouldn't exist. We can see that Libplacebo's AR is better than PC here (again because it's smoother), with 0.75 strength at the top.
     </p>
     <p>
-        MS-SSIM is just SSIM at different scales to emulate a viewing looking at the picture from different distances. This metric tend to correlate better to the human perception of quality than the other 3, and if you're not pixel peeping to 
-        catch the ringing this is probably what you should pay attention to. In this case, the picture with no AR at all is the top scorer. FIR filters need to overshoot a little bit to reach some intensity levels and in this case (since polar 
-        lanczossharp isn't that sharp to begin with), the ringing doesn't seem to be a big enough problem for it to hurt the scores. This isn't true for all filters and it might not be true for all scaling factors either, but for polar lanczossharp 
-        at 2x you could easily make an argument that AR is mostly unnecessary.
+        MS-SSIM is just SSIM at different scales to emulate a viewer looking at the picture from different distances. This metric tends to correlate better to the human perception of quality than the other 3, 
+        and if you're not pixel peeping to catch the ringing this is probably a better representation of reality. For this metric, the picture with no AR at all is the top scorer. FIR filters need to overshoot a little 
+        bit to reach some intensity levels and in this case (since polar lanczossharp isn't that sharp to begin with), the ringing doesn't seem to be a big enough problem for it to hurt the score. 
+        This isn't true for all filters and it might not be true for all scaling factors either, but for polar lanczossharp at 2x you could easily make an argument that AR is probably unnecessary.
     </p>
     <p>
         To conclude, my opinion is that you can probably skip AR unless you're using a very sharp filter. If you want to use AR though, the ideal strength will depend on the choice of filter, scaling factor and content type, but 
