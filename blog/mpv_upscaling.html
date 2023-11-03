@@ -797,15 +797,18 @@
         You can read more about it <a href="https://en.wikipedia.org/wiki/Kriging">here</a>.
     </p>
     <p>
-        There's a different technique, usually called Joint Bilateral, that simply uses luma as an extra weighting factor. In short, chromatic information from pixels with similar luminosities is preferred. <a href="">I've written a shader that
-        implements this idea</a> mostly to learn GLSL, but it ended up being quite useful as it's much faster than KrigBilateral while still keeping a nice lead over classic methods sometimes (depends on content).
+        bjin has also released chroma variants of ravu in the past, and I've written a few shaders myself in an attempt to learn GLSL (ended up being too fun and now I can't spend a week without editing these shaders...).
     </p>
     <p>
-        I've actually also written <a href="https://github.com/Artoriuz/glsl-chroma-from-luma-prediction">another meme shader</a> for this, basically taking inspiration from <a href="https://arxiv.org/abs/1711.03951">this paper</a>. In short, Chroma from
-        Luma prediction is a technique that applies linear regression to map missing chromaticities based on the known luminosities. There are many tricks involved to make the shader look good though.
+        Anyway... My first (not very successful) chroma meme was called jointbilateral and it pretty much implemented <a href="https://johanneskopf.de/publications/jbu/paper/FinalPaper_0185.pdf">this paper.</a>
+        In short, chromatic information from pixels with similar luminosities is preferred (simply uses luma-deltas as an extra weighting factor). The inherent flaw with this idea is that it can't overshoot, so
+        it's literally incapable of reaching some intensity levels depending on how chroma subsampling is done. The shader has been recently updated to include a sharp spatial filter as a fallback, which makes it
+        relatively good even when there's no correlation between chroma and luma.
     </p>
     <p>
-        In any case, my goal here is to compare these chroma shaders against polar/orthogonal lanczos, which I'm using as reference points.
+        My second attempt at this is what's generally known as <a href="https://github.com/Artoriuz/glsl-chroma-from-luma-prediction">"CfL"</a>, which was written inspired on <a href="https://arxiv.org/abs/1711.03951">this paper</a>.
+        In short, Chroma from Luma (Prediction) is a technique that applies a linear regression to map the missing chromaticities based on known luminosities. This is paired with a sharp spatial filter that gets dynamically
+        mixed in based on the correlation between chroma and luma.
     </p>
     <h3 id="chroma_methodology">Chroma Methodology</h3>
     <p>
@@ -813,17 +816,17 @@
         This means that we generally don't have a reference point to work with, so we have to create one on our own.
     </p>
     <p>
-        I've semi-arbitrarily decided to use a downsampled screenshot from a random One Piece fanart:
+        I've semi-arbitrarily decided to use a downsampled version of this key visual:
     </p>
     <p>
-        <img src="./images/mpv_upscaling/chroma/uta.jpg" alt="chroma_reference" class="center" width="418" height="540">
+        <img src="./images/mpv_upscaling/chroma/maomao.jpg" alt="chroma_reference" class="center" width="510" height="720">
     </p>
     <p>
         Two versions of the image were created using FFmpeg:
     </p>
-    <code>ffmpeg -i original.png -pix_fmt yuv444p10le -c:v libx265 -preset placebo -x265-params lossless=1 444.mp4</code>
-    <br>
-    <code>ffmpeg -i original.png -pix_fmt yuv420p10le -c:v libx265 -preset placebo -x265-params lossless=1 420.mp4</code>
+    <code>ffmpeg -i original.png -pix_fmt yuv444p10le -vf libplacebo=colorspace=bt709:color_primaries=bt709:color_trc=bt709:range=tv:format=yuv444p10le -c:v libx265 -preset placebo -x265-params lossless=1 444.mp4</code>
+    <br><br>
+    <code>ffmpeg -i original.png -pix_fmt yuv420p10le -vf libplacebo=colorspace=bt709:color_primaries=bt709:color_trc=bt709:range=tv:format=yuv420p10le -c:v libx265 -preset placebo -x265-params lossless=1 420.mp4</code>
     <p>
         The idea here was creating (nearly) lossless variants with and without chroma subsampling.
     </p>
@@ -855,150 +858,150 @@
         </tr>
         <tr>
           <td>cfl_12+4</td>
-          <td>1.08E-03</td>
-          <td>49.0178</td>
-          <td>0.9967</td>
-          <td>0.9997</td>
+          <td>2.56E-03</td>
+          <td>41.7444</td>
+          <td>0.9920</td>
+          <td>0.9993</td>
           <td></td>
           <td>1.0000</td>
           <td>1.0000</td>
-          <td>1.0000</td>
-          <td>1.0000</td>
+          <td>0.9961</td>
+          <td>0.9952</td>
           <td></td>
-          <td>1.0000</td>
+          <td>0.9978</td>
         </tr>
         <tr>
           <td>cfl_12</td>
-          <td>1.09E-03</td>
-          <td>48.9620</td>
-          <td>0.9967</td>
-          <td>0.9997</td>
+          <td>2.57E-03</td>
+          <td>41.6986</td>
+          <td>0.9920</td>
+          <td>0.9993</td>
           <td></td>
-          <td>0.9696</td>
-          <td>0.9828</td>
-          <td>0.9894</td>
-          <td>0.9959</td>
+          <td>0.9916</td>
+          <td>0.9876</td>
+          <td>1.0000</td>
+          <td>1.0000</td>
           <td></td>
-          <td>0.9844</td>
+          <td>0.9948</td>
         </tr>
         <tr>
           <td>cfl_4</td>
-          <td>1.09E-03</td>
-          <td>48.8658</td>
-          <td>0.9966</td>
-          <td>0.9997</td>
+          <td>2.61E-03</td>
+          <td>41.5587</td>
+          <td>0.9916</td>
+          <td>0.9993</td>
           <td></td>
-          <td>0.9564</td>
-          <td>0.9531</td>
-          <td>0.9553</td>
-          <td>0.9562</td>
+          <td>0.9594</td>
+          <td>0.9498</td>
+          <td>0.9496</td>
+          <td>0.9551</td>
           <td></td>
-          <td>0.9552</td>
+          <td>0.9535</td>
         </tr>
         <tr>
           <td>jointbilateral</td>
-          <td>1.12E-03</td>
-          <td>48.8323</td>
-          <td>0.9963</td>
-          <td>0.9997</td>
+          <td>2.71E-03</td>
+          <td>41.4394</td>
+          <td>0.9908</td>
+          <td>0.9992</td>
           <td></td>
-          <td>0.8690</td>
-          <td>0.9428</td>
-          <td>0.8329</td>
-          <td>0.9059</td>
+          <td>0.8722</td>
+          <td>0.9175</td>
+          <td>0.8400</td>
+          <td>0.9102</td>
           <td></td>
-          <td>0.8876</td>
+          <td>0.8850</td>
         </tr>
         <tr>
           <td>krigbilateral</td>
-          <td>1.13E-03</td>
-          <td>48.4081</td>
-          <td>0.9964</td>
-          <td>0.9997</td>
+          <td>2.65E-03</td>
+          <td>40.7990</td>
+          <td>0.9913</td>
+          <td>0.9991</td>
           <td></td>
-          <td>0.8222</td>
-          <td>0.8119</td>
-          <td>0.8689</td>
-          <td>0.7898</td>
+          <td>0.9278</td>
+          <td>0.7442</td>
+          <td>0.9063</td>
+          <td>0.8260</td>
           <td></td>
-          <td>0.8232</td>
+          <td>0.8511</td>
         </tr>
         <tr>
           <td>ravu-zoom-r3-chroma</td>
-          <td>1.19E-03</td>
-          <td>47.7295</td>
-          <td>0.9959</td>
-          <td>0.9997</td>
+          <td>3.03E-03</td>
+          <td>40.4487</td>
+          <td>0.9887</td>
+          <td>0.9990</td>
           <td></td>
-          <td>0.6537</td>
-          <td>0.6026</td>
-          <td>0.6594</td>
-          <td>0.7863</td>
+          <td>0.6160</td>
+          <td>0.6494</td>
+          <td>0.5844</td>
+          <td>0.7353</td>
           <td></td>
-          <td>0.6755</td>
+          <td>0.6463</td>
         </tr>
         <tr>
           <td>ravu-zoom-r2-chroma</td>
-          <td>1.20E-03</td>
-          <td>47.6267</td>
-          <td>0.9959</td>
-          <td>0.9997</td>
+          <td>3.10E-03</td>
+          <td>40.3055</td>
+          <td>0.9884</td>
+          <td>0.9990</td>
           <td></td>
-          <td>0.5981</td>
-          <td>0.5708</td>
-          <td>0.6386</td>
-          <td>0.7764</td>
+          <td>0.5569</td>
+          <td>0.6106</td>
+          <td>0.5448</td>
+          <td>0.7195</td>
           <td></td>
-          <td>0.6460</td>
-        </tr>
-        <tr>
-          <td>lanczos</td>
-          <td>1.23E-03</td>
-          <td>47.1066</td>
-          <td>0.9955</td>
-          <td>0.9996</td>
-          <td></td>
-          <td>0.5225</td>
-          <td>0.4104</td>
-          <td>0.4844</td>
-          <td>0.6036</td>
-          <td></td>
-          <td>0.5052</td>
-        </tr>
-        <tr>
-          <td>polar_lanczossharp</td>
-          <td>1.23E-03</td>
-          <td>46.9619</td>
-          <td>0.9954</td>
-          <td>0.9996</td>
-          <td></td>
-          <td>0.5145</td>
-          <td>0.3658</td>
-          <td>0.4256</td>
-          <td>0.5291</td>
-          <td></td>
-          <td>0.4587</td>
+          <td>0.6080</td>
         </tr>
         <tr>
           <td>fastbilateral</td>
-          <td>1.27E-03</td>
-          <td>46.7787</td>
-          <td>0.9954</td>
-          <td>0.9996</td>
+          <td>3.04E-03</td>
+          <td>39.1385</td>
+          <td>0.9884</td>
+          <td>0.9988</td>
           <td></td>
-          <td>0.3962</td>
-          <td>0.3093</td>
-          <td>0.4191</td>
-          <td>0.3667</td>
+          <td>0.6092</td>
+          <td>0.2948</td>
+          <td>0.5457</td>
+          <td>0.5401</td>
           <td></td>
-          <td>0.3728</td>
+          <td>0.4975</td>
+        </tr>
+        <tr>
+          <td>lanczos</td>
+          <td>3.31E-03</td>
+          <td>39.4604</td>
+          <td>0.9869</td>
+          <td>0.9988</td>
+          <td></td>
+          <td>0.3826</td>
+          <td>0.3819</td>
+          <td>0.3523</td>
+          <td>0.5159</td>
+          <td></td>
+          <td>0.4082</td>
+        </tr>
+        <tr>
+          <td>polar_lanczossharp</td>
+          <td>3.37E-03</td>
+          <td>39.2526</td>
+          <td>0.9865</td>
+          <td>0.9987</td>
+          <td></td>
+          <td>0.3403</td>
+          <td>0.3257</td>
+          <td>0.2951</td>
+          <td>0.4532</td>
+          <td></td>
+          <td>0.3536</td>
         </tr>
         <tr>
           <td>bilinear</td>
-          <td>1.39E-03</td>
-          <td>45.7763</td>
-          <td>0.9945</td>
-          <td>0.9995</td>
+          <td>3.78E-03</td>
+          <td>38.0491</td>
+          <td>0.9841</td>
+          <td>0.9982</td>
           <td></td>
           <td>0.0000</td>
           <td>0.0000</td>
@@ -1011,12 +1014,29 @@
     </table>
     <h3 id="chroma_commentary">Chroma Commentary</h3>
     <p>
-        In the 2x upscaling section we saw the the PSNR difference between lanczos and the highest scoring shader was of ~3 dB, but this number is only half as big now.
-        Chroma shaders probably shouldn't be entirely dismissed but it's important to keep in mind the quality improvement they bring is relatively small.
+        Chroma upscaling is often seen as less important since the human visual system is less sensitive to chromatic variations, but all shaders managed to score higher than the built-in solutions. The numeric deltas obviously aren't
+        as bit this time, but the top scoring shader is still significantly ahead of Lanczos (main reference point since it's the default).
     </p>
     <p>
-        With that said, if you really want to use a chroma shader you should probably stick to KrigBilateral or CfL Prediction. krigBilateral is an older and more tested shader, so you know what to expect.
-        CfL looks sharper and produces better numbers, but it's new and experimental so there might be some issues to iron out.
+        If we look at the numbers, CfL is the best shader on all metrics. The default 12-tap variant scores higher than all other shaders and only loses to itself on MAE and PSNR when the 4-tap regression is turned on.
+        I've been chasing minor improvements for a while now and the shader became very good.
+    </p>
+    <p>
+        The only other shader that gets even remotely close to scoring as high as CfL is jointbilateral (previously known as "memebilateral", not to be confused with the old "jointbilateral").
+        My personal opinion is that there's not a lot of reason to use this since CfL is not only better but also faster.
+    </p>
+    <p>
+        Krigbilateral comes right after that and the reason it's so low is because its PSNR score sucks. This shader is extremely hit or miss, and sometimes the pixels are just terribly off-target (easily seen in the hair ornament).
+    </p>
+    <p>
+        Ravu is also an option is you really dislike what the regression-based shaders do, as it's analogous to a very good polar filter and relatively free of weird artifacts.
+    </p>
+    <p>
+        You should probably skip FastBilateral unless you really can't run any of the other shaders due to performance constraints (and in that case you're better off with built-in filters anyway).
+        This shader is kinda hit or miss just like Krig, but since it can't overshoot at all it tends to be worse than even the built-in solutions on very complex scenes.
+    </p>
+    <p>
+        To conclude, if you want to use a chroma shader you should probably use CfL. My opinion on this matter may be biased since I'm the author of the shader though, so feel free to do your own tests.
     </p>
     <h3 id="antiring">Antiring</h3>
     <p>
