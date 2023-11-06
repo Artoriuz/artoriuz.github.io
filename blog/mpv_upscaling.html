@@ -777,7 +777,7 @@
         It's a bit funny to see FSR get worse here, since a lower scaling factor corresponds to a higher quality preset in AMD's terms, but I think the problem is just that the shader is too sharp.
     </p>
     <p>
-        It's pretty easy to see that the slightly blurry downsampling step is severely hurting the doublers. This section previously used Catrom + Pixel Clipper to downsample (which is now only used to generate the "input"),
+        It's pretty easy to see that the slightly blurry downsampling step is hurting the doublers. This section previously used catrom+PC to downsample them (which is now only used to generate the "input"),
         but honestly that was a bit overkill. Using mpv's default downsampling filter makes more sense as that's what most users are probably using.
     </p>
     <p>
