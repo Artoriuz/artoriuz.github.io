@@ -794,13 +794,12 @@
     <p>
         Anyway... My first (not very successful) chroma meme was called jointbilateral and it pretty much implemented <a href="https://johanneskopf.de/publications/jbu/paper/FinalPaper_0185.pdf">this paper.</a>
         In short, chromatic information from pixels with similar luminosities is preferred (simply uses luma-deltas as an extra weighting factor). The inherent flaw with this idea is that it can't overshoot, so
-        it's literally incapable of reaching some intensity levels depending on how chroma subsampling is done. The shader has been recently updated to include a sharp spatial filter as a fallback, which makes it
-        relatively good even when there's no correlation between chroma and luma.
+        it's literally incapable of reaching some intensity levels depending on how chroma subsampling is done.
     </p>
     <p>
-        My second attempt at this is what's generally known as <a href="https://github.com/Artoriuz/glsl-chroma-from-luma-prediction">"CfL"</a>, which was written inspired on <a href="https://arxiv.org/abs/1711.03951">this paper</a>.
-        In short, Chroma from Luma (Prediction) is a technique that applies a linear regression to map the missing chromaticities based on known luminosities. This is paired with a sharp spatial filter that gets dynamically
-        mixed in based on the correlation between chroma and luma.
+        My second attempt at this is what's generally known as <a href="https://github.com/Artoriuz/glsl-chroma-from-luma-prediction">"CfL"</a>, which was written taking inspiration from
+        <a href="https://arxiv.org/abs/1711.03951">this paper</a>. In short, Chroma from Luma (Prediction) is a technique that applies a linear regression to map the missing chromaticities based on known luminosities.
+        This is paired with a sharp spatial filter that gets dynamically mixed-in based on the local correlation between chroma and luma.
     </p>
     <h3 id="chroma_methodology">Chroma Methodology</h3>
     <p>
@@ -891,20 +890,6 @@
           <td>0.9539</td>
         </tr>
         <tr>
-          <td>jointbilateral</td>
-          <td>2.71E-03</td>
-          <td>41.4394</td>
-          <td>0.9908</td>
-          <td>0.9992</td>
-          <td></td>
-          <td>0.8618</td>
-          <td>0.9139</td>
-          <td>0.8345</td>
-          <td>0.9089</td>
-          <td></td>
-          <td>0.8798</td>
-        </tr>
-        <tr>
           <td>krigbilateral</td>
           <td>2.65E-03</td>
           <td>40.7990</td>
@@ -945,6 +930,20 @@
           <td>0.7185</td>
           <td></td>
           <td>0.6046</td>
+        </tr>
+        <tr>
+          <td>jointbilateral</td>
+          <td>3.04E-03</td>
+          <td>39.1939</td>
+          <td>0.9887</td>
+          <td>0.9988</td>
+          <td></td>
+          <td>0.6034</td>
+          <td>0.3086</td>
+          <td>0.5709</td>
+          <td>0.5391</td>
+          <td></td>
+          <td>0.5055</td>
         </tr>
         <tr>
           <td>fastbilateral</td>
@@ -1014,17 +1013,13 @@
         I've been chasing minor improvements for a while now and the shader became very good.
     </p>
     <p>
-        The only other shader that gets even remotely close to scoring as high as CfL is jointbilateral (previously known as "memebilateral", not to be confused with the old "jointbilateral").
-        My personal opinion is that there's not a lot of reason to use this since CfL is not only better but also faster.
-    </p>
-    <p>
         Krigbilateral comes right after that and the reason it's so low is because its PSNR score sucks. This shader is extremely hit or miss, and sometimes the pixels are just terribly off-target (easily seen in the hair ornament).
     </p>
     <p>
         Ravu is also an option is you really dislike what the regression-based shaders do, as it's analogous to a very good polar filter and relatively free of weird artifacts.
     </p>
     <p>
-        You should probably skip FastBilateral unless you really can't run any of the other shaders due to performance constraints (and in that case you're better off with built-in filters anyway).
+        You should probably skip Joint/FastBilateral unless you really can't run any of the other shaders due to performance constraints (and in that case you're better off with built-in filters anyway).
         This shader is kinda hit or miss just like Krig, but since it can't overshoot at all it tends to be worse than even the built-in solutions on very complex scenes.
     </p>
     <p>
@@ -1962,6 +1957,12 @@
             <td>0.7802</td>
           </tr>
           <tr>
+            <td>jointbilateral</td>
+            <td>1544</td>
+            <td>55.57</td>
+            <td>0.7506</td>
+          </tr>
+          <tr>
             <td>cfl_12</td>
             <td>1529</td>
             <td>56.10</td>
@@ -1978,12 +1979,6 @@
             <td>1525</td>
             <td>56.27</td>
             <td>0.7413</td>
-          </tr>
-          <tr>
-            <td>jointbilateral</td>
-            <td>1508</td>
-            <td>56.88</td>
-            <td>0.7333</td>
           </tr>
           <tr>
             <td>ravu-lite-r2</td>
