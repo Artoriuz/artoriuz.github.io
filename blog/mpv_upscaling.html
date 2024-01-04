@@ -1005,25 +1005,23 @@
     </table>
     <h3 id="chroma_commentary">Chroma Commentary</h3>
     <p>
-        Chroma upscaling is often seen as less important since the human visual system is less sensitive to chromatic variations, but all shaders managed to score higher than the built-in solutions. The numeric deltas obviously aren't
-        as bit this time, but the top scoring shader is still significantly ahead of Lanczos (main reference point since it's the default).
+        Chroma upscaling is often seen as less important since the human visual system is less sensitive to chromatic variations, but there's still something to be gained using shaders to upscale chroma.
     </p>
     <p>
         If we look at the numbers, CfL is the best shader on all metrics. The default 12-tap variant scores higher than all other shaders and only loses to itself on MAE and PSNR when the 4-tap regression is turned on.
-        I've been chasing minor improvements for a while now and the shader became very good.
     </p>
     <p>
-        Krigbilateral comes right after that and the reason it's so low is because its PSNR score sucks. This shader is extremely hit or miss, and sometimes the pixels are just terribly off-target (easily seen in the hair ornament).
+        Krigbilateral comes right after that, this shader used to be the standard recommendation for chroma shaders for years but it's a bit hit or miss.
     </p>
     <p>
         Ravu is also an option is you really dislike what the regression-based shaders do, as it's analogous to a very good polar filter and relatively free of weird artifacts.
     </p>
     <p>
         You should probably skip Joint/FastBilateral unless you really can't run any of the other shaders due to performance constraints (and in that case you're better off with built-in filters anyway).
-        This shader is kinda hit or miss just like Krig, but since it can't overshoot at all it tends to be worse than even the built-in solutions on very complex scenes.
+        These shaders are kinda hit or miss just like Krig, but since they can't overshoot at all they tend to be worse than even the built-in solutions on very complex scenes.
     </p>
     <p>
-        To conclude, if you want to use a chroma shader you should probably use CfL. My opinion on this matter may be biased since I'm the author of the shader though, so feel free to do your own tests.
+        To conclude, if you want to use a chroma shader you should probably pick CfL. My opinion on this matter may be biased since I'm the author of the shader though, so you should probably double check with your own tests.
     </p>
     <h3 id="antiring">Antiring</h3>
     <p>
@@ -1668,7 +1666,7 @@
     </p>
     <p>
         If we choose to focus on MAE, the sweetspot seems to be around 0.85. MAE is very good at telling us what is numerically closer to the reference without biasing this towards any specific type of
-        artifacts (regardless of how humans perceive them).
+        artifacts regardless of how humans perceive them.
     </p>
     <p>
         If you only want to know how bad the worst pixels are you can focus on PSNR instead, and in this case Pixel Clipper seems to be much better than libplacebo's AR (presumably because the latter is smoother).
@@ -1680,9 +1678,9 @@
     </p>
     <p>
         MS-SSIM is just SSIM at different scales to emulate a viewer looking at the picture from different distances. This metric tends to correlate better to the human perception of quality than the other 3,
-        and if you're not pixel peeping to catch the ringing this is probably a better representation of reality. For this metric, the picture with no AR at all is the top scorer. FIR filters need to overshoot a little
+        and if you're not very close to the display this is probably a better metric. For MS-SSIM, the picture with no AR at all is the top scorer. FIR filters need to overshoot a little
         bit to reach some intensity levels and in this case (since polar lanczossharp isn't that sharp to begin with), the ringing doesn't seem to be a big enough problem for it to hurt the score.
-        This isn't true for all filters and it might not be true for all scaling factors either, but for polar lanczossharp at 2x you could easily make an argument that AR is probably unnecessary.
+        This isn't true for all filters and it might not be true for all scaling factors either, but for polar lanczossharp at 2x you could perhaps make an argument that AR might be unnecessary.
     </p>
     <p>
         To conclude, my opinion is that you can probably skip AR unless you're using a very sharp filter. If you want to use AR though, the ideal strength will depend on the choice of filter, scaling factor and content type, but
@@ -1691,8 +1689,7 @@
     <h3 id="downsampling_antiring">Downsampling Antiring</h3>
     <p>
         Pixel Clipper actually has a downsampling variant as well, which I believe is probably less broken than mpv's native <inline_code>--dscale-antiring</inline_code> solution for orthogonal filters.
-        Libplacebo's new polar AR has been recently enabled for downsampling as well, so we can also test that here. I'm skipping doing these tests at different strengths though, as throwing away unwanted information should be
-        easier when downsampling.
+        Libplacebo's new polar AR has been recently enabled for downsampling as well, so we can also test that here.
     </p>
     <p>
         The following image will be used for downsampling AR tests:
@@ -1701,7 +1698,7 @@
     <h3 id="downsampling_antiring_methodology">Downsampling Antiring Methodology</h3>
     <p>
         My current method to evaluate downsampling filters is to concede that at 0.5x linear light box is as good as it gets, since in this case we're just averaging 4 pixels together.
-        We can't use box itself for other scaling factors though, so the aim is to find a filter that produces a similar result but is also usable at any other arbitrary scaling factor.
+        We can't use box itself for other scaling factors though, so the aim is to find a filter that produces a similar result while also being usable at any other arbitrary scaling factor.
     </p>
     <p>
         To eliminate any differences caused by how differently mpv and ImageMagick perform linear light conversion, the box reference was also obtained using mpv.
@@ -1916,7 +1913,7 @@
         </ol>
     </p>
     <p>
-        In any case, the following numbers were produced with these mpv settings with a 720p anime episode (~24 minutes long video) on a 5600X+6600XT+Windows 11:
+        In any case, the following numbers were produced with these mpv settings with a 720p anime episode (~24 minutes long video) on a 5600X+6600XT+Windows11 setup:
         <br>
         <br>
         <code>
@@ -2112,8 +2109,6 @@
     </p>
     <p>
         Still though, the conclusion here seems to be that if you're running mpv on a semi-decent computer, these shaders will never be a problem.
-        Please note that you can make it go even faster with hardware decoding, but <inline_code>--d3d11-sync-interval=0</inline_code> doesn't seem to work in fullscreen, so it is what it is.
-        Until AMD fixes Vulkan hwdec in their drivers this is probably the best I can provide.
     </p>
     <h3 id="outro">Outro</h3>
     <p>
