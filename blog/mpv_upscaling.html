@@ -56,13 +56,14 @@
         <p>
             The following shaders were "benchmarked":
             <ol>
+              <li><a href="https://github.com/Artoriuz/ArtCNN">ArtCNN</a></li>
               <li><a href="https://github.com/bjin/mpv-prescalers">RAVU</a></li>
               <li><a href="https://github.com/bjin/mpv-prescalers">NNEDI3</a></li>
               <li><a href="https://github.com/igv/FSRCNN-TensorFlow">FSRCNNX</a></li>
               <li><a href="https://github.com/bloc97/Anime4K">Anime4K</a></li>
               <li><a href="https://gist.github.com/agyild/82219c545228d70c5604f865ce0b0ce5">FSR</a></li>
             </ol>
-            I've also added orthogonal and polar lanczossharp to the mix just to have a reference point, but feel free to send me any other shaders you would like to get scored.
+            I've also added orthogonal lanczos and polar lanczossharp to the mix just to have a reference point, but feel free to send me any other shaders you would like to get scored.
             For Anime4K I'm using the <a href="https://github.com/bloc97/Anime4K/blob/815b122284304e6e1e244a8cf6a160eeaa07040c/GLSL_Instructions.md">"C" mode</a> which is defined as <inline_code>Upscale_Denoise -> Upscale</inline_code>.
         </p>
         <p>
@@ -103,18 +104,46 @@
                 <td>Mean</td>
               </tr>
               <tr>
+                <td>ArtCNN_C4F16</td>
+                <td>2.90E-03</td>
+                <td>43.7904</td>
+                <td>0.9917</td>
+                <td>0.9992</td>
+                <td></td>
+                <td>1.0000</td>
+                <td>1.0000</td>
+                <td>1.0000</td>
+                <td>1.0000</td>
+                <td></td>
+                <td>1.0000</td>
+              </tr>
+              <tr>
+                <td>ArtCNN_C4F8</td>
+                <td>3.07E-03</td>
+                <td>43.1650</td>
+                <td>0.9908</td>
+                <td>0.9992</td>
+                <td></td>
+                <td>0.9482</td>
+                <td>0.9275</td>
+                <td>0.9492</td>
+                <td>0.9983</td>
+                <td></td>
+                <td>0.9558</td>
+              </tr>
+              <tr>
                 <td>ravu-lite-ar-r4</td>
                 <td>3.46E-03</td>
                 <td>41.3618</td>
                 <td>0.9887</td>
                 <td>0.9987</td>
                 <td></td>
-                <td>0.9925</td>
-                <td>1.0000</td>
-                <td>0.9876</td>
-                <td>0.9371</td>
+                <td>0.8316</td>
+                <td>0.7184</td>
+                <td>0.8354</td>
+                <td>0.8819</td>
                 <td></td>
-                <td>0.9793</td>
+                <td>0.8168</td>
               </tr>
               <tr>
                 <td>ravu-zoom-ar-r3</td>
@@ -123,12 +152,12 @@
                 <td>0.9889</td>
                 <td>0.9987</td>
                 <td></td>
-                <td>1.0000</td>
-                <td>0.9762</td>
-                <td>1.0000</td>
-                <td>0.9369</td>
+                <td>0.8378</td>
+                <td>0.7013</td>
+                <td>0.8458</td>
+                <td>0.8818</td>
                 <td></td>
-                <td>0.9783</td>
+                <td>0.8167</td>
               </tr>
               <tr>
                 <td>ravu-lite-ar-r3</td>
@@ -137,12 +166,12 @@
                 <td>0.9883</td>
                 <td>0.9988</td>
                 <td></td>
-                <td>0.9614</td>
-                <td>0.9549</td>
-                <td>0.9573</td>
-                <td>0.9446</td>
+                <td>0.8055</td>
+                <td>0.6860</td>
+                <td>0.8097</td>
+                <td>0.8890</td>
                 <td></td>
-                <td>0.9546</td>
+                <td>0.7976</td>
               </tr>
               <tr>
                 <td>ravu-lite-r4</td>
@@ -151,12 +180,12 @@
                 <td>0.9876</td>
                 <td>0.9989</td>
                 <td></td>
-                <td>0.9002</td>
-                <td>0.9819</td>
-                <td>0.9122</td>
-                <td>0.9861</td>
+                <td>0.7543</td>
+                <td>0.7054</td>
+                <td>0.7716</td>
+                <td>0.9280</td>
                 <td></td>
-                <td>0.9451</td>
+                <td>0.7898</td>
               </tr>
               <tr>
                 <td>ravu-zoom-r3</td>
@@ -165,12 +194,12 @@
                 <td>0.9872</td>
                 <td>0.9990</td>
                 <td></td>
-                <td>0.8743</td>
-                <td>0.9481</td>
-                <td>0.8825</td>
-                <td>1.0000</td>
+                <td>0.7325</td>
+                <td>0.6811</td>
+                <td>0.7464</td>
+                <td>0.9412</td>
                 <td></td>
-                <td>0.9262</td>
+                <td>0.7753</td>
               </tr>
               <tr>
                 <td>FSRCNNX_x2_8-0-4-1</td>
@@ -179,12 +208,12 @@
                 <td>0.9882</td>
                 <td>0.9987</td>
                 <td></td>
-                <td>0.8803</td>
-                <td>0.9336</td>
-                <td>0.9549</td>
-                <td>0.9171</td>
+                <td>0.7375</td>
+                <td>0.6707</td>
+                <td>0.8077</td>
+                <td>0.8632</td>
                 <td></td>
-                <td>0.9215</td>
+                <td>0.7698</td>
               </tr>
               <tr>
                 <td>ravu-zoom-ar-r2</td>
@@ -193,12 +222,12 @@
                 <td>0.9877</td>
                 <td>0.9987</td>
                 <td></td>
-                <td>0.9295</td>
-                <td>0.8745</td>
-                <td>0.9196</td>
-                <td>0.9264</td>
+                <td>0.7787</td>
+                <td>0.6282</td>
+                <td>0.7778</td>
+                <td>0.8719</td>
                 <td></td>
-                <td>0.9125</td>
+                <td>0.7642</td>
               </tr>
               <tr>
                 <td>ravu-lite-r3</td>
@@ -207,12 +236,12 @@
                 <td>0.9870</td>
                 <td>0.9989</td>
                 <td></td>
-                <td>0.8649</td>
-                <td>0.9295</td>
-                <td>0.8716</td>
-                <td>0.9785</td>
+                <td>0.7246</td>
+                <td>0.6677</td>
+                <td>0.7372</td>
+                <td>0.9210</td>
                 <td></td>
-                <td>0.9111</td>
+                <td>0.7626</td>
               </tr>
               <tr>
                 <td>ravu-lite-ar-r2</td>
@@ -221,12 +250,12 @@
                 <td>0.9872</td>
                 <td>0.9988</td>
                 <td></td>
-                <td>0.8951</td>
-                <td>0.8154</td>
-                <td>0.8867</td>
-                <td>0.9513</td>
+                <td>0.7500</td>
+                <td>0.5858</td>
+                <td>0.7500</td>
+                <td>0.8953</td>
                 <td></td>
-                <td>0.8871</td>
+                <td>0.7453</td>
               </tr>
               <tr>
                 <td>ravu-zoom-r2</td>
@@ -235,12 +264,12 @@
                 <td>0.9866</td>
                 <td>0.9989</td>
                 <td></td>
-                <td>0.8192</td>
-                <td>0.8564</td>
-                <td>0.8432</td>
-                <td>0.9757</td>
+                <td>0.6864</td>
+                <td>0.6152</td>
+                <td>0.7132</td>
+                <td>0.9183</td>
                 <td></td>
-                <td>0.8736</td>
+                <td>0.7333</td>
               </tr>
               <tr>
                 <td>ravu-lite-r2</td>
@@ -249,12 +278,12 @@
                 <td>0.9856</td>
                 <td>0.9988</td>
                 <td></td>
-                <td>0.7873</td>
-                <td>0.7862</td>
-                <td>0.7780</td>
-                <td>0.9626</td>
+                <td>0.6596</td>
+                <td>0.5648</td>
+                <td>0.6581</td>
+                <td>0.9059</td>
                 <td></td>
-                <td>0.8285</td>
+                <td>0.6971</td>
               </tr>
               <tr>
                 <td>FSRCNNX_x2_16-0-4-1</td>
@@ -263,26 +292,12 @@
                 <td>0.9873</td>
                 <td>0.9984</td>
                 <td></td>
-                <td>0.7864</td>
-                <td>0.7667</td>
-                <td>0.8952</td>
-                <td>0.8479</td>
+                <td>0.6589</td>
+                <td>0.5508</td>
+                <td>0.7571</td>
+                <td>0.7980</td>
                 <td></td>
-                <td>0.8240</td>
-              </tr>
-              <tr>
-                <td>EASU</td>
-                <td>4.33E-03</td>
-                <td>38.8482</td>
-                <td>0.9841</td>
-                <td>0.9981</td>
-                <td></td>
-                <td>0.6785</td>
-                <td>0.5943</td>
-                <td>0.6789</td>
-                <td>0.7718</td>
-                <td></td>
-                <td>0.6809</td>
+                <td>0.6912</td>
               </tr>
               <tr>
                 <td>lanczos</td>
@@ -291,12 +306,12 @@
                 <td>0.9826</td>
                 <td>0.9984</td>
                 <td></td>
-                <td>0.5566</td>
-                <td>0.5674</td>
-                <td>0.5795</td>
-                <td>0.8360</td>
+                <td>0.4663</td>
+                <td>0.4076</td>
+                <td>0.4901</td>
+                <td>0.7868</td>
                 <td></td>
-                <td>0.6349</td>
+                <td>0.5377</td>
               </tr>
               <tr>
                 <td>nnedi3-nns64-win8x4</td>
@@ -305,26 +320,12 @@
                 <td>0.9839</td>
                 <td>0.9973</td>
                 <td></td>
-                <td>0.6516</td>
-                <td>0.5596</td>
-                <td>0.6686</td>
-                <td>0.5421</td>
+                <td>0.5459</td>
+                <td>0.4020</td>
+                <td>0.5655</td>
+                <td>0.5102</td>
                 <td></td>
-                <td>0.6055</td>
-              </tr>
-              <tr>
-                <td>nnedi3-nns32-win8x4</td>
-                <td>4.46E-03</td>
-                <td>38.5214</td>
-                <td>0.9835</td>
-                <td>0.9973</td>
-                <td></td>
-                <td>0.6342</td>
-                <td>0.5415</td>
-                <td>0.6428</td>
-                <td>0.5334</td>
-                <td></td>
-                <td>0.5880</td>
+                <td>0.5059</td>
               </tr>
               <tr>
                 <td>polar_lanczossharp</td>
@@ -333,12 +334,26 @@
                 <td>0.9818</td>
                 <td>0.9982</td>
                 <td></td>
-                <td>0.5140</td>
-                <td>0.5168</td>
-                <td>0.5286</td>
-                <td>0.7725</td>
+                <td>0.4307</td>
+                <td>0.3713</td>
+                <td>0.4471</td>
+                <td>0.7271</td>
                 <td></td>
-                <td>0.5830</td>
+                <td>0.4940</td>
+              </tr>
+              <tr>
+                <td>nnedi3-nns32-win8x4</td>
+                <td>4.46E-03</td>
+                <td>38.5214</td>
+                <td>0.9835</td>
+                <td>0.9973</td>
+                <td></td>
+                <td>0.5313</td>
+                <td>0.3890</td>
+                <td>0.5437</td>
+                <td>0.5020</td>
+                <td></td>
+                <td>0.4915</td>
               </tr>
               <tr>
                 <td>FSR</td>
@@ -347,12 +362,12 @@
                 <td>0.9817</td>
                 <td>0.9981</td>
                 <td></td>
-                <td>0.4036</td>
-                <td>0.6189</td>
-                <td>0.5228</td>
-                <td>0.7581</td>
+                <td>0.3382</td>
+                <td>0.4446</td>
+                <td>0.4422</td>
+                <td>0.7135</td>
                 <td></td>
-                <td>0.5759</td>
+                <td>0.4846</td>
               </tr>
               <tr>
                 <td>Anime4K_C_S</td>
@@ -361,12 +376,12 @@
                 <td>0.9783</td>
                 <td>0.9972</td>
                 <td></td>
-                <td>0.2242</td>
-                <td>0.1954</td>
-                <td>0.2920</td>
-                <td>0.5063</td>
+                <td>0.1879</td>
+                <td>0.1404</td>
+                <td>0.2469</td>
+                <td>0.4765</td>
                 <td></td>
-                <td>0.3045</td>
+                <td>0.2629</td>
               </tr>
               <tr>
                 <td>Anime4K_C_L</td>
@@ -375,12 +390,12 @@
                 <td>0.9767</td>
                 <td>0.9968</td>
                 <td></td>
-                <td>0.1417</td>
-                <td>0.1248</td>
-                <td>0.1878</td>
-                <td>0.4026</td>
+                <td>0.1188</td>
+                <td>0.0896</td>
+                <td>0.1588</td>
+                <td>0.3789</td>
                 <td></td>
-                <td>0.2142</td>
+                <td>0.1865</td>
               </tr>
               <tr>
                 <td>Anime4K_C_VL</td>
@@ -389,12 +404,12 @@
                 <td>0.9766</td>
                 <td>0.9963</td>
                 <td></td>
-                <td>0.1015</td>
-                <td>0.0826</td>
-                <td>0.1818</td>
-                <td>0.2603</td>
+                <td>0.0850</td>
+                <td>0.0593</td>
+                <td>0.1538</td>
+                <td>0.2450</td>
                 <td></td>
-                <td>0.1565</td>
+                <td>0.1358</td>
               </tr>
               <tr>
                 <td>Anime4K_C_M</td>
@@ -404,25 +419,11 @@
                 <td>0.9962</td>
                 <td></td>
                 <td>0.0000</td>
-                <td>0.0217</td>
-                <td>0.0375</td>
-                <td>0.2409</td>
+                <td>0.0156</td>
+                <td>0.0317</td>
+                <td>0.2267</td>
                 <td></td>
-                <td>0.0750</td>
-              </tr>
-              <tr>
-                <td>bilinear</td>
-                <td>5.78E-03</td>
-                <td>35.9907</td>
-                <td>0.9739</td>
-                <td>0.9954</td>
-                <td></td>
-                <td>0.1585</td>
-                <td>0.1330</td>
-                <td>0.0000</td>
-                <td>0.0000</td>
-                <td></td>
-                <td>0.0729</td>
+                <td>0.0685</td>
               </tr>
               <tr>
                 <td>Anime4K_C_UL</td>
@@ -431,12 +432,26 @@
                 <td>0.9750</td>
                 <td>0.9959</td>
                 <td></td>
-                <td>0.0283</td>
+                <td>0.0237</td>
                 <td>0.0000</td>
-                <td>0.0777</td>
-                <td>0.1493</td>
+                <td>0.0657</td>
+                <td>0.1405</td>
                 <td></td>
-                <td>0.0638</td>
+                <td>0.0575</td>
+              </tr>
+              <tr>
+                <td>bilinear</td>
+                <td>5.78E-03</td>
+                <td>35.9907</td>
+                <td>0.9739</td>
+                <td>0.9954</td>
+                <td></td>
+                <td>0.1328</td>
+                <td>0.0956</td>
+                <td>0.0000</td>
+                <td>0.0000</td>
+                <td></td>
+                <td>0.0571</td>
               </tr>
             </tbody>
           </table>
@@ -455,14 +470,11 @@
         The overly-sharp shaders would probably do much better on perceptual metrics, I'll evaluate whether adding a few of them to the benchmarking script makes sense on a later date.
     </p>
     <p>
-        EASU (which is FSR without RCAS) actually scores way better than FSR, and I think it's probably a good option if you're looking for an efficient shader.
-    </p>
-    <p>
         It's nice to see that bjin came back from the dead with gold. The new ravu variants perform much better than their previous incarnations and they're also free of the half-pixel shift problem.
     </p>
     <p>
-        Ravu-lite-ar-r4 is the best luma-doubler according to the metrics, and it's probably a safe choice if you're looking for a doubler. If you're not only doubling though, ravu-zoom-ar-r3 might be a better option. You can
-        also edit their trigger conditions or use auto-profiles.lua to switch between them as needed.
+        ArtCNN seems to have a comfortable lead on top of everything else, which probably comes from training it with the Manga109 dataset downsampled in linear light. I'm also employing a simpler loss function (MAE),
+        which might converge better than what FSCRNNX is using. This is probably what you should use if your hardware can handle it and you don't mind the extra heat.
     </p>
     <h3 id="fractional_upsampling">Fractional Upsampling</h3>
     <p>
@@ -471,14 +483,10 @@
     </p>
     <h3 id="fractional_upsampling_methodology">Fractional Upsampling Methodology</h3>
     <p>
-        Unfortunately, some of my choices here are only explained in the following sections. You'll have to bear with me and trust this makes (some) sense, as the alternative would be placing the fractional upsampling section at the end of the page
-        instead of here, its most logical position.
-    </p>
-    <p>
       In short, the entire methodology stays the same with a few modifications:
       <ol>
         <li>Downsampling was done from 1080p to 720p with catrom+PC to create the input image.</li>
-        <li>The doublers were downsampled with hermite (mpv's default) to reach the 1.5x scaling factor.</li>
+        <li>The doublers were downsampled with catrom (without PC or any other form of AR) to reach the 1.5x scaling factor.</li>
         <li>I've removed Anime4K from this because this is too far removed from what the devs intended it to be used for.</li>
       </ol>
     </p>
@@ -501,18 +509,74 @@
             <td>Mean</td>
           </tr>
           <tr>
+            <td>ArtCNN_C4F16</td>
+            <td>2.84E-03</td>
+            <td>44.5102</td>
+            <td>0.9929</td>
+            <td>0.9992</td>
+            <td></td>
+            <td>0.9825</td>
+            <td>1.0000</td>
+            <td>1.0000</td>
+            <td>1.0000</td>
+            <td></td>
+            <td>0.9956</td>
+          </tr>
+          <tr>
+            <td>ArtCNN_C4F8</td>
+            <td>2.80E-03</td>
+            <td>44.4833</td>
+            <td>0.9927</td>
+            <td>0.9992</td>
+            <td></td>
+            <td>1.0000</td>
+            <td>0.9953</td>
+            <td>0.9825</td>
+            <td>0.9949</td>
+            <td></td>
+            <td>0.9932</td>
+          </tr>
+          <tr>
+            <td>FSRCNNX_x2_8-0-4-1</td>
+            <td>2.87E-03</td>
+            <td>43.7704</td>
+            <td>0.9927</td>
+            <td>0.9992</td>
+            <td></td>
+            <td>0.9666</td>
+            <td>0.8713</td>
+            <td>0.9758</td>
+            <td>0.9716</td>
+            <td></td>
+            <td>0.9463</td>
+          </tr>
+          <tr>
+            <td>FSRCNNX_x2_16-0-4-1</td>
+            <td>2.98E-03</td>
+            <td>43.8938</td>
+            <td>0.9928</td>
+            <td>0.9992</td>
+            <td></td>
+            <td>0.9179</td>
+            <td>0.8928</td>
+            <td>0.9879</td>
+            <td>0.9664</td>
+            <td></td>
+            <td>0.9412</td>
+          </tr>
+          <tr>
             <td>ravu-zoom-ar-r3</td>
             <td>2.88E-03</td>
             <td>43.8869</td>
             <td>0.9924</td>
             <td>0.9991</td>
             <td></td>
-            <td>1.0000</td>
-            <td>1.0000</td>
-            <td>1.0000</td>
-            <td>0.9763</td>
+            <td>0.9658</td>
+            <td>0.8916</td>
+            <td>0.9451</td>
+            <td>0.9241</td>
             <td></td>
-            <td>0.9941</td>
+            <td>0.9316</td>
           </tr>
           <tr>
             <td>ravu-zoom-r3</td>
@@ -521,12 +585,12 @@
             <td>0.9918</td>
             <td>0.9991</td>
             <td></td>
-            <td>0.8988</td>
-            <td>0.9434</td>
-            <td>0.9196</td>
-            <td>1.0000</td>
+            <td>0.8680</td>
+            <td>0.8411</td>
+            <td>0.8691</td>
+            <td>0.9465</td>
             <td></td>
-            <td>0.9404</td>
+            <td>0.8812</td>
           </tr>
           <tr>
             <td>ravu-zoom-ar-r2</td>
@@ -535,26 +599,40 @@
             <td>0.9918</td>
             <td>0.9990</td>
             <td></td>
-            <td>0.9556</td>
-            <td>0.8974</td>
-            <td>0.9236</td>
-            <td>0.9350</td>
+            <td>0.9229</td>
+            <td>0.8001</td>
+            <td>0.8729</td>
+            <td>0.8850</td>
             <td></td>
-            <td>0.9279</td>
+            <td>0.8702</td>
           </tr>
           <tr>
-            <td>FSRCNNX_x2_8-0-4-1</td>
-            <td>3.06E-03</td>
-            <td>43.0042</td>
-            <td>0.9919</td>
-            <td>0.9989</td>
+            <td>ravu-lite-r4</td>
+            <td>3.12E-03</td>
+            <td>43.2904</td>
+            <td>0.9917</td>
+            <td>0.9991</td>
             <td></td>
-            <td>0.9148</td>
-            <td>0.8278</td>
-            <td>0.9341</td>
-            <td>0.8707</td>
+            <td>0.8561</td>
+            <td>0.7878</td>
+            <td>0.8568</td>
+            <td>0.9369</td>
             <td></td>
-            <td>0.8869</td>
+            <td>0.8594</td>
+          </tr>
+          <tr>
+            <td>ravu-lite-r3</td>
+            <td>3.17E-03</td>
+            <td>43.1456</td>
+            <td>0.9915</td>
+            <td>0.9991</td>
+            <td></td>
+            <td>0.8338</td>
+            <td>0.7626</td>
+            <td>0.8313</td>
+            <td>0.9243</td>
+            <td></td>
+            <td>0.8380</td>
           </tr>
           <tr>
             <td>ravu-zoom-r2</td>
@@ -563,68 +641,96 @@
             <td>0.9913</td>
             <td>0.9990</td>
             <td></td>
-            <td>0.8516</td>
-            <td>0.8443</td>
-            <td>0.8511</td>
-            <td>0.9486</td>
+            <td>0.8224</td>
+            <td>0.7528</td>
+            <td>0.8044</td>
+            <td>0.8978</td>
             <td></td>
-            <td>0.8739</td>
+            <td>0.8194</td>
           </tr>
           <tr>
-            <td>FSRCNNX_x2_16-0-4-1</td>
-            <td>3.19E-03</td>
-            <td>43.0352</td>
-            <td>0.9920</td>
+            <td>ravu-lite-ar-r4</td>
+            <td>3.11E-03</td>
+            <td>42.8698</td>
+            <td>0.9915</td>
             <td>0.9989</td>
             <td></td>
-            <td>0.8555</td>
-            <td>0.8339</td>
-            <td>0.9420</td>
-            <td>0.8577</td>
+            <td>0.8588</td>
+            <td>0.7147</td>
+            <td>0.8297</td>
+            <td>0.8379</td>
             <td></td>
-            <td>0.8723</td>
-          </tr>
-          <tr>
-            <td>ravu-lite-r4</td>
-            <td>3.16E-03</td>
-            <td>42.6660</td>
-            <td>0.9914</td>
-            <td>0.9990</td>
-            <td></td>
-            <td>0.8652</td>
-            <td>0.7618</td>
-            <td>0.8656</td>
-            <td>0.9146</td>
-            <td></td>
-            <td>0.8518</td>
-          </tr>
-          <tr>
-            <td>ravu-lite-r3</td>
-            <td>3.21E-03</td>
-            <td>42.5309</td>
-            <td>0.9912</td>
-            <td>0.9990</td>
-            <td></td>
-            <td>0.8433</td>
-            <td>0.7355</td>
-            <td>0.8391</td>
-            <td>0.9025</td>
-            <td></td>
-            <td>0.8301</td>
+            <td>0.8103</td>
           </tr>
           <tr>
             <td>ravu-lite-r2</td>
-            <td>3.27E-03</td>
-            <td>42.2439</td>
-            <td>0.9908</td>
+            <td>3.23E-03</td>
+            <td>42.8392</td>
+            <td>0.9912</td>
+            <td>0.9990</td>
+            <td></td>
+            <td>0.8081</td>
+            <td>0.7094</td>
+            <td>0.7886</td>
+            <td>0.8976</td>
+            <td></td>
+            <td>0.8009</td>
+          </tr>
+          <tr>
+            <td>ravu-lite-ar-r3</td>
+            <td>3.14E-03</td>
+            <td>42.7837</td>
+            <td>0.9914</td>
             <td>0.9989</td>
             <td></td>
-            <td>0.8145</td>
-            <td>0.6795</td>
-            <td>0.7887</td>
-            <td>0.8763</td>
+            <td>0.8458</td>
+            <td>0.6997</td>
+            <td>0.8157</td>
+            <td>0.8358</td>
             <td></td>
-            <td>0.7897</td>
+            <td>0.7992</td>
+          </tr>
+          <tr>
+            <td>nnedi3-nns64-win8x4</td>
+            <td>3.19E-03</td>
+            <td>42.5799</td>
+            <td>0.9913</td>
+            <td>0.9989</td>
+            <td></td>
+            <td>0.8252</td>
+            <td>0.6642</td>
+            <td>0.8041</td>
+            <td>0.8337</td>
+            <td></td>
+            <td>0.7818</td>
+          </tr>
+          <tr>
+            <td>nnedi3-nns32-win8x4</td>
+            <td>3.19E-03</td>
+            <td>42.5700</td>
+            <td>0.9912</td>
+            <td>0.9989</td>
+            <td></td>
+            <td>0.8230</td>
+            <td>0.6625</td>
+            <td>0.7997</td>
+            <td>0.8332</td>
+            <td></td>
+            <td>0.7796</td>
+          </tr>
+          <tr>
+            <td>ravu-lite-ar-r2</td>
+            <td>3.19E-03</td>
+            <td>42.5060</td>
+            <td>0.9911</td>
+            <td>0.9989</td>
+            <td></td>
+            <td>0.8247</td>
+            <td>0.6514</td>
+            <td>0.7767</td>
+            <td>0.8208</td>
+            <td></td>
+            <td>0.7684</td>
           </tr>
           <tr>
             <td>lanczos</td>
@@ -633,26 +739,12 @@
             <td>0.9901</td>
             <td>0.9989</td>
             <td></td>
-            <td>0.7282</td>
-            <td>0.6242</td>
-            <td>0.6903</td>
-            <td>0.8382</td>
+            <td>0.7033</td>
+            <td>0.5565</td>
+            <td>0.6525</td>
+            <td>0.7934</td>
             <td></td>
-            <td>0.7203</td>
-          </tr>
-          <tr>
-            <td>EASU</td>
-            <td>3.35E-03</td>
-            <td>41.7479</td>
-            <td>0.9901</td>
-            <td>0.9987</td>
-            <td></td>
-            <td>0.7810</td>
-            <td>0.5827</td>
-            <td>0.6968</td>
-            <td>0.7592</td>
-            <td></td>
-            <td>0.7049</td>
+            <td>0.6764</td>
           </tr>
           <tr>
             <td>polar_lanczossharp</td>
@@ -661,82 +753,12 @@
             <td>0.9898</td>
             <td>0.9988</td>
             <td></td>
-            <td>0.7390</td>
-            <td>0.5855</td>
-            <td>0.6573</td>
-            <td>0.8253</td>
+            <td>0.7137</td>
+            <td>0.5220</td>
+            <td>0.6212</td>
+            <td>0.7812</td>
             <td></td>
-            <td>0.7018</td>
-          </tr>
-          <tr>
-            <td>ravu-lite-ar-r4</td>
-            <td>3.41E-03</td>
-            <td>41.7120</td>
-            <td>0.9902</td>
-            <td>0.9986</td>
-            <td></td>
-            <td>0.7522</td>
-            <td>0.5757</td>
-            <td>0.7113</td>
-            <td>0.6697</td>
-            <td></td>
-            <td>0.6772</td>
-          </tr>
-          <tr>
-            <td>ravu-lite-ar-r3</td>
-            <td>3.43E-03</td>
-            <td>41.6404</td>
-            <td>0.9901</td>
-            <td>0.9986</td>
-            <td></td>
-            <td>0.7392</td>
-            <td>0.5617</td>
-            <td>0.6951</td>
-            <td>0.6684</td>
-            <td></td>
-            <td>0.6661</td>
-          </tr>
-          <tr>
-            <td>nnedi3-nns32-win8x4.hook</td>
-            <td>3.47E-03</td>
-            <td>41.5189</td>
-            <td>0.9901</td>
-            <td>0.9986</td>
-            <td></td>
-            <td>0.7211</td>
-            <td>0.5380</td>
-            <td>0.6953</td>
-            <td>0.6926</td>
-            <td></td>
-            <td>0.6618</td>
-          </tr>
-          <tr>
-            <td>nnedi3-nns64-win8x4.hook</td>
-            <td>3.47E-03</td>
-            <td>41.5101</td>
-            <td>0.9901</td>
-            <td>0.9986</td>
-            <td></td>
-            <td>0.7210</td>
-            <td>0.5363</td>
-            <td>0.6971</td>
-            <td>0.6896</td>
-            <td></td>
-            <td>0.6610</td>
-          </tr>
-          <tr>
-            <td>ravu-lite-ar-r2</td>
-            <td>3.48E-03</td>
-            <td>41.4288</td>
-            <td>0.9898</td>
-            <td>0.9985</td>
-            <td></td>
-            <td>0.7178</td>
-            <td>0.5205</td>
-            <td>0.6496</td>
-            <td>0.6602</td>
-            <td></td>
-            <td>0.6370</td>
+            <td>0.6595</td>
           </tr>
           <tr>
             <td>FSR</td>
@@ -746,11 +768,11 @@
             <td>0.9981</td>
             <td></td>
             <td>0.0000</td>
-            <td>0.3346</td>
-            <td>0.0969</td>
-            <td>0.4210</td>
+            <td>0.2983</td>
+            <td>0.0916</td>
+            <td>0.3984</td>
             <td></td>
-            <td>0.2131</td>
+            <td>0.1971</td>
           </tr>
           <tr>
             <td>bilinear</td>
@@ -759,12 +781,12 @@
             <td>0.9848</td>
             <td>0.9974</td>
             <td></td>
-            <td>0.3224</td>
+            <td>0.3114</td>
             <td>0.0000</td>
             <td>0.0000</td>
             <td>0.0000</td>
             <td></td>
-            <td>0.0806</td>
+            <td>0.0778</td>
           </tr>
         </tbody>
       </table>
@@ -774,14 +796,8 @@
         The numbers are all closer together at 1.5x, which shows that your choice of scaler becomes less relevant as you decrease the scaling factor.
     </p>
     <p>
-        It's a bit funny to see FSR get worse here, since a lower scaling factor corresponds to a higher quality preset in AMD's terms, but I think the problem is just that the shader is too sharp.
-    </p>
-    <p>
-        It's pretty easy to see that the slightly blurry downsampling step is hurting the doublers. This section previously used catrom+PC to downsample them (which is now only used to generate the "input"),
-        but honestly that was a bit overkill. Using mpv's default downsampling filter makes more sense as that's what most users are probably using.
-    </p>
-    <p>
-        The conclusion is that at lower scaling factors the benefits these shaders bring become smaller, but the new ravu-zoom variants are all pretty damn good. I personally recommend sticking to the r3 variants, with or without AR.
+        We can see that the CNNs are topping the chart here as well, but keep in mind that since they can only double you'll waste some resources downsampling the image back to the target resolution.
+        With that in mind, it seems fair to recommend ravu-zoom here unless you really don't mind loading your GPU.
     </p>
     <h3 id="chroma_shaders">Chroma Shaders</h3>
     <p>
@@ -789,11 +805,8 @@
         You can read more about it <a href="https://en.wikipedia.org/wiki/Kriging">here</a>.
     </p>
     <p>
-        bjin has also released chroma variants of ravu in the past, and I've written a few shaders myself in an attempt to learn GLSL (ended up being too fun and now I can't spend a week without editing these shaders...).
-    </p>
-    <p>
-        Anyway... My first (not very successful) chroma meme was called jointbilateral and it pretty much implemented <a href="https://johanneskopf.de/publications/jbu/paper/FinalPaper_0185.pdf">this paper.</a>
-        In short, chromatic information from pixels with similar luminosities is preferred (simply uses luma-deltas as an extra weighting factor). The inherent flaw with this idea is that it can't overshoot, so
+        Anyway... My first (not very successful) attempt at a chroma shader was jointbilateral and it pretty much implemented <a href="https://johanneskopf.de/publications/jbu/paper/FinalPaper_0185.pdf">this paper.</a>
+        In short, chromatic information from pixels with similar luminosities is preferred (simply uses luma-deltas as an extra weighting factor). The inherent flaw with this idea is that the shader can't overshoot, so
         it's literally incapable of reaching some intensity levels depending on how chroma subsampling is done.
     </p>
     <p>
@@ -1910,12 +1923,6 @@
       <table>
         <tbody>
           <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
             <td>Preset/Shader</td>
             <td>FPS</td>
             <td>Time</td>
@@ -1946,22 +1953,10 @@
             <td>0.7506</td>
           </tr>
           <tr>
-            <td>cfl_12</td>
-            <td>1529</td>
-            <td>56.10</td>
-            <td>0.7434</td>
-          </tr>
-          <tr>
-            <td>cfl_4</td>
-            <td>1526</td>
-            <td>56.21</td>
-            <td>0.7420</td>
-          </tr>
-          <tr>
-            <td>cfl_12+4</td>
-            <td>1525</td>
-            <td>56.27</td>
-            <td>0.7413</td>
+            <td>cfl_lite</td>
+            <td>1509</td>
+            <td>56.85</td>
+            <td>0.7337</td>
           </tr>
           <tr>
             <td>ravu-lite-r2</td>
@@ -1970,16 +1965,10 @@
             <td>0.7065</td>
           </tr>
           <tr>
-            <td>EASU</td>
-            <td>1447</td>
-            <td>59.29</td>
-            <td>0.7035</td>
-          </tr>
-          <tr>
-            <td>krigbilateral</td>
-            <td>1417</td>
-            <td>60.55</td>
-            <td>0.6888</td>
+            <td>cfl</td>
+            <td>1435</td>
+            <td>59.80</td>
+            <td>0.6975</td>
           </tr>
           <tr>
             <td>ravu-lite-ar-r2</td>
@@ -2072,10 +2061,28 @@
             <td>0.4433</td>
           </tr>
           <tr>
+            <td>ArtCNN_C4F8</td>
+            <td>903</td>
+            <td>95.03</td>
+            <td>0.4389</td>
+          </tr>
+          <tr>
+            <td>krigbilateral</td>
+            <td>903</td>
+            <td>95.03</td>
+            <td>0.4389</td>
+          </tr>
+          <tr>
             <td>nnedi3-nns64-win8x4</td>
             <td>640</td>
             <td>134.07</td>
             <td>0.3111</td>
+          </tr>
+          <tr>
+            <td>ArtCNN_C4F16</td>
+            <td>402</td>
+            <td>213.66</td>
+            <td>0.1952</td>
           </tr>
           <tr>
             <td>FSRCNNX_x2_16-0-4-1</td>
