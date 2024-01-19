@@ -903,34 +903,6 @@
           <td>0.7919</td>
         </tr>
         <tr>
-          <td>ravu-zoom-r3-chroma</td>
-          <td>3.03E-03</td>
-          <td>40.4487</td>
-          <td>0.9887</td>
-          <td>0.9990</td>
-          <td></td>
-          <td>0.5675</td>
-          <td>0.5874</td>
-          <td>0.5246</td>
-          <td>0.7355</td>
-          <td></td>
-          <td>0.6038</td>
-        </tr>
-        <tr>
-          <td>ravu-zoom-r2-chroma</td>
-          <td>3.10E-03</td>
-          <td>40.3055</td>
-          <td>0.9884</td>
-          <td>0.9990</td>
-          <td></td>
-          <td>0.5130</td>
-          <td>0.5524</td>
-          <td>0.4891</td>
-          <td>0.7196</td>
-          <td></td>
-          <td>0.5685</td>
-        </tr>
-        <tr>
           <td>jointbilateral</td>
           <td>3.09E-03</td>
           <td>39.2373</td>
@@ -1013,14 +985,12 @@
         Krigbilateral comes right after that, this shader used to be the standard recommendation for chroma shaders for years but it's a bit hit or miss.
     </p>
     <p>
-        Ravu is also an option is you really dislike what the regression-based shaders do, as it's analogous to a very good polar filter and relatively free of weird artifacts.
-    </p>
-    <p>
         You should probably skip Joint/FastBilateral unless you really can't run any of the other shaders due to performance constraints (and in that case you're better off with built-in filters anyway).
         These shaders are kinda hit or miss just like Krig, but since they can't overshoot at all they tend to be worse than even the built-in solutions on very complex scenes.
     </p>
     <p>
-        To conclude, if you want to use a chroma shader you should probably pick CfL. My opinion on this matter may be biased since I'm the author of the shader though, so you should probably double check with your own tests.
+        To conclude, if you want to use a chroma shader you should probably pick CfL. I don't think there's that much to be gained from using chroma shaders when watching real content though, and since they all can produce some
+        weird artifacts sometimes I'd say skipping them is a very reasonably advice.
     </p>
     <h3 id="antiring">Antiring</h3>
     <p>
