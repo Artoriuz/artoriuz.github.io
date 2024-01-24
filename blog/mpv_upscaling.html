@@ -1660,26 +1660,25 @@
         Pixel Clipper actually has a downsampling variant as well, which I believe is probably less broken than mpv's native <inline_code>--dscale-antiring</inline_code> solution for orthogonal filters.
         Libplacebo's new polar AR has been recently enabled for downsampling as well, so we can also test that here.
     </p>
-    <p>
-        The following image will be used for downsampling AR tests:
-    </p>
-    <img src="./images/mpv_upscaling/downsampling/highres.png" alt="yurucamp" class="center" width="960" height="540">
     <h3 id="downsampling_antiring_methodology">Downsampling Antiring Methodology</h3>
     <p>
         My current method to evaluate downsampling filters is to concede that at 0.5x linear light box is as good as it gets, since in this case we're just averaging 4 pixels together.
         We can't use box itself for other scaling factors though, so the aim is to find a filter that produces a similar result while also being usable at any other arbitrary scaling factor.
     </p>
     <p>
-        To eliminate any differences caused by how differently mpv and ImageMagick perform linear light conversion, the box reference was also obtained using mpv.
+        The same violet.png test image was used to test downsampling AR, and it was downsampled with ImageMagick as follows:
     </p>
+    <code>
+        magick convert violet.png -colorspace RGB -filter box -resize 50% -colorspace sRGB reference.png
+    </code>
     <p>
         The images were basically generated using the following commands:
     </p>
-    <code>mpv --no-config --vo=gpu-next --no-hidpi-window-scale --window-scale=0.5 --pause=yes --screenshot-format=png --linear-downscaling --correct-downscaling --deband=no --dither-depth=no --screenshot-high-bit-depth=no --dscale=filter --glsl-shader="Pixel Clipper_downscaling.glsl" higres.png</code>
+    <code>mpv --no-config --vo=gpu-next --no-hidpi-window-scale --window-scale=0.5 --pause=yes --screenshot-format=png --linear-downscaling --correct-downscaling --deband=no --dither-depth=no --screenshot-high-bit-depth=no --dscale=filter --glsl-shader="Pixel Clipper_downscaling.glsl" violet.png</code>
     <br><br>
-    <code>mpv --no-config --vo=gpu-next --no-hidpi-window-scale --window-scale=0.5 --pause=yes --screenshot-format=png --linear-downscaling --correct-downscaling --deband=no --dither-depth=no --screenshot-high-bit-depth=no --dscale=filter --scale-antiring=1 higres.png</code>
+    <code>mpv --no-config --vo=gpu-next --no-hidpi-window-scale --window-scale=0.5 --pause=yes --screenshot-format=png --linear-downscaling --correct-downscaling --deband=no --dither-depth=no --screenshot-high-bit-depth=no --dscale=filter --scale-antiring=1.0 violet.png</code>
     <p>
-      Please note that you have to set <inline_code>--scale-antiring=1</inline_code> instead of <inline_code>--dscale-antiring=1</inline_code>. That's probably a bug but it is what it is.
+      Please note that you have to set <inline_code>--scale-antiring=1.0</inline_code> instead of <inline_code>--dscale-antiring=1.0</inline_code>. That's probably a bug but it is what it is.
     </p>
     <h3 id="downsampling_antiring_results">Downsampling Antiring Results</h3>
     <p>
@@ -1700,151 +1699,151 @@
             <td>Mean</td>
           </tr>
           <tr>
-            <td>lanczos_pc_100</td>
-            <td>2.73E-03</td>
-            <td>42.0482</td>
-            <td>0.9950</td>
-            <td>0.9994</td>
+            <td>catrom_pc</td>
+            <td>1.69E-03</td>
+            <td>49.0252</td>
+            <td>0.9976</td>
+            <td>0.9997</td>
             <td></td>
             <td>1.0000</td>
             <td>1.0000</td>
             <td>1.0000</td>
+            <td>0.9904</td>
+            <td></td>
+            <td>0.9976</td>
+          </tr>
+          <tr>
+            <td>catrom</td>
+            <td>1.70E-03</td>
+            <td>48.7158</td>
+            <td>0.9975</td>
+            <td>0.9997</td>
+            <td></td>
+            <td>0.9889</td>
+            <td>0.9342</td>
+            <td>0.9861</td>
             <td>1.0000</td>
             <td></td>
-            <td>1.0000</td>
+            <td>0.9773</td>
           </tr>
           <tr>
-            <td>lanczos_pc_75</td>
-            <td>3.04E-03</td>
-            <td>41.3289</td>
-            <td>0.9945</td>
-            <td>0.9994</td>
+            <td>lanczos_pc</td>
+            <td>1.78E-03</td>
+            <td>48.7595</td>
+            <td>0.9974</td>
+            <td>0.9997</td>
             <td></td>
-            <td>0.8532</td>
-            <td>0.8748</td>
-            <td>0.9223</td>
-            <td>0.9429</td>
+            <td>0.8918</td>
+            <td>0.9435</td>
+            <td>0.9396</td>
+            <td>0.8517</td>
             <td></td>
-            <td>0.8983</td>
+            <td>0.9066</td>
           </tr>
           <tr>
-            <td>lanczos_pc_50</td>
-            <td>3.35E-03</td>
-            <td>40.1205</td>
-            <td>0.9938</td>
-            <td>0.9993</td>
+            <td>polar_lanczossharp_ar</td>
+            <td>1.85E-03</td>
+            <td>47.3664</td>
+            <td>0.9970</td>
+            <td>0.9997</td>
             <td></td>
-            <td>0.7074</td>
-            <td>0.6644</td>
-            <td>0.8048</td>
-            <td>0.8127</td>
+            <td>0.8022</td>
+            <td>0.6470</td>
+            <td>0.7183</td>
+            <td>0.7255</td>
             <td></td>
-            <td>0.7473</td>
+            <td>0.7232</td>
           </tr>
           <tr>
-            <td>polar_lanczossharp_ar_100</td>
-            <td>3.28E-03</td>
-            <td>40.3036</td>
-            <td>0.9930</td>
-            <td>0.9993</td>
+            <td>polar_lanczossharp_pc</td>
+            <td>2.05E-03</td>
+            <td>46.9530</td>
+            <td>0.9968</td>
+            <td>0.9997</td>
             <td></td>
-            <td>0.7381</td>
-            <td>0.6962</td>
-            <td>0.6898</td>
-            <td>0.7798</td>
+            <td>0.5401</td>
+            <td>0.5590</td>
+            <td>0.6008</td>
+            <td>0.6447</td>
             <td></td>
-            <td>0.7260</td>
-          </tr>
-          <tr>
-            <td>polar_lanczossharp_pc_100</td>
-            <td>3.45E-03</td>
-            <td>40.1487</td>
-            <td>0.9927</td>
-            <td>0.9993</td>
-            <td></td>
-            <td>0.6562</td>
-            <td>0.6693</td>
-            <td>0.6369</td>
-            <td>0.7703</td>
-            <td></td>
-            <td>0.6832</td>
-          </tr>
-          <tr>
-            <td>polar_lanczossharp_ar_75</td>
-            <td>3.56E-03</td>
-            <td>39.8009</td>
-            <td>0.9926</td>
-            <td>0.9993</td>
-            <td></td>
-            <td>0.6036</td>
-            <td>0.6087</td>
-            <td>0.6265</td>
-            <td>0.7744</td>
-            <td></td>
-            <td>0.6533</td>
-          </tr>
-          <tr>
-            <td>polar_lanczossharp_pc_75</td>
-            <td>3.82E-03</td>
-            <td>39.5368</td>
-            <td>0.9921</td>
-            <td>0.9992</td>
-            <td></td>
-            <td>0.4812</td>
-            <td>0.5627</td>
-            <td>0.5379</td>
-            <td>0.6968</td>
-            <td></td>
-            <td>0.5697</td>
-          </tr>
-          <tr>
-            <td>polar_lanczossharp_ar_50</td>
-            <td>3.97E-03</td>
-            <td>38.7195</td>
-            <td>0.9917</td>
-            <td>0.9992</td>
-            <td></td>
-            <td>0.4127</td>
-            <td>0.4204</td>
-            <td>0.4776</td>
-            <td>0.6237</td>
-            <td></td>
-            <td>0.4836</td>
-          </tr>
-          <tr>
-            <td>polar_lanczossharp_pc_50</td>
-            <td>4.17E-03</td>
-            <td>38.4965</td>
-            <td>0.9911</td>
-            <td>0.9991</td>
-            <td></td>
-            <td>0.3134</td>
-            <td>0.3816</td>
-            <td>0.3921</td>
-            <td>0.5300</td>
-            <td></td>
-            <td>0.4043</td>
+            <td>0.5862</td>
           </tr>
           <tr>
             <td>lanczos</td>
-            <td>3.93E-03</td>
-            <td>37.7231</td>
-            <td>0.9917</td>
-            <td>0.9990</td>
+            <td>2.09E-03</td>
+            <td>46.4377</td>
+            <td>0.9967</td>
+            <td>0.9996</td>
             <td></td>
-            <td>0.4286</td>
-            <td>0.2469</td>
-            <td>0.4812</td>
-            <td>0.4032</td>
+            <td>0.4900</td>
+            <td>0.4493</td>
+            <td>0.5663</td>
+            <td>0.5351</td>
             <td></td>
-            <td>0.3900</td>
+            <td>0.5102</td>
+          </tr>
+          <tr>
+            <td>hermite</td>
+            <td>2.09E-03</td>
+            <td>45.8359</td>
+            <td>0.9966</td>
+            <td>0.9996</td>
+            <td></td>
+            <td>0.4854</td>
+            <td>0.3213</td>
+            <td>0.5352</td>
+            <td>0.3482</td>
+            <td></td>
+            <td>0.4225</td>
+          </tr>
+          <tr>
+            <td>hermite_pc</td>
+            <td>2.17E-03</td>
+            <td>45.7873</td>
+            <td>0.9965</td>
+            <td>0.9996</td>
+            <td></td>
+            <td>0.3857</td>
+            <td>0.3109</td>
+            <td>0.4918</td>
+            <td>0.2945</td>
+            <td></td>
+            <td>0.3707</td>
           </tr>
           <tr>
             <td>polar_lanczossharp</td>
-            <td>4.83E-03</td>
-            <td>36.3049</td>
-            <td>0.9886</td>
-            <td>0.9988</td>
+            <td>2.46E-03</td>
+            <td>44.8483</td>
+            <td>0.9957</td>
+            <td>0.9996</td>
+            <td></td>
+            <td>0.0147</td>
+            <td>0.1111</td>
+            <td>0.0607</td>
+            <td>0.2214</td>
+            <td></td>
+            <td>0.1020</td>
+          </tr>
+          <tr>
+            <td>mitchell</td>
+            <td>2.41E-03</td>
+            <td>44.3562</td>
+            <td>0.9956</td>
+            <td>0.9995</td>
+            <td></td>
+            <td>0.0863</td>
+            <td>0.0063</td>
+            <td>0.0362</td>
+            <td>0.0535</td>
+            <td></td>
+            <td>0.0456</td>
+          </tr>
+          <tr>
+            <td>mitchell_pc</td>
+            <td>2.48E-03</td>
+            <td>44.3264</td>
+            <td>0.9956</td>
+            <td>0.9995</td>
             <td></td>
             <td>0.0000</td>
             <td>0.0000</td>
@@ -1858,15 +1857,14 @@
     </p>
     <h3 id="downsampling_antiring_commentary">Downsampling Antiring Commentary</h3>
     <p>
-        The first thing we can see is that AR seems to be a net-positive in general, and the score differences we see here are much larger than their upsampling counterparts.
+        The first thing we can see is that AR seems to be a net-positive in general when using ringy filters. Only Mitchell and Hermite got worse with AR.
     </p>
     <p>
         It's also good to see that libplacebo's AR seems to work even better when downsampling, as it can remove ringing without introducing any significant blur. This consolidates that there's little reason to use Pixel Clipper over
         Libplacebo's native AR if you're using polar filters.
     </p>
     <p>
-        It's also worth mentioning that downsampling AR only makes sense when you're using a sharp filter. Blurry filters such as mitchell do not benefit nearly as much from this (since there's almost no ringing to remove), and the remark that some
-        mild ringing can be perceived as a positive thing by the human eye is also valid here. Personally I'd say you probably need some AR for anything sharper than catrom, but catrom itself is still perfectly usable without AR.
+        Personally, I'd say you probably need some kind of AR for anything sharper than catrom, but catrom itself is still perfectly usable without AR.
     </p>
     <h3 id="performance">Performance Benchmarks</h3>
     <p>

@@ -20,7 +20,7 @@ def msssim(im1, im2, data_range = 255, channel_axis = None):
                 filtered_im2[:, :, channel] = convolve(im2[:, :, channel], downsample_filter, mode='reflect')
             im1 = filtered_im1[::2, ::2, :]
             im2 = filtered_im2[::2, ::2, :]
-        else:    
+        else:
             filtered_im1 = convolve(im1, downsample_filter, mode='reflect')
             filtered_im2 = convolve(im2, downsample_filter, mode='reflect')
             im1 = filtered_im1[::2, ::2]
@@ -31,12 +31,12 @@ output_file = open("benchmark_result.txt", "w")
 
 print("Starting benchmarks")
 
-reference = cv2.imread('./box.png', cv2.IMREAD_COLOR).astype("float") / 255.0
+reference = cv2.imread('./reference.png', cv2.IMREAD_COLOR).astype("float") / 255.0
 # reference = cv2.cvtColor(reference, cv2.COLOR_BGR2GRAY, 0).astype(float) / 255.0
 
 filelist = sorted(glob.glob('./*.png'))
 for myFile in filelist:
-    if not "highres" in myFile:
+    if not "violet" in myFile:
         image = cv2.imread(myFile, cv2.IMREAD_COLOR).astype("float") / 255.0
         # image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY, 0).astype(float) / 255.0
 
@@ -44,7 +44,7 @@ for myFile in filelist:
         psnr_score = skimage.metrics.peak_signal_noise_ratio(reference, image)
         ssim_score = skimage.metrics.structural_similarity(reference, image, data_range = 1.0, channel_axis = 2)
         msssim_score = msssim(reference, image, data_range = 1.0, channel_axis = 2)
-        
+
         print(f"{myFile} - MAE: {mae_score}, PSNR: {psnr_score}, SSIM: {ssim_score}, MS-SSIM: {msssim_score}\n")
         output_file.write(f"{myFile}, {mae_score}, {psnr_score}, {ssim_score}, {msssim_score}\n")
 
