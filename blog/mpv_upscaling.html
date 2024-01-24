@@ -816,14 +816,14 @@
     </p>
     <h3 id="chroma_methodology">Chroma Methodology</h3>
     <p>
-        This test is a little different and it requires a slightly more elaborate process. The first problem with this is that, with real video content, we rarely get a 4:4:4 copy.
-        This means that we generally don't have a reference point to work with, so we have to create one on our own.
+        This test is a little different and it requires a slightly more elaborate process. The first problem with this is that with real video content we rarely get a 4:4:4 copy, so we either have to make our own
+        (downsampling luma for example) or use something else.
     </p>
     <p>
-        I've semi-arbitrarily decided to use a downsampled version of this key visual:
+        I've semi-arbitrarily decided to use this promotional art:
     </p>
     <p>
-        <img src="./images/mpv_upscaling/chroma/maomao.jpg" alt="chroma_reference" class="center" width="510" height="720">
+        <img src="./images/mpv_upscaling/chroma/original.png" alt="chroma_reference" class="center" width="960" height="540">
     </p>
     <p>
         Two versions of the image were created using FFmpeg:
@@ -862,10 +862,10 @@
         </tr>
         <tr>
           <td>cfl</td>
-          <td>2.45E-03</td>
-          <td>42.1339</td>
-          <td>0.9929</td>
-          <td>0.9993</td>
+          <td>4.11E-03</td>
+          <td>38.1577</td>
+          <td>0.9905</td>
+          <td>0.9992</td>
           <td></td>
           <td>1.0000</td>
           <td>1.0000</td>
@@ -876,94 +876,94 @@
         </tr>
         <tr>
           <td>cfl_lite</td>
-          <td>2.48E-03</td>
-          <td>41.9916</td>
-          <td>0.9928</td>
-          <td>0.9993</td>
+          <td>4.18E-03</td>
+          <td>37.9453</td>
+          <td>0.9902</td>
+          <td>0.9992</td>
           <td></td>
-          <td>0.9783</td>
-          <td>0.9652</td>
-          <td>0.9850</td>
-          <td>0.9918</td>
+          <td>0.9739</td>
+          <td>0.9584</td>
+          <td>0.9797</td>
+          <td>0.9787</td>
           <td></td>
-          <td>0.9801</td>
+          <td>0.9727</td>
         </tr>
         <tr>
           <td>krigbilateral</td>
-          <td>2.65E-03</td>
-          <td>40.7990</td>
-          <td>0.9913</td>
-          <td>0.9991</td>
+          <td>4.37E-03</td>
+          <td>36.7895</td>
+          <td>0.9888</td>
+          <td>0.9990</td>
           <td></td>
-          <td>0.8547</td>
-          <td>0.6732</td>
-          <td>0.8136</td>
-          <td>0.8262</td>
+          <td>0.9006</td>
+          <td>0.7323</td>
+          <td>0.8842</td>
+          <td>0.8299</td>
           <td></td>
-          <td>0.7919</td>
-        </tr>
-        <tr>
-          <td>jointbilateral</td>
-          <td>3.09E-03</td>
-          <td>39.2373</td>
-          <td>0.9883</td>
-          <td>0.9988</td>
-          <td></td>
-          <td>0.5187</td>
-          <td>0.2909</td>
-          <td>0.4692</td>
-          <td>0.5135</td>
-          <td></td>
-          <td>0.4481</td>
+          <td>0.8367</td>
         </tr>
         <tr>
           <td>fastbilateral</td>
-          <td>3.10E-03</td>
-          <td>39.1754</td>
-          <td>0.9881</td>
-          <td>0.9988</td>
+          <td>5.05E-03</td>
+          <td>35.4604</td>
+          <td>0.9851</td>
+          <td>0.9987</td>
           <td></td>
-          <td>0.5154</td>
-          <td>0.2757</td>
-          <td>0.4530</td>
-          <td>0.5268</td>
+          <td>0.6507</td>
+          <td>0.4722</td>
+          <td>0.6315</td>
+          <td>0.6045</td>
           <td></td>
-          <td>0.4427</td>
+          <td>0.5897</td>
+        </tr>
+        <tr>
+          <td>jointbilateral</td>
+          <td>5.07E-03</td>
+          <td>35.4165</td>
+          <td>0.9851</td>
+          <td>0.9987</td>
+          <td></td>
+          <td>0.6420</td>
+          <td>0.4636</td>
+          <td>0.6368</td>
+          <td>0.5700</td>
+          <td></td>
+          <td>0.5781</td>
         </tr>
         <tr>
           <td>lanczos</td>
-          <td>3.31E-03</td>
-          <td>39.4604</td>
-          <td>0.9869</td>
-          <td>0.9988</td>
+          <td>5.62E-03</td>
+          <td>34.8552</td>
+          <td>0.9815</td>
+          <td>0.9986</td>
           <td></td>
-          <td>0.3525</td>
-          <td>0.3455</td>
-          <td>0.3163</td>
-          <td>0.5160</td>
+          <td>0.4389</td>
+          <td>0.3537</td>
+          <td>0.3932</td>
+          <td>0.5475</td>
           <td></td>
-          <td>0.3826</td>
+          <td>0.4333</td>
         </tr>
         <tr>
           <td>polar_lanczossharp</td>
-          <td>3.37E-03</td>
-          <td>39.2526</td>
-          <td>0.9865</td>
-          <td>0.9987</td>
+          <td>5.80E-03</td>
+          <td>34.5458</td>
+          <td>0.9807</td>
+          <td>0.9986</td>
           <td></td>
-          <td>0.3135</td>
-          <td>0.2946</td>
-          <td>0.2649</td>
-          <td>0.4533</td>
+          <td>0.3720</td>
+          <td>0.2932</td>
+          <td>0.3356</td>
+          <td>0.4923</td>
           <td></td>
-          <td>0.3316</td>
+          <td>0.3733</td>
         </tr>
         <tr>
           <td>bilinear</td>
-          <td>3.78E-03</td>
-          <td>38.0491</td>
-          <td>0.9841</td>
-          <td>0.9982</td>
+          <td>6.81E-03</td>
+          <td>33.0476</td>
+          <td>0.9757</td>
+          <td>0.9979</td>
           <td></td>
           <td>0.0000</td>
           <td>0.0000</td>
@@ -973,24 +973,24 @@
           <td>0.0000</td>
         </tr>
       </tbody>
-    </table>
+      </table>
     <h3 id="chroma_commentary">Chroma Commentary</h3>
     <p>
-        Chroma upscaling is often seen as less important since the human visual system is less sensitive to chromatic variations, but there's still something to be gained using shaders to upscale chroma.
+        Chroma upscaling is often seen as less important since the human visual system is less sensitive to chromatic variations, but there's still something to be gained using meme shaders to upscale chroma.
     </p>
     <p>
         If we look at the numbers, CfL is the best shader on all metrics. This doesn't mean that it'll always look the best, but generally speaking when it goes bad it doesn't go as bad as the others.
     </p>
     <p>
-        Krigbilateral comes right after that, this shader used to be the standard recommendation for chroma shaders for years but it's a bit hit or miss.
+        Krigbilateral comes right after that, this shader used to be the standard recommendation for chroma shaders for years it can look fantastic sometimes. The problem is that when it goes bad it goes really bad.
     </p>
     <p>
-        You should probably skip Joint/FastBilateral unless you really can't run any of the other shaders due to performance constraints (and in that case you're better off with built-in filters anyway).
-        These shaders are kinda hit or miss just like Krig, but since they can't overshoot at all they tend to be worse than even the built-in solutions on very complex scenes.
+        You should probably skip Joint/FastBilateral unless you really can't run any of the other shaders due to performance constraints.
+        These shaders are kinda hit or miss just like Krig, but since they can't overshoot at all they tend to be worse than even lanczos on scenes with a lot of high-frequency information. This is rarely the case on anime content
+        though, and these shaders can reduce chroma bleeding/smearing.
     </p>
     <p>
-        To conclude, if you want to use a chroma shader you should probably pick CfL. I don't think there's that much to be gained from using chroma shaders when watching real content though, and since they all can produce some
-        weird artifacts sometimes I'd say skipping them is a very reasonably advice.
+        To conclude, if you want to use a chroma shader you should probably pick either CfL or Krig.
     </p>
     <h3 id="antiring">Antiring</h3>
     <p>
