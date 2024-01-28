@@ -977,17 +977,51 @@
         </tbody>
       </table>
     </p>
+    <h3 id="fractional_upsampling_results_gamma">Fractional Upsampling Results (Gamma Light)</h3>
+    <p>
+      <table>
+        <tbody>
+          <tr>
+            <td>Shader/Filter</td>
+            <td>MAE</td>
+            <td>PSNR</td>
+            <td>SSIM</td>
+            <td>MS-SSIM</td>
+          </tr>
+          <tr>
+            <td>ArtCNN_C4F16</td>
+            <td>5.60E-03</td>
+            <td>35.7404</td>
+            <td>0.9905</td>
+            <td>0.9990</td>
+          </tr>
+          <tr>
+            <td>ravu-zoom-ar-r3</td>
+            <td>6.09E-03</td>
+            <td>34.6927</td>
+            <td>0.9885</td>
+            <td>0.9987</td>
+          </tr>
+          <tr>
+            <td>ArtCNN_C4F16_LL</td>
+            <td>6.34E-03</td>
+            <td>34.5006</td>
+            <td>0.9898</td>
+            <td>0.9986</td>
+          </tr>
+        </tbody>
+      </table>
+    </p>
     <h3 id="fractional_upsampling_commentary">Fractional Upsampling Commentary</h3>
     <p>
         The numbers are all closer together at 1.33x, which shows that your choice of scaler becomes less relevant as you decrease the scaling factor.
     </p>
     <p>
-        We can see that the LL variant of ArtCNN is obviously topping the chart here as well, but the gamma variants are all way lower. This happens because when we downsample the image from 2x to 1.33x we're throwing alway most
-        of the extra information and RAVU is excellent at such a low scaling factor.
+        We can see that the LL variant of ArtCNN is obviously topping the LL chart here as well, but the gamma variants are all way lower. This happens because when we downsample the image from 2x to 1.33x we're throwing alway most
+        of the extra information and RAVU is excellent at such a low scaling factor. When testing in gamma light, the normal variant of ArtCNN goes back up but that's also expected.
     </p>
     <p>
-        My recommendation here is ravu-zoom-ar-r3. This shader can output to the target resolution directly and it's way faster than the neural networks (which includes NNEDI3). If you know the content has been downsampled in linear light though,
-        the linear light variant of ArtCNN is always going to be the best option.
+        My recommendation here is ravu-zoom-ar-r3. This shader can output to the target resolution directly and it's way faster than the neural networks (which includes NNEDI3).
     </p>
     <h3 id="chroma_shaders">Chroma Shaders</h3>
     <p>
