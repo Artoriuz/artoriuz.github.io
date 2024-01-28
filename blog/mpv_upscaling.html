@@ -385,6 +385,260 @@
     <p>
         In short, if you want a luma doubler in 2024 my recommendation is ArtCNN. Even its smaller variant seems to do better than everything else, so there should be no performance concerns about it.
     </p>
+    <h3 id="gamma_upsampling">The Effect of the Downsampler in Upsampling Evaluation</h3>
+    <p>
+        Downsampling in linear light is widely accepted as the "usually correct" approach, it can better preserve bright highlights which can make a huge difference depending on what you're downsampling. That doesn't mean that
+        linear light downsampling will absolutely always look better, if you're downsampling black text on a white background you're probably better off doing it in gamma light to prevent the background from dilating into the text
+        for example, since that would hurt legibility.
+    </p>
+    <p>
+        This usually isn't a problem when using the built-in filters because mpv doesn't upsample in either linear or gamma light by default, it does it in sigmoid light instead to reduce ringing artifacts. However, that's
+        usually not true for the shaders and some of these shaders are trained with LR-HR image pairs, in which the LR image is artificially created via downsampling the HR reference. Since I'm testing
+        these shaders with an image downsampled in LL, it's obvious that any model trained with images downsampled in LL is going to have an unfair advantage (which was the case with ArtCNN in the tables above).
+    </p>
+    <p>
+        You could say "but LL is correct so this is fine!", but at the end of the day this is just a preference. When it comes to line-art at least, it seems perfectly valid to prefer downsampling in gamma light to better
+        preserve dark highlights (which is why some people don't recommend downsampling manga in LL).
+    </p>
+    <p>
+        In short, downsampling in linear light dilates bright structures while eroding dark ones (relative to downsampling in gamma light). This is generally considered correct but it might not always be ideal depending on content.
+    </p>
+    <p>
+        The problem arises when we have to decide how to downsample training data before feeding it to a model. If we feed images that have been downsampled in linear light, the model will produce images with dilated dark highlights
+        and eroded bright features. The exact opposite of what happens when you downsample in linear light, because it's merely "undoing" it to arrive back at the reference.
+    </p>
+    <p>
+        Most models will also show better reconstruction performance when you feed them LR images that have been downsampled in gamma light.
+        These ML models have a learning capacity "budget" in the number of weights they have, so when they don't have to learn how to undo what LL downscaling does,
+        they end up with a bigger "budget" to the actual task of upsampling the LR image.
+    </p>
+    <p>
+        With all that said though, what difference does it make? The following table shows the scores for a 2x upsampling task, but with the LR downsampled in gamma light instead.
+    </p>
+    <p>
+      <table>
+        <tbody>
+          <tr>
+            <td>Shader/Filter</td>
+            <td>MAE</td>
+            <td>PSNR</td>
+            <td>SSIM</td>
+            <td>MS-SSIM</td>
+            <td></td>
+            <td>MAE (N)</td>
+            <td>PSNR (N)</td>
+            <td>SSIM (N)</td>
+            <td>MS-SSIM (N)</td>
+            <td></td>
+            <td>Mean</td>
+          </tr>
+          <tr>
+            <td>ArtCNN_C4F32</td>
+            <td>7.28E-03</td>
+            <td>33.7133</td>
+            <td>0.9837</td>
+            <td>0.9990</td>
+            <td></td>
+            <td>1.0000</td>
+            <td>1.0000</td>
+            <td>1.0000</td>
+            <td>1.0000</td>
+            <td></td>
+            <td>1.0000</td>
+          </tr>
+          <tr>
+            <td>ArtCNN_C4F16</td>
+            <td>7.78E-03</td>
+            <td>33.0783</td>
+            <td>0.9820</td>
+            <td>0.9989</td>
+            <td></td>
+            <td>0.9610</td>
+            <td>0.9203</td>
+            <td>0.9718</td>
+            <td>0.9905</td>
+            <td></td>
+            <td>0.9609</td>
+          </tr>
+          <tr>
+            <td>ArtCNN_C4F8</td>
+            <td>9.02E-03</td>
+            <td>31.9308</td>
+            <td>0.9773</td>
+            <td>0.9986</td>
+            <td></td>
+            <td>0.8632</td>
+            <td>0.7763</td>
+            <td>0.8918</td>
+            <td>0.9655</td>
+            <td></td>
+            <td>0.8742</td>
+          </tr>
+          <tr>
+            <td>FSRCNNX_x2_16-0-4-1</td>
+            <td>9.75E-03</td>
+            <td>31.7201</td>
+            <td>0.9758</td>
+            <td>0.9976</td>
+            <td></td>
+            <td>0.8066</td>
+            <td>0.7499</td>
+            <td>0.8673</td>
+            <td>0.8661</td>
+            <td></td>
+            <td>0.8225</td>
+          </tr>
+          <tr>
+            <td>FSRCNNX_x2_8-0-4-1</td>
+            <td>1.08E-02</td>
+            <td>31.0438</td>
+            <td>0.9705</td>
+            <td>0.9975</td>
+            <td></td>
+            <td>0.7269</td>
+            <td>0.6650</td>
+            <td>0.7777</td>
+            <td>0.8564</td>
+            <td></td>
+            <td>0.7565</td>
+          </tr>
+          <tr>
+            <td>ravu-lite-ar-r4</td>
+            <td>1.09E-02</td>
+            <td>30.4805</td>
+            <td>0.9681</td>
+            <td>0.9974</td>
+            <td></td>
+            <td>0.7174</td>
+            <td>0.5943</td>
+            <td>0.7372</td>
+            <td>0.8481</td>
+            <td></td>
+            <td>0.7243</td>
+          </tr>
+          <tr>
+            <td>ravu-lite-ar-r3</td>
+            <td>1.12E-02</td>
+            <td>30.2648</td>
+            <td>0.9666</td>
+            <td>0.9974</td>
+            <td></td>
+            <td>0.6933</td>
+            <td>0.5673</td>
+            <td>0.7113</td>
+            <td>0.8464</td>
+            <td></td>
+            <td>0.7046</td>
+          </tr>
+          <tr>
+            <td>ravu-zoom-ar-r3</td>
+            <td>1.11E-02</td>
+            <td>30.0447</td>
+            <td>0.9684</td>
+            <td>0.9972</td>
+            <td></td>
+            <td>0.6999</td>
+            <td>0.5397</td>
+            <td>0.7425</td>
+            <td>0.8262</td>
+            <td></td>
+            <td>0.7021</td>
+          </tr>
+          <tr>
+            <td>ravu-lite-ar-r2</td>
+            <td>1.14E-02</td>
+            <td>29.7235</td>
+            <td>0.9660</td>
+            <td>0.9975</td>
+            <td></td>
+            <td>0.6765</td>
+            <td>0.4993</td>
+            <td>0.7016</td>
+            <td>0.8554</td>
+            <td></td>
+            <td>0.6832</td>
+          </tr>
+          <tr>
+            <td>ravu-zoom-ar-r2</td>
+            <td>1.15E-02</td>
+            <td>29.6350</td>
+            <td>0.9661</td>
+            <td>0.9970</td>
+            <td></td>
+            <td>0.6695</td>
+            <td>0.4882</td>
+            <td>0.7035</td>
+            <td>0.8008</td>
+            <td></td>
+            <td>0.6655</td>
+          </tr>
+          <tr>
+            <td>polar_lanczos4sharpest</td>
+            <td>1.41E-02</td>
+            <td>28.4185</td>
+            <td>0.9546</td>
+            <td>0.9959</td>
+            <td></td>
+            <td>0.4627</td>
+            <td>0.3356</td>
+            <td>0.5088</td>
+            <td>0.6928</td>
+            <td></td>
+            <td>0.5000</td>
+          </tr>
+          <tr>
+            <td>lanczos</td>
+            <td>1.53E-02</td>
+            <td>28.3051</td>
+            <td>0.9497</td>
+            <td>0.9962</td>
+            <td></td>
+            <td>0.3736</td>
+            <td>0.3214</td>
+            <td>0.4260</td>
+            <td>0.7256</td>
+            <td></td>
+            <td>0.4616</td>
+          </tr>
+          <tr>
+            <td>polar_lanczossharp</td>
+            <td>1.61E-02</td>
+            <td>27.8741</td>
+            <td>0.9448</td>
+            <td>0.9949</td>
+            <td></td>
+            <td>0.3061</td>
+            <td>0.2673</td>
+            <td>0.3437</td>
+            <td>0.6019</td>
+            <td></td>
+            <td>0.3797</td>
+          </tr>
+          <tr>
+            <td>bilinear</td>
+            <td>2.00E-02</td>
+            <td>25.7442</td>
+            <td>0.9245</td>
+            <td>0.9889</td>
+            <td></td>
+            <td>0.0000</td>
+            <td>0.0000</td>
+            <td>0.0000</td>
+            <td>0.0000</td>
+            <td></td>
+            <td>0.0000</td>
+          </tr>
+        </tbody>
+      </table>
+    </p>
+    <p>
+        We can easily see that all shaders that require some sort of training with LR-HR pairs score higher now, all ArtCNN variants trained in gamma light outperform their LL counterparts as well
+        and all FIR filters are also scoring higher. This doesn't tell us that downsampling in gamma light is better, it simply tells us that going back to the reference is easier when you downsample in gamma light.
+    </p>
+    <p>
+        For the reasons above, the standard variants of ArtCNN are now trained with images downsampled in gamma light. The linear light variants are still offered with the "_LL" suffix though.
+        I don't know how the other shaders are trained but I'd image everyone is downsampling in gamma light as well since all shaders got better results in this test.
+    </p>
     <h3 id="fractional_upsampling">Fractional Upsampling</h3>
     <p>
         While doing these tests at 2x makes sense since we can use a box filter to downsample, most people aren't always doubling their content. Scaling "performance" at lower scaling factors, such as 1.5x or 1.33x, are usually more interesting
@@ -693,260 +947,6 @@
     <p>
         We can see that ArtCNN is topping the chart here as well, but keep in mind that since it can only double you'll waste some resources downsampling the image back to the target resolution.
         With that in mind, it seems fair to recommend ravu-zoom-ar-r3 (next best option) here unless you really don't mind loading your GPU.
-    </p>
-    <h3 id="gamma_upsampling">The Effect of the Downsampler in Upsampling Evaluation</h3>
-    <p>
-        Downsampling in linear light is widely accepted as the "usually correct" approach, it can better preserve bright highlights which can make a huge difference depending on what you're downsampling. That doesn't mean that
-        linear light downsampling will absolutely always look better, if you're downsampling black text on a white background you're probably better off doing it in gamma light to prevent the background from dilating into the text
-        for example, since that would hurt legibility.
-    </p>
-    <p>
-        This usually isn't a problem when using the built-in filters because mpv doesn't upsample in either linear or gamma light by default, it does it in sigmoid light instead to reduce ringing artifacts. However, that's
-        usually not true for the shaders and some of these shaders are trained with LR-HR image pairs, in which the LR image is artificially created via downsampling the HR reference. Since I'm testing
-        these shaders with an image downsampled in LL, it's obvious that any model trained with images downsampled in LL is going to have an unfair advantage (which was the case with ArtCNN in the tables above).
-    </p>
-    <p>
-        You could say "but LL is correct so this is fine!", but at the end of the day this is just a preference. When it comes to line-art at least, it seems perfectly valid to prefer downsampling in gamma light to better
-        preserve dark highlights (which is why some people don't recommend downsampling manga in LL).
-    </p>
-    <p>
-        In short, downsampling in linear light dilates bright structures while eroding dark ones (relative to downsampling in gamma light). This is generally considered correct but it might not always be ideal depending on content.
-    </p>
-    <p>
-        The problem arises when we have to decide how to downsample training data before feeding it to a model. If we feed images that have been downsampled in linear light, the model will produce images with dilated dark highlights
-        and eroded bright features. The exact opposite of what happens when you downsample in linear light, because it's merely "undoing" it to arrive back at the reference.
-    </p>
-    <p>
-        Most models will also show better reconstruction performance when you feed them LR images that have been downsampled in gamma light.
-        These ML models have a learning capacity "budget" in the number of weights they have, so when they don't have to learn how to undo what LL downscaling does,
-        they end up with a bigger "budget" to the actual task of upsampling the LR image.
-    </p>
-    <p>
-        With all that said though, what difference does it make? The following table shows the scores for a 2x upsampling task, but with the LR downsampled in gamma light instead.
-    </p>
-    <p>
-      <table>
-        <tbody>
-          <tr>
-            <td>Shader/Filter</td>
-            <td>MAE</td>
-            <td>PSNR</td>
-            <td>SSIM</td>
-            <td>MS-SSIM</td>
-            <td></td>
-            <td>MAE (N)</td>
-            <td>PSNR (N)</td>
-            <td>SSIM (N)</td>
-            <td>MS-SSIM (N)</td>
-            <td></td>
-            <td>Mean</td>
-          </tr>
-          <tr>
-            <td>ArtCNN_C4F32</td>
-            <td>7.28E-03</td>
-            <td>33.7133</td>
-            <td>0.9837</td>
-            <td>0.9990</td>
-            <td></td>
-            <td>1.0000</td>
-            <td>1.0000</td>
-            <td>1.0000</td>
-            <td>1.0000</td>
-            <td></td>
-            <td>1.0000</td>
-          </tr>
-          <tr>
-            <td>ArtCNN_C4F16</td>
-            <td>7.78E-03</td>
-            <td>33.0783</td>
-            <td>0.9820</td>
-            <td>0.9989</td>
-            <td></td>
-            <td>0.9610</td>
-            <td>0.9203</td>
-            <td>0.9718</td>
-            <td>0.9905</td>
-            <td></td>
-            <td>0.9609</td>
-          </tr>
-          <tr>
-            <td>ArtCNN_C4F8</td>
-            <td>9.02E-03</td>
-            <td>31.9308</td>
-            <td>0.9773</td>
-            <td>0.9986</td>
-            <td></td>
-            <td>0.8632</td>
-            <td>0.7763</td>
-            <td>0.8918</td>
-            <td>0.9655</td>
-            <td></td>
-            <td>0.8742</td>
-          </tr>
-          <tr>
-            <td>FSRCNNX_x2_16-0-4-1</td>
-            <td>9.75E-03</td>
-            <td>31.7201</td>
-            <td>0.9758</td>
-            <td>0.9976</td>
-            <td></td>
-            <td>0.8066</td>
-            <td>0.7499</td>
-            <td>0.8673</td>
-            <td>0.8661</td>
-            <td></td>
-            <td>0.8225</td>
-          </tr>
-          <tr>
-            <td>FSRCNNX_x2_8-0-4-1</td>
-            <td>1.08E-02</td>
-            <td>31.0438</td>
-            <td>0.9705</td>
-            <td>0.9975</td>
-            <td></td>
-            <td>0.7269</td>
-            <td>0.6650</td>
-            <td>0.7777</td>
-            <td>0.8564</td>
-            <td></td>
-            <td>0.7565</td>
-          </tr>
-          <tr>
-            <td>ravu-lite-ar-r4</td>
-            <td>1.09E-02</td>
-            <td>30.4805</td>
-            <td>0.9681</td>
-            <td>0.9974</td>
-            <td></td>
-            <td>0.7174</td>
-            <td>0.5943</td>
-            <td>0.7372</td>
-            <td>0.8481</td>
-            <td></td>
-            <td>0.7243</td>
-          </tr>
-          <tr>
-            <td>ravu-lite-ar-r3</td>
-            <td>1.12E-02</td>
-            <td>30.2648</td>
-            <td>0.9666</td>
-            <td>0.9974</td>
-            <td></td>
-            <td>0.6933</td>
-            <td>0.5673</td>
-            <td>0.7113</td>
-            <td>0.8464</td>
-            <td></td>
-            <td>0.7046</td>
-          </tr>
-          <tr>
-            <td>ravu-zoom-ar-r3</td>
-            <td>1.11E-02</td>
-            <td>30.0447</td>
-            <td>0.9684</td>
-            <td>0.9972</td>
-            <td></td>
-            <td>0.6999</td>
-            <td>0.5397</td>
-            <td>0.7425</td>
-            <td>0.8262</td>
-            <td></td>
-            <td>0.7021</td>
-          </tr>
-          <tr>
-            <td>ravu-lite-ar-r2</td>
-            <td>1.14E-02</td>
-            <td>29.7235</td>
-            <td>0.9660</td>
-            <td>0.9975</td>
-            <td></td>
-            <td>0.6765</td>
-            <td>0.4993</td>
-            <td>0.7016</td>
-            <td>0.8554</td>
-            <td></td>
-            <td>0.6832</td>
-          </tr>
-          <tr>
-            <td>ravu-zoom-ar-r2</td>
-            <td>1.15E-02</td>
-            <td>29.6350</td>
-            <td>0.9661</td>
-            <td>0.9970</td>
-            <td></td>
-            <td>0.6695</td>
-            <td>0.4882</td>
-            <td>0.7035</td>
-            <td>0.8008</td>
-            <td></td>
-            <td>0.6655</td>
-          </tr>
-          <tr>
-            <td>polar_lanczos4sharpest</td>
-            <td>1.41E-02</td>
-            <td>28.4185</td>
-            <td>0.9546</td>
-            <td>0.9959</td>
-            <td></td>
-            <td>0.4627</td>
-            <td>0.3356</td>
-            <td>0.5088</td>
-            <td>0.6928</td>
-            <td></td>
-            <td>0.5000</td>
-          </tr>
-          <tr>
-            <td>lanczos</td>
-            <td>1.53E-02</td>
-            <td>28.3051</td>
-            <td>0.9497</td>
-            <td>0.9962</td>
-            <td></td>
-            <td>0.3736</td>
-            <td>0.3214</td>
-            <td>0.4260</td>
-            <td>0.7256</td>
-            <td></td>
-            <td>0.4616</td>
-          </tr>
-          <tr>
-            <td>polar_lanczossharp</td>
-            <td>1.61E-02</td>
-            <td>27.8741</td>
-            <td>0.9448</td>
-            <td>0.9949</td>
-            <td></td>
-            <td>0.3061</td>
-            <td>0.2673</td>
-            <td>0.3437</td>
-            <td>0.6019</td>
-            <td></td>
-            <td>0.3797</td>
-          </tr>
-          <tr>
-            <td>bilinear</td>
-            <td>2.00E-02</td>
-            <td>25.7442</td>
-            <td>0.9245</td>
-            <td>0.9889</td>
-            <td></td>
-            <td>0.0000</td>
-            <td>0.0000</td>
-            <td>0.0000</td>
-            <td>0.0000</td>
-            <td></td>
-            <td>0.0000</td>
-          </tr>
-        </tbody>
-      </table>
-    </p>
-    <p>
-        We can easily see that all shaders that require some sort of training with LR-HR pairs score higher now, all ArtCNN variants trained in gamma light outperform their LL counterparts as well
-        and all FIR filters are also scoring higher. This doesn't tell us that downsampling in gamma light is better, it simply tells us that going back to the reference is easier when you downsample in gamma light.
-    </p>
-    <p>
-        For the reasons above, the standard variants of ArtCNN are now trained with images downsampled in gamma light. The linear light variants are still offered with the "_LL" suffix though.
-        I don't know how the other shaders are trained but I'd image everyone is downsampling in gamma light as well since all shaders got better results in this test.
     </p>
     <h3 id="chroma_shaders">Chroma Shaders</h3>
     <p>
