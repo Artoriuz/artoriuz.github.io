@@ -1007,8 +1007,7 @@
         The numbers are all closer together at 1.33x, which shows that your choice of scaler becomes less relevant as you decrease the scaling factor.
     </p>
     <p>
-        Funnily enough, FSRCNNX actually scores higher than ArtCNN here when it was much worse at 2x. I think the reason for this is that FSRCNNX is sharper in general while ArtCNN attempts to be more
-        natural-looking. These subtleties are probably being lost after downsampling which is why the simply sharper option is scoring higher.
+        Funnily enough, FSRCNNX actually scores higher than ArtCNN here when it was much worse at 2x. I think the reason for this is that the downsampling step is massively helping FSRCNNX here, hiding its artifacts.
     </p>
     <p>
         I'm actually not sure if using CNNs at these kind of scaling factors makes a lot of sense, ravu-zoom is excellent here and also much faster. However, if you think the content has been downsampled in
