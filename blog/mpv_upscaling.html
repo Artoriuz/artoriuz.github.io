@@ -761,6 +761,20 @@
             <td>Mean</td>
           </tr>
           <tr>
+            <td>ArtCNN_C4F16_SH</td>
+            <td>4.38E-03</td>
+            <td>38.5964</td>
+            <td>0.9936</td>
+            <td>0.9994</td>
+            <td></td>
+            <td>1.0000</td>
+            <td>1.0000</td>
+            <td>1.0000</td>
+            <td>1.0000</td>
+            <td></td>
+            <td>1.0000</td>
+          </tr>
+          <tr>
             <td>FSRCNNX_x2_16-0-4-1</td>
             <td>5.10E-03</td>
             <td>37.3300</td>
@@ -950,8 +964,8 @@
         The numbers are all closer together at 1.33x, which shows that your choice of scaler becomes less relevant as you decrease the scaling factor.
     </p>
     <p>
-        Funnily enough, FSRCNNX actually scores higher than the normal variants of ArtCNN here when it was much worse at 2x. The "_SH" (Sharpener) variant of ArtCNN (which is not shown above) scores even higher though so
-        this test is pretty pointless, it's probably overvaluing sharpness way too much.
+        Funnily enough, FSRCNNX actually scores higher than the normal variants of ArtCNN here when it was much worse at 2x. The "_SH" (Sharpener) variant of ArtCNN (only shown above to make this point) scores even higher
+        though so this test is pretty pointless, it's probably overvaluing sharpness way too much.
     </p>
     <p>
         I'm actually not sure if using CNNs at these kind of scaling factors makes a lot of sense, ravu-zoom is excellent here and also much faster. However, if you think the content has been downsampled in
