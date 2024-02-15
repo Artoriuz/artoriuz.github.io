@@ -547,7 +547,7 @@
         </p>
     <h3 id="upsampling_commentary">Upsampling Commentary</h3>
     <p>
-        As we can see in the table above, ArtCNN is easily above the other options. I could even say that the bigger C4F32 model is on a class of its own,
+        As we can see in the table above, ArtCNN is easily above the other options according to all metrics. I could even say that the bigger C4F32 model is on a class of its own,
         but using something this big for video is probably wasteful as you'll rarely have a detailed enough stream to need all this reconstruction capacity.
     </p>
     <p>
@@ -558,23 +558,27 @@
         actually has a huge impact on how sharp the final image will be, so sticking to the hermite default makes all doublers much softer than ravu-zoom for example. Also keep in mind that the difference between the shaders
         also becomes smaller as you decrease the scaling factor.
     </p>
-    <p>
-        In short, if you want a luma doubler in 2024 my recommendation is ArtCNN. CNNs are intrinsically resource-intensive so if you're worried about performance just use RAVU instead.
-    </p>
     <h3 id="chroma_shaders">Chroma Shaders</h3>
     <p>
-        Using shaders to upsample chroma is an old meme, as igv ported Shiandow's KrigBilateral to mpv years ago. KrigBilateral implements kringing interpolation, which is commonly used in geostatistics.
+      The following shaders were "benchmarked":
+      <ol>
+        <li><a href="https://github.com/Artoriuz/glsl-joint-bilateral">JointBilateral</a></li>
+        <li><a href=https://github.com/Artoriuz/glsl-chroma-from-luma-prediction>Chroma From Luma Prediction</a></li>
+        <li><a href="https://github.com/igv/FSRCNN-TensorFlow">KrigBilateral</a></li>
+      </ol>
+    </p>
+    <p>
+        KrigBilateral implements kringing interpolation, which is commonly used in geostatistics.
         You can read more about it <a href="https://en.wikipedia.org/wiki/Kriging">here</a>.
     </p>
     <p>
-        Anyway... My first (not very successful) attempt at a chroma shader was jointbilateral and it pretty much implemented <a href="https://johanneskopf.de/publications/jbu/paper/FinalPaper_0185.pdf">this paper.</a>
-        In short, chromatic information from pixels with similar luminosities is preferred (simply uses luma-deltas as an extra weighting factor). The inherent flaw with this idea is that the shader can't overshoot, so
-        it's literally incapable of reaching some intensity levels depending on how chroma subsampling is done.
+        JointBilateral implements <a href="https://johanneskopf.de/publications/jbu/paper/FinalPaper_0185.pdf">this paper.</a>
+        In short, chromatic information from pixels with similar luminosities is weighted higher.
     </p>
     <p>
-        My second attempt at this is what's generally known as <a href="https://github.com/Artoriuz/glsl-chroma-from-luma-prediction">"CfL"</a>, which was written taking inspiration from
-        <a href="https://arxiv.org/abs/1711.03951">this paper</a>. In short, Chroma from Luma (Prediction) is a technique that applies a linear regression to map the missing chromaticities based on known luminosities.
-        This is paired with a sharp spatial filter that gets dynamically mixed-in based on the local chroma-luma correlation.
+        Chroma From Luma Prediction was written taking inspiration from <a href="https://arxiv.org/abs/1711.03951">this paper</a>.
+        In short, the shader uses linear regressions to map the missing chromaticities based on known luminosities. This is paired with a sharp spatial filter that gets dynamically mixed-in based on the local
+        correlation between chroma and luma.
     </p>
     <h3 id="chroma_methodology">Chroma Methodology</h3>
     <p>
@@ -737,9 +741,7 @@
         Krigbilateral comes right after that, this shader used to be the standard recommendation for chroma shaders for years it can look fantastic sometimes. The problem is that when it goes bad it goes really bad.
     </p>
     <p>
-        You should probably skip Joint/FastBilateral unless you really can't run any of the other shaders due to performance constraints.
-        These shaders are kinda hit or miss just like Krig, but since they can't overshoot at all they tend to be worse than even lanczos on scenes with a lot of high-frequency information. This is rarely the case on anime content
-        though, and these shaders can reduce chroma bleeding/smearing.
+        You should probably skip Joint/FastBilateral unless you really can't run any of the other shaders due to performance constraints. These will probably help make things look "tight", but they have clear limitations.
     </p>
     <p>
         To conclude, if you want to use a chroma shader you should probably pick either CfL or Krig.
