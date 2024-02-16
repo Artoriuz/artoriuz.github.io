@@ -778,16 +778,11 @@
         Chroma upscaling is often seen as less important since the human visual system is less sensitive to chromatic variations, but there's still something to be gained using meme shaders to upsample chroma.
     </p>
     <p>
-        If we look at the numbers, CfL is the best shader on all metrics. This doesn't mean that it'll always look the best, but generally speaking when it goes bad it doesn't go as bad as the others.
+        If we look at the numbers, ArtCNN is the best shader on all metrics. Since it's just a SISR CNN being applied to the chroma channels,
+        it should be free or major quality issues and its only drawback is that it's computationally heavy.
     </p>
     <p>
-        Krigbilateral comes right after that, this shader used to be the standard recommendation for chroma shaders for years it can look fantastic sometimes. The problem is that when it goes bad it goes really bad.
-    </p>
-    <p>
-        You should probably skip Joint/FastBilateral unless you really can't run any of the other shaders due to performance constraints. These will probably help make things look "tight", but they have clear limitations.
-    </p>
-    <p>
-        To conclude, if you want to use a chroma shader you should probably pick either CfL or Krig.
+        The luma-guided shaders can generate really good results sometimes, but they're a bit hit and miss. CfL is usually the least bad of them when it goes bad, but that doesn't mean it'll always look the best.
     </p>
     <h3 id="antiring">Antiring</h3>
     <p>
