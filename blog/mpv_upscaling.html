@@ -562,8 +562,9 @@
     <p>
       The following shaders were "benchmarked":
       <ol>
-        <li><a href="https://github.com/Artoriuz/glsl-joint-bilateral">JointBilateral</a></li>
+        <li><a href="https://github.com/Artoriuz/ArtCNN">ArtCNN</a></li>
         <li><a href=https://github.com/Artoriuz/glsl-chroma-from-luma-prediction>Chroma From Luma Prediction</a></li>
+        <li><a href="https://github.com/Artoriuz/glsl-joint-bilateral">JointBilateral</a></li>
         <li><a href="https://github.com/igv/FSRCNN-TensorFlow">KrigBilateral</a></li>
       </ol>
     </p>
@@ -617,18 +618,60 @@
           <td>Mean</td>
         </tr>
         <tr>
+          <td>ArtCNN_C4F32_SH_Chroma</td>
+          <td>3.50E-03</td>
+          <td>39.8290</td>
+          <td>0.9919</td>
+          <td>0.9994</td>
+          <td></td>
+          <td>1.0000</td>
+          <td>1.0000</td>
+          <td>1.0000</td>
+          <td>1.0000</td>
+          <td></td>
+          <td>1.0000</td>
+        </tr>
+        <tr>
+          <td>ArtCNN_C4F16_SH_Chroma</td>
+          <td>3.58E-03</td>
+          <td>39.5896</td>
+          <td>0.9915</td>
+          <td>0.9994</td>
+          <td></td>
+          <td>0.9748</td>
+          <td>0.9647</td>
+          <td>0.9791</td>
+          <td>0.9876</td>
+          <td></td>
+          <td>0.9766</td>
+        </tr>
+        <tr>
+          <td>ArtCNN_C4F8_SH_Chroma</td>
+          <td>3.84E-03</td>
+          <td>39.1079</td>
+          <td>0.9908</td>
+          <td>0.9993</td>
+          <td></td>
+          <td>0.8974</td>
+          <td>0.8937</td>
+          <td>0.9304</td>
+          <td>0.9407</td>
+          <td></td>
+          <td>0.9155</td>
+        </tr>
+        <tr>
           <td>cfl</td>
           <td>4.11E-03</td>
           <td>38.1577</td>
           <td>0.9905</td>
           <td>0.9992</td>
           <td></td>
-          <td>1.0000</td>
-          <td>1.0000</td>
-          <td>1.0000</td>
-          <td>1.0000</td>
+          <td>0.8157</td>
+          <td>0.7535</td>
+          <td>0.9168</td>
+          <td>0.8585</td>
           <td></td>
-          <td>1.0000</td>
+          <td>0.8361</td>
         </tr>
         <tr>
           <td>cfl_lite</td>
@@ -637,12 +680,12 @@
           <td>0.9902</td>
           <td>0.9992</td>
           <td></td>
-          <td>0.9739</td>
-          <td>0.9584</td>
-          <td>0.9797</td>
-          <td>0.9787</td>
+          <td>0.7944</td>
+          <td>0.7222</td>
+          <td>0.8981</td>
+          <td>0.8402</td>
           <td></td>
-          <td>0.9727</td>
+          <td>0.8137</td>
         </tr>
         <tr>
           <td>krigbilateral</td>
@@ -651,12 +694,12 @@
           <td>0.9888</td>
           <td>0.9990</td>
           <td></td>
-          <td>0.9006</td>
-          <td>0.7323</td>
-          <td>0.8842</td>
-          <td>0.8299</td>
+          <td>0.7346</td>
+          <td>0.5518</td>
+          <td>0.8106</td>
+          <td>0.7125</td>
           <td></td>
-          <td>0.8367</td>
+          <td>0.7024</td>
         </tr>
         <tr>
           <td>fastbilateral</td>
@@ -665,12 +708,12 @@
           <td>0.9855</td>
           <td>0.9987</td>
           <td></td>
-          <td>0.6805</td>
-          <td>0.4670</td>
-          <td>0.6587</td>
-          <td>0.6112</td>
+          <td>0.5551</td>
+          <td>0.3519</td>
+          <td>0.6039</td>
+          <td>0.5247</td>
           <td></td>
-          <td>0.6044</td>
+          <td>0.5089</td>
         </tr>
         <tr>
           <td>jointbilateral</td>
@@ -679,12 +722,12 @@
           <td>0.9856</td>
           <td>0.9986</td>
           <td></td>
-          <td>0.6693</td>
-          <td>0.4581</td>
-          <td>0.6700</td>
-          <td>0.5668</td>
+          <td>0.5459</td>
+          <td>0.3452</td>
+          <td>0.6143</td>
+          <td>0.4866</td>
           <td></td>
-          <td>0.5911</td>
+          <td>0.4980</td>
         </tr>
         <tr>
           <td>lanczos</td>
@@ -693,12 +736,12 @@
           <td>0.9815</td>
           <td>0.9986</td>
           <td></td>
-          <td>0.4389</td>
-          <td>0.3537</td>
-          <td>0.3932</td>
-          <td>0.5475</td>
+          <td>0.3580</td>
+          <td>0.2665</td>
+          <td>0.3605</td>
+          <td>0.4700</td>
           <td></td>
-          <td>0.4333</td>
+          <td>0.3638</td>
         </tr>
         <tr>
           <td>polar_lanczossharp</td>
@@ -707,12 +750,12 @@
           <td>0.9807</td>
           <td>0.9986</td>
           <td></td>
-          <td>0.3720</td>
-          <td>0.2932</td>
-          <td>0.3356</td>
-          <td>0.4923</td>
+          <td>0.3035</td>
+          <td>0.2209</td>
+          <td>0.3077</td>
+          <td>0.4226</td>
           <td></td>
-          <td>0.3733</td>
+          <td>0.3137</td>
         </tr>
         <tr>
           <td>bilinear</td>
@@ -729,7 +772,7 @@
           <td>0.0000</td>
         </tr>
       </tbody>
-      </table>
+    </table>
     <h3 id="chroma_commentary">Chroma Commentary</h3>
     <p>
         Chroma upscaling is often seen as less important since the human visual system is less sensitive to chromatic variations, but there's still something to be gained using meme shaders to upsample chroma.
