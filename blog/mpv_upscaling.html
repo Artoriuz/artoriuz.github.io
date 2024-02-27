@@ -632,6 +632,20 @@
           <td>1.0000</td>
         </tr>
         <tr>
+          <td>ArtCNN_C4F16_Chroma</td>
+          <td>4.02E-03</td>
+          <td>38.3486</td>
+          <td>0.9899</td>
+          <td>0.9993</td>
+          <td></td>
+          <td>0.9069</td>
+          <td>0.8246</td>
+          <td>0.8879</td>
+          <td>0.9495</td>
+          <td></td>
+          <td>0.8922</td>
+        </tr>
+        <tr>
           <td>cfl_prediction</td>
           <td>4.06E-03</td>
           <td>38.1639</td>
@@ -658,20 +672,6 @@
           <td>0.8922</td>
           <td></td>
           <td>0.8566</td>
-        </tr>
-        <tr>
-          <td>ArtCNN_C4F16_Chroma</td>
-          <td>4.44E-03</td>
-          <td>38.8758</td>
-          <td>0.9886</td>
-          <td>0.9991</td>
-          <td></td>
-          <td>0.7728</td>
-          <td>0.9066</td>
-          <td>0.8098</td>
-          <td>0.8676</td>
-          <td></td>
-          <td>0.8392</td>
         </tr>
         <tr>
           <td>krigbilateral</td>
@@ -764,8 +764,7 @@
         Chroma upscaling is often seen as less important since the human visual system is less sensitive to chromatic variations, but there's still something to be gained using meme shaders to upsample chroma.
     </p>
     <p>
-        If we look at the numbers, ArtCNN is the best shader on all metrics. The C4F32 model is excellent here but C4F16 isn't quite capable of generating 2 channels simultaneously that well. I actually wouldn't
-        recommend using your resources on this unless you're playing native res video and your GPU has nothing better to do.
+        If we look at the numbers, ArtCNN is the best shader on all metrics. I actually wouldn't recommend using your resources on this unless you're playing native res video and your GPU has nothing better to do.
     </p>
     <p>
         The other shaders can generate really good results sometimes, but they're a bit hit and miss. CfL is usually the least bad of them when it goes bad, but that doesn't mean it'll always look the best. You should
