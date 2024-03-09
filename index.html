@@ -128,10 +128,10 @@
                 <h3>National Institute for Space Research</h3>
                 <h4>Research Intern</h4>
                 <p>
-                    Assigned primarily at developing and maintaining the testbench of a SBCDA (Brazilian Environmental Data Collection System) Cubesat compatible payload, including a hardware in the loop test-routine 
+                    Assigned primarily at developing and maintaining the testbench of a SBCDA (Brazilian Environmental Data Collection System) Cubesat compatible payload, including a hardware in the loop test-routine
                     and the required code to emulate an on-board-computer utilising an x86 Workstation running Matlab as a master, an Arduino Due as an I²C bridge and a Rohde&Schwarz SMBV100A Vector Signal Generator.
                     <br><br>
-                    Secondary tasks varied from firmware development to brainstorming possible engineering solutions or improvements to the Environmental Data Collector as a whole, 
+                    Secondary tasks varied from firmware development to brainstorming possible engineering solutions or improvements to the Environmental Data Collector as a whole,
                     which included changes to the dedicated decoding hardware in the Microsemi Smartfusion 2 FPGA, or to the communication protocols handled by the ARM Cortex-M3 based microcontroller subsystem running FreeRTOS.
                     <br><br>
                     Updating internal and external use documentation was also part of the daily routine, on top of sometimes interacting with external teams integrating our system alongside their on-board-computers.
@@ -161,16 +161,16 @@
             <span class="education-date">2014 - 2019</span>
             <h4>Bachelor of Science in Electrical Engineering</h4>
             <p>
-                Developed Maestro, a 5-stage pipeline in-order RV32I RISC-V core written entirely in VHDL for academic purposes. Intel Quartus Prime and ModelSim were utilised for synthesis and verification, 
+                Developed Maestro, a 5-stage pipeline in-order RV32I RISC-V core written entirely in VHDL for academic purposes. Intel Quartus Prime and ModelSim were utilised for synthesis and verification,
                 and a Cyclone V FPGA was used for testing purposes. The core is part of my bachelor’s degree and can be found at <a href="https://riscv.org/risc-v-cores">https://riscv.org/risc-v-cores</a>.
             </p><br>
             <p>
-                Conducted a performance and picture quality evaluation of different upscaling algorithms supported by the popular video player mpv, which includes a wide variety of choices, 
-                from polynomial interpolation to convolutional neural networks based shaders. The study was conducted for a Digital Image Processing subject and can be found at 
+                Conducted a performance and picture quality evaluation of different upscaling algorithms supported by the popular video player mpv, which includes a wide variety of choices,
+                from polynomial interpolation to convolutional neural networks based shaders. The study was conducted for a Digital Image Processing subject and can be found at
                 <a href="https://artoriuz.github.io/mpv_upscaling.html">https://artoriuz.github.io/mpv_upscaling.html</a>.
              </p><br>
              <p>
-                 Undergrad classes included digital and analogue electronics, power systems, control systems, communication systems, embedded systems and artificial intelligence. 
+                 Undergrad classes included digital and analogue electronics, power systems, control systems, communication systems, embedded systems and artificial intelligence.
              </p>
         </div>
         <!-- End .education-block -->
@@ -184,14 +184,32 @@
 
                 <div class="project shadow-large">
                     <div class="project-image">
+                        <img src="images/ArtCNN.gif" height=300px width=300px />
+                    </div>
+                    <!-- End .project-image -->
+                    <div class="project-info">
+                        <h3>ArtCNN</h3>
+                        <p>
+                            Single-Image Super-Resolution Convolutional Neural Networks as GLSL shaders for mpv. The model is relatively simple with a
+                            feed-forward architecture, a single long-skip connection and a pixel shuffle layer to upscale the feature maps. Different degradation models
+                            and dataset preparation steps were used to tackle different problems, and the model is offered in various flavours.
+                        </p>
+                        <a href="https://github.com/Artoriuz/ArtCNN">View Project</a>
+                    </div>
+                    <!-- End .project-info -->
+                </div>
+                <!-- End .project -->
+
+                <div class="project shadow-large">
+                    <div class="project-image">
                         <img src="images/chroma_from_luma.gif" height=300px width=300px />
                     </div>
                     <!-- End .project-image -->
                     <div class="project-info">
                         <h3>Chroma From Luma Prediction</h3>
                         <p>
-                            CfL is a GLSL shader that implements chroma upscaling based on the closed least squares solution for linear regression, inspired by the adoption of the same technique in modern video codecs. 
-                            Since a simple linear regression obviously doesn't take into account pixel distance, the prediction is mixed with the output of a normal resampling filter based on how high the 
+                            CfL is a GLSL shader that implements chroma upscaling based on the closed least squares solution for linear regression, inspired by the adoption of the same technique in modern video codecs.
+                            Since a simple linear regression obviously doesn't take into account pixel distance, the prediction is mixed with the output of a normal resampling filter based on how high the
                             correlation between luma and chroma is.
                         </p>
                         <a href="https://github.com/Artoriuz/glsl-chroma-from-luma-prediction">View Project</a>
@@ -224,7 +242,7 @@
                     <div class="project-info">
                         <h3>Pixel Clipper</h3>
                         <p>
-                            Pixel Clipper is a GLSL shader for anti-ringing. It limits pixel magnitude after resampling to avoid overshooting and haloing. 
+                            Pixel Clipper is a GLSL shader for anti-ringing. It limits pixel magnitude after resampling to avoid overshooting and haloing.
                         </p>
                         <a href="https://github.com/Artoriuz/glsl-pixel-clipper">View Project</a>
                     </div>
@@ -256,7 +274,7 @@
                     <div class="project-info">
                         <h3>SP-VDSR</h3>
                         <p>
-                            SP-VDSR is a shallow convolutional neural network based on both VDSR and ESPCN. The rationale was making VDSR faster employing ESPCN's depth-to-space sub-pixel convolution to upsample 
+                            SP-VDSR is a shallow convolutional neural network based on both VDSR and ESPCN. The rationale was making VDSR faster employing ESPCN's depth-to-space sub-pixel convolution to upsample
                             the residuals. The trained network is relatively shallow with only 5 convolutional layers of 8 kernels each.
                         </p>
                         <a href="https://github.com/Artoriuz/sp-vdsr">View Project</a>
@@ -273,9 +291,9 @@
                     <div class="project-info">
                         <h3>Maestro</h3>
                         <p>
-                            Maestro is a 5 stage pipeline implementation of the RV32I ISA strongly inspired by <a href="https://www.amazon.com/dp/0128122757">David Patterson's and John Hennessy's Computer Organization and Design RISC-V Edition.</a><br><br> 
+                            Maestro is a 5 stage pipeline implementation of the RV32I ISA strongly inspired by <a href="https://www.amazon.com/dp/0128122757">David Patterson's and John Hennessy's Computer Organization and Design RISC-V Edition.</a><br><br>
                             The project is entirely academic, it's written in VHDL in a beginner-friendly way so computer architecture students can also learn about hardware design.<br><br>
-                            The core is very good at demonstrating how to build simple workarounds for problems encountered within pipelined in-order CPU cores such as hazards and stalls. 
+                            The core is very good at demonstrating how to build simple workarounds for problems encountered within pipelined in-order CPU cores such as hazards and stalls.
                         </p>
                         <a href="https://github.com/Artoriuz/maestro">View Project</a>
                     </div>
@@ -292,7 +310,7 @@
                         <h3>EDC testbench</h3>
                         <p>
                             The environmental data collector is a Cubsat-compatible payload capable of decoding up to 12 <a href="https://www.argos-system.org/">ARGOS-2</a> PTT signals.<br><br>
-                            During my internship I was in charge of developing a way of simulating the system to catch bugs and evaluate its performance. The testbench was composed of a hardware in the loop test-routine 
+                            During my internship I was in charge of developing a way of simulating the system to catch bugs and evaluate its performance. The testbench was composed of a hardware in the loop test-routine
                             and the required code to emulate an on-board-computer utilising an x86 Workstation running Matlab as a master, an Arduino Due as an I²C bridge and a Rohde&Schwarz SMBV100A Vector Signal Generator.
                         </p>
                     </div>
