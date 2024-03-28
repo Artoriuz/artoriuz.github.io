@@ -565,37 +565,14 @@
         <li><a href="https://github.com/Artoriuz/ArtCNN">ArtCNN</a></li>
         <li><a href=https://github.com/Artoriuz/glsl-chroma-from-luma-prediction>Chroma From Luma Prediction</a></li>
         <li><a href="https://github.com/Artoriuz/glsl-joint-bilateral">JointBilateral</a></li>
-        <li><a href="https://github.com/igv/FSRCNN-TensorFlow">KrigBilateral</a></li>
+        <li><a href="https://gist.github.com/igv/a015fc885d5c22e6891820ad89555637">KrigBilateral</a></li>
       </ol>
-    </p>
-    <p>
-        KrigBilateral implements kringing interpolation, which is commonly used in geostatistics.
-        You can read more about it <a href="https://en.wikipedia.org/wiki/Kriging">here</a>.
-    </p>
-    <p>
-        JointBilateral implements <a href="https://johanneskopf.de/publications/jbu/paper/FinalPaper_0185.pdf">this paper.</a>
-        In short, chromatic information from pixels with similar luminosities is weighted higher.
-    </p>
-    <p>
-        Chroma From Luma Prediction was written taking inspiration from <a href="https://arxiv.org/abs/1711.03951">this paper</a>.
-        In short, the shader uses linear regressions to map the missing chromaticities based on known luminosities. This is paired with a sharp spatial filter that gets dynamically mixed-in based on the local
-        correlation between chroma and luma.
     </p>
     <h3 id="chroma_methodology">Chroma Methodology</h3>
     <p>
-        Two versions of the aoko.png test image were created using FFmpeg:
-    </p>
-    <code>ffmpeg -i aoko.png -pix_fmt yuv444p10le -vf libplacebo=colorspace=bt709:color_primaries=bt709:color_trc=bt709:range=tv:format=yuv444p10le -c:v libx265 -preset placebo -x265-params lossless=1 444.mp4</code>
-    <br><br>
-    <code>ffmpeg -i aoko.png -pix_fmt yuv420p10le -vf libplacebo=colorspace=bt709:color_primaries=bt709:color_trc=bt709:range=tv:format=yuv420p10le -c:v libx265 -preset placebo -x265-params lossless=1 420.mp4</code>
-    <p>
-        The idea here was creating (nearly) lossless variants with and without chroma subsampling.
-    </p>
-    <p>
-        The "reference" image was obtained by screenshotting "444.mp4" on mpv.
-    </p>
-    <p>
-        The images under test were obtained by screenshotting "420.mp4" on mpv using the various chroma resampling filters/shaders.
+        A "near lossless" 420 version of aoko.png was created:
+    <br>
+    <code>avifenc aoko.png --min 0 --max 0 -y 420 420.avif</code>
     </p>
     <p>
         mpv options remains the same with the exception that we don't need <inline_code>--window-scale=2.0</inline_code> anymore, and since we're comparing chroma here, the images weren't converted to grayscale.
@@ -619,136 +596,136 @@
         </tr>
         <tr>
           <td>ArtCNN_C4F32_Chroma</td>
-          <td>3.74E-03</td>
-          <td>39.4762</td>
-          <td>0.9917</td>
-          <td>0.9993</td>
+          <td>3.19E-03</td>
+          <td>42.5991</td>
+          <td>0.9908</td>
+          <td>0.9977</td>
           <td></td>
           <td>1.0000</td>
           <td>1.0000</td>
           <td>1.0000</td>
-          <td>1.0000</td>
+          <td>0.9550</td>
           <td></td>
-          <td>1.0000</td>
+          <td>0.9887</td>
         </tr>
         <tr>
           <td>ArtCNN_C4F16_Chroma</td>
-          <td>4.02E-03</td>
-          <td>38.3486</td>
-          <td>0.9899</td>
-          <td>0.9993</td>
+          <td>3.59E-03</td>
+          <td>40.9809</td>
+          <td>0.9895</td>
+          <td>0.9977</td>
           <td></td>
-          <td>0.9069</td>
-          <td>0.8246</td>
-          <td>0.8879</td>
-          <td>0.9495</td>
+          <td>0.8900</td>
+          <td>0.8074</td>
+          <td>0.9143</td>
+          <td>0.9576</td>
           <td></td>
-          <td>0.8922</td>
+          <td>0.8923</td>
         </tr>
         <tr>
-          <td>cfl_prediction</td>
-          <td>4.06E-03</td>
-          <td>38.1639</td>
-          <td>0.9907</td>
-          <td>0.9992</td>
+          <td>cfl</td>
+          <td>3.81E-03</td>
+          <td>39.8314</td>
+          <td>0.9893</td>
+          <td>0.9977</td>
           <td></td>
-          <td>0.8968</td>
-          <td>0.7959</td>
-          <td>0.9380</td>
-          <td>0.9202</td>
+          <td>0.8294</td>
+          <td>0.6706</td>
+          <td>0.9022</td>
+          <td>1.0000</td>
           <td></td>
-          <td>0.8877</td>
+          <td>0.8506</td>
         </tr>
         <tr>
-          <td>cfl_prediction_lite</td>
-          <td>4.15E-03</td>
-          <td>37.9093</td>
-          <td>0.9903</td>
-          <td>0.9992</td>
+          <td>cfl_lite</td>
+          <td>3.90E-03</td>
+          <td>39.5782</td>
+          <td>0.9889</td>
+          <td>0.9977</td>
           <td></td>
-          <td>0.8652</td>
-          <td>0.7563</td>
-          <td>0.9126</td>
-          <td>0.8922</td>
+          <td>0.8032</td>
+          <td>0.6405</td>
+          <td>0.8783</td>
+          <td>0.9732</td>
           <td></td>
-          <td>0.8566</td>
+          <td>0.8238</td>
         </tr>
         <tr>
           <td>krigbilateral</td>
-          <td>4.37E-03</td>
-          <td>36.7895</td>
-          <td>0.9888</td>
-          <td>0.9990</td>
+          <td>4.22E-03</td>
+          <td>38.6022</td>
+          <td>0.9873</td>
+          <td>0.9976</td>
           <td></td>
-          <td>0.7929</td>
-          <td>0.5821</td>
-          <td>0.8203</td>
-          <td>0.7498</td>
+          <td>0.7153</td>
+          <td>0.5243</td>
+          <td>0.7746</td>
+          <td>0.9179</td>
           <td></td>
-          <td>0.7363</td>
+          <td>0.7330</td>
         </tr>
         <tr>
           <td>fastbilateral</td>
-          <td>4.97E-03</td>
-          <td>35.4342</td>
-          <td>0.9855</td>
-          <td>0.9987</td>
+          <td>4.37E-03</td>
+          <td>37.1016</td>
+          <td>0.9858</td>
+          <td>0.9974</td>
           <td></td>
-          <td>0.5992</td>
-          <td>0.3712</td>
-          <td>0.6111</td>
-          <td>0.5522</td>
+          <td>0.6733</td>
+          <td>0.3457</td>
+          <td>0.6757</td>
+          <td>0.7678</td>
           <td></td>
-          <td>0.5334</td>
+          <td>0.6157</td>
         </tr>
         <tr>
           <td>jointbilateral</td>
-          <td>5.25E-03</td>
-          <td>35.3968</td>
-          <td>0.9846</td>
-          <td>0.9986</td>
+          <td>4.60E-03</td>
+          <td>37.3093</td>
+          <td>0.9852</td>
+          <td>0.9973</td>
           <td></td>
-          <td>0.5064</td>
-          <td>0.3654</td>
-          <td>0.5572</td>
-          <td>0.4479</td>
+          <td>0.6097</td>
+          <td>0.3704</td>
+          <td>0.6386</td>
+          <td>0.7131</td>
           <td></td>
-          <td>0.4692</td>
+          <td>0.5829</td>
         </tr>
         <tr>
           <td>lanczos</td>
-          <td>5.62E-03</td>
-          <td>34.8552</td>
-          <td>0.9815</td>
-          <td>0.9986</td>
+          <td>5.70E-03</td>
+          <td>36.3881</td>
+          <td>0.9800</td>
+          <td>0.9972</td>
           <td></td>
-          <td>0.3864</td>
-          <td>0.2812</td>
-          <td>0.3648</td>
-          <td>0.4947</td>
+          <td>0.3052</td>
+          <td>0.2608</td>
+          <td>0.3028</td>
+          <td>0.5742</td>
           <td></td>
-          <td>0.3818</td>
+          <td>0.3607</td>
         </tr>
         <tr>
           <td>polar_lanczossharp</td>
-          <td>5.80E-03</td>
-          <td>34.5458</td>
-          <td>0.9807</td>
-          <td>0.9986</td>
+          <td>5.89E-03</td>
+          <td>35.9492</td>
+          <td>0.9795</td>
+          <td>0.9972</td>
           <td></td>
-          <td>0.3275</td>
-          <td>0.2331</td>
-          <td>0.3113</td>
-          <td>0.4447</td>
+          <td>0.2529</td>
+          <td>0.2086</td>
+          <td>0.2675</td>
+          <td>0.5995</td>
           <td></td>
-          <td>0.3292</td>
+          <td>0.3321</td>
         </tr>
         <tr>
           <td>bilinear</td>
-          <td>6.81E-03</td>
-          <td>33.0476</td>
-          <td>0.9757</td>
-          <td>0.9979</td>
+          <td>6.80E-03</td>
+          <td>34.1966</td>
+          <td>0.9753</td>
+          <td>0.9965</td>
           <td></td>
           <td>0.0000</td>
           <td>0.0000</td>
@@ -761,14 +738,10 @@
     </table>
     <h3 id="chroma_commentary">Chroma Commentary</h3>
     <p>
-        Chroma upscaling is often seen as less important since the human visual system is less sensitive to chromatic variations, but there's still something to be gained using meme shaders to upsample chroma.
+        If we look at the numbers, ArtCNN is easily the best option. I actually wouldn't recommend using your resources on this unless you're playing native resolution video and your GPU has nothing better to do.
     </p>
     <p>
-        If we look at the numbers, ArtCNN is the best shader on all metrics. I actually wouldn't recommend using your resources on this unless you're playing native res video and your GPU has nothing better to do.
-    </p>
-    <p>
-        The other shaders can generate really good results sometimes, but they're a bit hit and miss. CfL is usually the least bad of them when it goes bad, but that doesn't mean it'll always look the best. You should
-        probably skip all of them.
+        The other shaders all suffer from chromaloc issues and they can be easily fooled when there's no correlation between luma and chroma. I'd personally skip all of them.
     </p>
     <h3 id="antiring">Antiring</h3>
     <p>
