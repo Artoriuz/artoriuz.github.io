@@ -61,8 +61,8 @@
         </p>
         <p>
             Interestingly though, most models seem to show better reconstruction performance when you feed them LR images that have been downsampled in gamma light. I don't know the exact reason behind that yet though,
-            maybe linear light downscaling simply has worse mathematical properties (which doesn't mean you shouldn't downsample in linear light, it simply means getting back to the reference might be harder when
-            downscaling in linear light).
+            maybe linear light downsampling simply has worse mathematical properties (which doesn't mean you shouldn't downsample in linear light, it simply means getting back to the reference might be harder when
+            downsampling in linear light).
         </p>
         <p>
             For these reasons, the upsampling tests will be done with an image downsampled in gamma light and an image downsampled in linear light.
@@ -571,7 +571,7 @@
     <h3 id="chroma_methodology">Chroma Methodology</h3>
     <p>
         A "near lossless" 420 version of aoko.png was created:
-    <br>
+    <br><br>
     <code>avifenc aoko.png --min 0 --max 0 -y 420 420.avif</code>
     </p>
     <p>
@@ -1431,9 +1431,9 @@
     <p>
         The images were basically generated using the following commands:
     </p>
-    <code>mpv --no-config --vo=gpu-next --no-hidpi-window-scale --window-scale=0.5 --pause=yes --screenshot-format=png --linear-downscaling --correct-downscaling --deband=no --dither-depth=no --screenshot-high-bit-depth=no --dscale=filter --glsl-shader="Pixel Clipper_downscaling.glsl" violet.png</code>
+    <code>mpv --no-config --vo=gpu-next --no-hidpi-window-scale --window-scale=0.5 --pause=yes --screenshot-format=png --linear-downsampling --correct-downsampling --deband=no --dither-depth=no --screenshot-high-bit-depth=no --dscale=filter --glsl-shader="Pixel Clipper_downsampling.glsl" violet.png</code>
     <br><br>
-    <code>mpv --no-config --vo=gpu-next --no-hidpi-window-scale --window-scale=0.5 --pause=yes --screenshot-format=png --linear-downscaling --correct-downscaling --deband=no --dither-depth=no --screenshot-high-bit-depth=no --dscale=filter --scale-antiring=1.0 violet.png</code>
+    <code>mpv --no-config --vo=gpu-next --no-hidpi-window-scale --window-scale=0.5 --pause=yes --screenshot-format=png --linear-downsampling --correct-downsampling --deband=no --dither-depth=no --screenshot-high-bit-depth=no --dscale=filter --scale-antiring=1.0 violet.png</code>
     <p>
       Please note that you have to set <inline_code>--scale-antiring=1.0</inline_code> instead of <inline_code>--dscale-antiring=1.0</inline_code>. That's probably a bug but it is what it is.
     </p>
