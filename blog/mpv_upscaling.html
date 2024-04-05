@@ -60,7 +60,7 @@
             and eroded bright features. The exact opposite of what happens when you downsample in linear light. The model is simply learning how to "undo" what linear light downsampling "does", so this behaviour makes perfect sense.
         </p>
         <p>
-            Interestingly though, most models seem to show better reconstruction performance when you feed them LR images that have been downsampled in gamma light, and pretty much all mpv shaders have been trained with
+            Interestingly though, most models seem to show better reconstruction quality when you feed them LR images that have been downsampled in gamma light, and pretty much all mpv shaders have been trained with
             data downsampled in gamma light (including NNEDI3, FSRCNNX, RAVU, etc).
         </p>
         <p>
@@ -71,7 +71,7 @@
             I still do not have a good way of automating mpv tests and therefore I'll have to stick to a single test image, which is going to be aoko.png:
         </p>
         <p>
-            <img src="./images/mpv_upscaling/upsampling/linear/aoko.png" alt="Aoko" class="center" width="960" height="540">
+            <img src="./images/mpv_upscaling/upsampling/aoko.png" alt="Aoko" class="center" width="960" height="540">
         </p>
         <p>
             The small number of samples under test makes this very unscientific, but it is what it is.
