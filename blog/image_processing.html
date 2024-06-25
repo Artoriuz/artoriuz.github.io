@@ -2,16 +2,6 @@
 <html lang="en">
 
 <head>
-		<!-- Global site tag (gtag.js) - Google Analytics -->
-	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-135192850-1"></script>
-	<script>
-		window.dataLayer = window.dataLayer || [];
-		function gtag(){dataLayer.push(arguments);}
-		gtag('js', new Date());
-
-		gtag('config', 'UA-135192850-1');
-	</script>
-
 	<title>Digital Image Processing</title>
 	<meta charset="utf-8" />
 	<link rel="stylesheet" type="text/css" href="./css/default.css" />
@@ -39,8 +29,8 @@
 		<section id="disclaimer">
 			<h2>Disclaimer</h2>
 			<p>
-				This page was written in 2018 when I was learning digital signal processing basics during my undergrad in electrical engineering. It is not an accurate representation of my current knowledge in the matter, 
-				please check newer blog posts to see what I'm up to nowadays. 
+				This page was written in 2018 when I was learning digital signal processing basics during my undergrad in electrical engineering. It is not an accurate representation of my current knowledge in the matter,
+				please check newer blog posts to see what I'm up to nowadays.
 			</p>
 		</section>
 
@@ -56,17 +46,17 @@
 			<a href=#homomorphic><h4>Homomorphic Filter</h4></a>
 			<a href=#cannypoints><h4>Enhanced pointillism with canny edge detector</h4></a>
 			<a href=#kmeans><h4>K-means art</h4></a>
-		
-		
+
+
 		</section>
 		<section id="posts">
 			<br>
 			<br>
 			<h3 id="negativo">Negative</h3>
             <p>
-                The first algorithm simply performs a colour inversion in a given area and outputs the result. To understand the procedure it's important to understand 
-                how RGB digital images store colour information. When the sub-pixel matrix consists of 3 different independent colour channels (red, blue and green), 
-                a combination of intensity of those channels results in the perceived output colour.     
+                The first algorithm simply performs a colour inversion in a given area and outputs the result. To understand the procedure it's important to understand
+                how RGB digital images store colour information. When the sub-pixel matrix consists of 3 different independent colour channels (red, blue and green),
+                a combination of intensity of those channels results in the perceived output colour.
             </p>
             <p>
                 Multiple different pixel format standards exist, but if your image is targetting the web it's sane to assume we have 8 bits of precision per colour channel.
@@ -74,7 +64,7 @@
             </p>
             <p>
                 The colour "white" is an equal combination of all colours, so in our system to output white we need maximum intensity in all three of our colour channels,
-                which means white is (255, 255, 255) in decimal, or #FFFFFF in hexadecimal. 
+                which means white is (255, 255, 255) in decimal, or #FFFFFF in hexadecimal.
             </p>
 			<p>
                 The inverse of a colour is simply the difference between absolute white and the colour itself, and since the pixel data is stored in binary we can perform
@@ -99,7 +89,7 @@ int main(int argc, char** argv) {
 		cout << "imagem nao carregou corretamente" << endl;
 		return(-1);
 	}
-	
+
 	Mat img_out = Mat::zeros(img.rows, img.cols, CV_8UC3);
 
 	int pos_xi, pos_yi, pos_xf, pos_yf;
@@ -158,7 +148,7 @@ int main(int argc, char** argv) {
 			<br>
 			<h3 id="quadrantes">Quadrants</h3>
 			<p>
-                An image can be divided into 4 quadrants, the following example aims to swap the position of those quadrants maintaining the original pixel values.  
+                An image can be divided into 4 quadrants, the following example aims to swap the position of those quadrants maintaining the original pixel values.
             </p>
 			<p>Here we can see the original quadrant configuration of any image:</p>
 			<p>
@@ -239,17 +229,17 @@ int main(int argc, char** argv) {
 			<br>
 			<br>
 			<h3 id="contagem">Object counting</h3>
-			<p>Now we'll learn how to count objects, in order to increase the complexity of the algorithm and its accuracy, 
+			<p>Now we'll learn how to count objects, in order to increase the complexity of the algorithm and its accuracy,
                 it's important to differentiate objects with holes and objects without.</p>
 			<p>The following image will be the input of the program:</p>
 			<p>
 				<img src="./images/count/bolhas.png" alt="Original image" class="center">
 			</p>
             <p>
-                The very first thing the program does is delete all the objects that are touching the borders of the image. After that, the background 
-                is "painted" in a certain colour of choice in order to differentiate it from the holes. Then, the program will search for white pixels 
+                The very first thing the program does is delete all the objects that are touching the borders of the image. After that, the background
+                is "painted" in a certain colour of choice in order to differentiate it from the holes. Then, the program will search for white pixels
                 and paint the entire agglomerate of white pixels with a given colour. This colour changes each time the program finds another agglomerate of
-                white pixels, which are the objects.  
+                white pixels, which are the objects.
             </p>
             <p>
                 After all the objects are found and painted with a corresponding colour, the program will search for holes and paint those holes with the same
@@ -264,7 +254,7 @@ using namespace std;
 using namespace cv;
 
 int main(int argc, char** argv) {
-	
+
 	Mat image = imread(argv[1], CV_LOAD_IMAGE_GRAYSCALE);
 	if (!image.data) {
 		cout << "imagem nao carregou corretamente" << endl;
@@ -315,7 +305,7 @@ int main(int argc, char** argv) {
 	imshow("Labelling", image);
 	waitKey();
 
-	for (int x = 0; x < image.rows; x++) { 
+	for (int x = 0; x < image.rows; x++) {
 		for (int y = 0; y < image.cols; y++) {
 			if (image.at<uchar>(x, y) == 0 && image.at<uchar>(x, y - 1) != obj_colour_aux) {
 				obj_colour_aux = image.at<uchar>(x, y - 1);
@@ -343,8 +333,8 @@ int main(int argc, char** argv) {
 	waitKey();
 	return 0;
 }
-			
-			
+
+
 
 	</code>
 	</pre>
@@ -486,7 +476,7 @@ int main(int argc, char** argv) {
 				different values goes from left to right. The background of the histogram is white, and the actual histogram is what can be seen as black on top of this white background.
 			</p>
 			<p>
-				The code was originally designed to be used with still images, however with some modifications it can be used for videos (or camera inputs, which are also video streams). 
+				The code was originally designed to be used with still images, however with some modifications it can be used for videos (or camera inputs, which are also video streams).
 			</p>
             <p>
                 In the following example, a video was used intead of a camera input because of technical limitations (lack of a camera). It can be used with a camera
@@ -577,24 +567,24 @@ int main(int argc, char** argv) {
 		<br>
 		<h3 id="movimentos">Movement Detection</h3>
 		<p>
-            As we know, an image is a matrix of pixels, which are arrays of subpixels containing information. A greyscale image only has a single subpixel per 
-            pixel, and can only assume values between black and white. A RGB or a YUV image however, has 3 channels per pixel (3 sub-pixels) and can assume 
+            As we know, an image is a matrix of pixels, which are arrays of subpixels containing information. A greyscale image only has a single subpixel per
+            pixel, and can only assume values between black and white. A RGB or a YUV image however, has 3 channels per pixel (3 sub-pixels) and can assume
             different colours. In either case, an image is a matrix.
 		</p>
         <p>
-            A video, then, is simply a sequence of matrices. Each matrix in the sequence represents a frame, and the temporal change in values is perceived as motion. 
+            A video, then, is simply a sequence of matrices. Each matrix in the sequence represents a frame, and the temporal change in values is perceived as motion.
         </p>
         <p>
-            Our objective is to be able to detect movements in a video stream, and we'll use our knowledge of what a video is in order to achieve it. Since a video is a series 
-            of matrices, in order to detect movement we can compare those matrices and see if their values differ in a significant way. If they do, it's evident that there was 
+            Our objective is to be able to detect movements in a video stream, and we'll use our knowledge of what a video is in order to achieve it. Since a video is a series
+            of matrices, in order to detect movement we can compare those matrices and see if their values differ in a significant way. If they do, it's evident that there was
             movement. If they don't, it's obvious that the image stayed still.
         </p>
         <p>
-            The program simply finds the difference between the pixels of the current frame and the previous frame, creating a summation of all those values and deciding whether 
-            there was movement or not depending on how high this value is. 
+            The program simply finds the difference between the pixels of the current frame and the previous frame, creating a summation of all those values and deciding whether
+            there was movement or not depending on how high this value is.
 		</p>
 		<p>
-            The program also displays the difference between frames in the screen, and it's very easy to interpret the image since black values mean that the values of the frames 
+            The program also displays the difference between frames in the screen, and it's very easy to interpret the image since black values mean that the values of the frames
             didn't change and white values mean that those values indeed changed significantly (remember the difference between frame N and frame N - 1 is what's being displayed).
 		</p>
 		<p>
@@ -612,16 +602,16 @@ int main(int argc, char** argv) {
 	long frame_counter = 0, difference_total_value = 0;
 	Mat frame, frame_past, difference;
 	VideoCapture cap(argv[1]);
-	
+
 	int width = cap.get(CV_CAP_PROP_FRAME_WIDTH);
 	int height = cap.get(CV_CAP_PROP_FRAME_HEIGHT);
-	
+
 	difference = Mat::zeros(height, width, CV_8UC1);
 
 	while (true) {
 		cap >> frame;
 		cvtColor(frame, frame, CV_BGR2GRAY);
-		
+
 		difference_total_value = 0;
 		for (int i = 0; i < frame.rows; i++) {
 			for (int j = 0; j < frame.cols; j++) {
@@ -654,10 +644,10 @@ int main(int argc, char** argv) {
 		</p>
 		<a href="https://github.com/Artoriuz/OpenCV-Examples/blob/master/movement.cpp">movement.cpp</a>
         <p>
-            For the reader, the most important part to understand here is how the difference summation is calculated. 
+            For the reader, the most important part to understand here is how the difference summation is calculated.
         </p>
         <p>
-            Inside a loop, the program simply makes the difference between the current frame and the previous frame, if the frame_counter is still 0 the difference 
+            Inside a loop, the program simply makes the difference between the current frame and the previous frame, if the frame_counter is still 0 the difference
             is also 0 since we don't have any previous frame yet. When frame_counter is higher than 0 though, the program will calculate the difference between each pixel in
             the current frame and its counterpart in the previous frame, and then it'll add this difference into a difference summation.
         </p>
@@ -688,11 +678,11 @@ for (int i = 0; i < frame.rows; i++) {
 			<img width="960" height="451" src="./images/motion_detection/parachute.png" alt="Violet in her parachute" class="center">
 		</p>
 		<p>
-            We can see a grey parachutist in the image, while its background remains almost completely black. This happens because while the parachutist is moving in the original video, 
-            the sky (which is our background) remains still. 
+            We can see a grey parachutist in the image, while its background remains almost completely black. This happens because while the parachutist is moving in the original video,
+            the sky (which is our background) remains still.
 		</p>
 		<p>
-            In this example the threshold between "no movement" and "movement" was a 
+            In this example the threshold between "no movement" and "movement" was a
             total difference summation of 150000. The video below shows how the program works when running:
 		</p>
 		<p>
@@ -702,7 +692,7 @@ for (int i = 0; i < frame.rows; i++) {
 			</video>
 		</p>
 		<p>
-            The number of the current frame is printed at the terminal, and the total difference summation value between it and the previous frame is as well. 
+            The number of the current frame is printed at the terminal, and the total difference summation value between it and the previous frame is as well.
             If this value is higher than our threshold, the program also prints that there was movement.
             As already explained, what we see closer to black means that there wasn't movement in that area. And what we see closer to white, means that it's moving.
 		</p>
@@ -723,9 +713,9 @@ for (int i = 0; i < frame.rows; i++) {
                 of a convolution in the time domain. In our case "time" is simply the value variation across an axis, and we have 2 axis creating a plane.
 			</p>
 			<p>
-				The program, as requested in the assignment should alternate between certain masks depending on the key pressed during execution. Starting from our original program  
+				The program, as requested in the assignment should alternate between certain masks depending on the key pressed during execution. Starting from our original program
                 <a href="http://agostinhobritojr.github.io/tutoriais/pdi/exemplos/filtroespatial.cpp">filtroespatial.cpp</a>, the objective is to add the option of doing a gaussian
-                filtering before applying the laplacian one. 
+                filtering before applying the laplacian one.
 			</p>
 			<p>
 				The modified program is shown below:
@@ -761,7 +751,7 @@ void menu() {
 int main(int argvc, char** argv) {
 	VideoCapture video(argv[1]); //use this for videos
 	//cap = imread(argv[1]); //use this for images
-	
+
 	float media[] = { 1,1,1,1,1,1,1,1,1 };
 	float gauss[] = { 1,2,1,2,4,2,1,2,1 };
 	float horizontal[] = { -1,0,1,-2,0,2,-1,0,1 };
@@ -794,13 +784,13 @@ int main(int argvc, char** argv) {
 	swap(mask, mask);
 
 	menu();
-	
+
 	while (true) {
 		video >> cap; //comment this when using images as input
 		cvtColor(cap, frame, CV_BGR2GRAY);
 		imshow("original", frame);
 		frame.convertTo(frame32f, CV_32F);
-		
+
 		key = (char)waitKey(10);
 
 		if (lap_gauss_aux) {
@@ -820,7 +810,7 @@ int main(int argvc, char** argv) {
 			frameFiltered.convertTo(result, CV_8U);
 			imshow("spatialfilter", result);
 		}
-			
+
 		if (key == 27) break; // esc pressed!
 
 		switch (key) {
@@ -868,23 +858,23 @@ int main(int argvc, char** argv) {
 		}
 	}
 	return 0;
-}							
+}
 					</code>
 				</pre>
 			</p>
 			<a href="https://github.com/Artoriuz/OpenCV-Examples/blob/master/spatialfilters.cpp">spatialfilters.cpp</a>
 			<p>
-                The program can be used with images or videos, simply alternating between a few set of lines already commented in the code itself. The image 
+                The program can be used with images or videos, simply alternating between a few set of lines already commented in the code itself. The image
                 used as input is shown below:
 			</p>
 			<p>
-				<img src="./images/lapgauss/erika_original.png" alt="Original Erika" class="center">	
+				<img src="./images/lapgauss/erika_original.png" alt="Original Erika" class="center">
 			</p>
 			<p>
-				The first thing done is the convertion of the original image to greyscale: 
+				The first thing done is the convertion of the original image to greyscale:
 			</p>
 			<p>
-				<img src="./images/lapgauss/erika_original_greyscale.png" alt="Original Erika" class="center">	
+				<img src="./images/lapgauss/erika_original_greyscale.png" alt="Original Erika" class="center">
 			</p>
 			<p>
 				The user can alternate between different masks using the keyboard, the following list of options are available:
@@ -905,43 +895,43 @@ int main(int argvc, char** argv) {
 				Module:
 			</p>
 			<p>
-				<img src="./images/lapgauss/erika_original_greyscale.png" alt="Original Erika" class="center">	
+				<img src="./images/lapgauss/erika_original_greyscale.png" alt="Original Erika" class="center">
 			</p>
 			<p>
 				Median:
 			</p>
 			<p>
-				<img src="./images/lapgauss/erika_median.png" alt="Original Erika" class="center">	
+				<img src="./images/lapgauss/erika_median.png" alt="Original Erika" class="center">
 			</p>
 			<p>
 				Gauss:
 			</p>
 			<p>
-				<img src="./images/lapgauss/erika_gauss.png" alt="Original Erika" class="center">	
+				<img src="./images/lapgauss/erika_gauss.png" alt="Original Erika" class="center">
 			</p>
 			<p>
 				Vertical:
 			</p>
 			<p>
-				<img src="./images/lapgauss/erika_vertical.png" alt="Original Erika" class="center">	
+				<img src="./images/lapgauss/erika_vertical.png" alt="Original Erika" class="center">
 			</p>
 			<p>
 				Horizontal:
 			</p>
 			<p>
-				<img src="./images/lapgauss/erika_horizontal.png" alt="Original Erika" class="center">	
+				<img src="./images/lapgauss/erika_horizontal.png" alt="Original Erika" class="center">
 			</p>
 			<p>
 				Laplacian:
 			</p>
 			<p>
-				<img src="./images/lapgauss/erika_laplacian.png" alt="Original Erika" class="center">	
+				<img src="./images/lapgauss/erika_laplacian.png" alt="Original Erika" class="center">
 			</p>
 			<p>
 				Gauss + laplacian:
 			</p>
 			<p>
-				<img src="./images/lapgauss/erika_lapgauss.png" alt="Original Erika" class="center">	
+				<img src="./images/lapgauss/erika_lapgauss.png" alt="Original Erika" class="center">
 			</p>
 			<p>
 				It's easy to see that applying a gaussian blur before applying the laplacian filter makes the output cleaner and smoother.
@@ -1000,35 +990,35 @@ int main(int argvc, char** argv) {
 		}
 	}
 	mask_unfocus = mask_unfocus - mask_focus;
-	
+
 	//This section shows the masks
 	imshow("focus mask", mask_focus);
 	imshow("unfocus mask", mask_unfocus);
 	waitKey();
-	
-	
+
+
 	img_in.convertTo(img_in, CV_32FC3);
 	GaussianBlur(img_in, img_blurred, Size(7, 7), 0, 0);
 
 	img_focused = img_in.mul(mask_focus);
 	img_unfocused = img_blurred.mul(mask_unfocus);
-	
+
 	//This section only shows the blurred image
 	img_blurred.convertTo(img_blurred, CV_8UC3);
 	imshow("img_blurred", img_blurred);
 	waitKey();
-	
-	
+
+
 	img_out = img_focused + img_unfocused;
 	img_out.convertTo(img_out, CV_8UC3);
-	
+
 	//This section only shows the components of the final image
 	img_focused.convertTo(img_focused, CV_8UC3);
 	img_unfocused.convertTo(img_unfocused, CV_8UC3);
 	imshow("img_focused", img_focused);
 	imshow("img_unfocused", img_unfocused);
 	waitKey();
-	
+
 	imshow("output", img_out);
 	waitKey();
 	return 0;
@@ -1048,7 +1038,7 @@ int main(int argvc, char** argv) {
 				<img src="./images/tiltshift/img_in.png" alt="Original image" class="center">
 			</p>
 			<p>
-				The program then, generates an auxiliar image with hyperbolic sines with the same size as the input image, we'll call this the focus mask: 
+				The program then, generates an auxiliar image with hyperbolic sines with the same size as the input image, we'll call this the focus mask:
 			</p>
 			<p>
 				<img src="./images/tiltshift/mask_focus.png" alt="focus mask" class="center">
@@ -1060,7 +1050,7 @@ int main(int argvc, char** argv) {
 				<img src="./images/tiltshift/mask_unfocus.png" alt="unfocus mask" class="center">
 			</p>
 			<p>
-				We then create a blurred version of the original image through a gaussian blur filter, this image will be used as our unfocused version of the original image: 
+				We then create a blurred version of the original image through a gaussian blur filter, this image will be used as our unfocused version of the original image:
 			</p>
 			<p>
 				<img src="./images/tiltshift/img_blurred.png" alt="blurred image" class="center">
@@ -1089,7 +1079,7 @@ int main(int argvc, char** argv) {
 			<video loop autoplay>
 				<source src="./video/tiltshift.mp4" type="video/mp4">
 				Your browser does not support the video tag.
-			</video> 
+			</video>
 			<p>
                 We can utilise the same effect to create a video that looks like it was filmed from a miniature, and make it more convincing including a frame skip effect
                 which is common on those videos to fake motion.
@@ -1142,14 +1132,14 @@ int main(int argvc, char** argv) {
 	//This section shows the masks
 	imshow("focus mask", mask_focus);
 	imshow("unfocus mask", mask_unfocus);
-	
+
 	while (true) {
 		if (pass_frame == 0) {
 			video &#62;&#62; img_in;
 		} else {
 			video &#62;&#62; img_discard;
 		}
-		
+
 		img_in.convertTo(img_in, CV_32FC3);
 		GaussianBlur(img_in, img_blurred, Size(7, 7), 0, 0);
 
@@ -1188,7 +1178,7 @@ int main(int argvc, char** argv) {
 			</p>
 			<a href="https://github.com/Artoriuz/OpenCV-Examples/blob/master/tiltshift_video.cpp">tiltshift_video.cpp</a>
 			<p>
-                As we can see the skeleton of the code remains the same, and the divergence to the original code is related to acquiring frames and passing those frames to 
+                As we can see the skeleton of the code remains the same, and the divergence to the original code is related to acquiring frames and passing those frames to
                 the matrices that will process the information and generate our intended result.
 			</p>
 			<p>
@@ -1198,22 +1188,22 @@ int main(int argvc, char** argv) {
 				<video controls>
 					<source src="./video/tilt_shift_video_original.mp4" type="video/mp4">
 					Your browser does not support the video tag.
-				</video> 
+				</video>
 			</p>
 			<p>
-                In this example, since the video's resolution is the same as the image's resolution in the previous example, our masks will look identical 
-                to those already shown before. The frame skipping logic was set to skip 2 frames every frame that's passed to the algorithm. This number needs to be tweaked 
+                In this example, since the video's resolution is the same as the image's resolution in the previous example, our masks will look identical
+                to those already shown before. The frame skipping logic was set to skip 2 frames every frame that's passed to the algorithm. This number needs to be tweaked
                 in order to create a better miniature effect.
 			</p>
 			<p>
                 We can see the output video below. Due to the fact that we're throwing 2/3 of the frames away, but holdind the already passed
-                frames until a new frame can be passed, it looks slower than the original: 
+                frames until a new frame can be passed, it looks slower than the original:
 			</p>
 			<p>
 				<video controls>
 					<source src="./video/tilt_shift_video_output.mp4" type="video/mp4">
 					Your browser does not support the video tag.
-				</video> 
+				</video>
 			</p>
 			<p>
 				We can however, "fix" the motion speed problem by encoding the video with a lower frame persistance time:
@@ -1222,7 +1212,7 @@ int main(int argvc, char** argv) {
 				<video controls>
 					<source src="./video/tilt_shift_video_output_accelerated.mp4" type="video/mp4">
 					Your browser does not support the video tag.
-				</video> 
+				</video>
 			</p>
 			<br>
 			<br>
@@ -1237,14 +1227,14 @@ int main(int argvc, char** argv) {
 			<br>
 			<h3 id="homomorphic">Homomorphic Filter</h3>
 			<p>
-				The homomorphic filtering simultaneously normalises brightness across an image and increases contrast, since illumination and reflectance 
-				combine multiplicatively, we can make those components additive by taking the logarithm of the image and then we can separate those in 
+				The homomorphic filtering simultaneously normalises brightness across an image and increases contrast, since illumination and reflectance
+				combine multiplicatively, we can make those components additive by taking the logarithm of the image and then we can separate those in
 				the frequency domain. Illumination variations can be seen as as multiplicative noise, which we can reduce through filtering.
 			</p>
 			<p>
-				In order to improve the image by making its illumination more even, the high-frequency components are increased and low-frequency components are decreased, 
-				because the high-frequency components are assumed to represent mostly the reflectance in the scene (the amount of light reflected off 
-				the object in the scene), whereas the low-frequency components are assumed to represent mostly the illumination in the scene. 
+				In order to improve the image by making its illumination more even, the high-frequency components are increased and low-frequency components are decreased,
+				because the high-frequency components are assumed to represent mostly the reflectance in the scene (the amount of light reflected off
+				the object in the scene), whereas the low-frequency components are assumed to represent mostly the illumination in the scene.
 				That is, high-pass filtering is used to suppress low frequencies and amplify high frequencies, in the log-intensity domain.
 			</p>
 			<p>
@@ -1317,9 +1307,9 @@ int main(int argc, char **argv){
 
 	for (int i = 0; i &#60; dft_M; i++){
 		for (int j = 0; j &#60; dft_N; j++){
-			tmp.at&#60;float&#62;(i, j) = (gama_h - gama_l) * 
-			(1.0 - exp(-1.0 * (float)c * ((((float)i - dft_M / 2.0) * 
-			((float)i - dft_M / 2.0) + ((float)j - dft_N / 2.0) * 
+			tmp.at&#60;float&#62;(i, j) = (gama_h - gama_l) *
+			(1.0 - exp(-1.0 * (float)c * ((((float)i - dft_M / 2.0) *
+			((float)i - dft_M / 2.0) + ((float)j - dft_N / 2.0) *
 			((float)j - dft_N / 2.0)) / (D_0 * D_0)))) + gama_l;
 		}
 	}
@@ -1408,7 +1398,7 @@ int main(int argc, char **argv){
 				<img src="./images/homomorphic/homomorphic_input_equalised.png" alt="equalised input image" class="center">
 			</p>
 			<p>
-				We can clearly see that in the last image, the equalised version of the original image, the details and luminance deviations aren't 
+				We can clearly see that in the last image, the equalised version of the original image, the details and luminance deviations aren't
 				as clearly visible as in the previous image, which was filtered, then used as luma plane, then equalised.
 			</p>
 			<br>
@@ -1430,7 +1420,7 @@ int main(int argc, char **argv){
 				<img src="./images/canny_points/fate_input.png" alt="input image" class="center">
 			</p>
 			<p>
-				You can use <a href="http://agostinhobritojr.github.io/tutoriais/pdi/exemplos/pontilhismo.cpp">pontilhismo.cpp</a> 
+				You can use <a href="http://agostinhobritojr.github.io/tutoriais/pdi/exemplos/pontilhismo.cpp">pontilhismo.cpp</a>
 				to create pointillism art.
 				<br>
 				The generated art can be seen below:
@@ -1563,9 +1553,9 @@ int main(int argc, char **argv){
 						<a href="https://github.com/Artoriuz/OpenCV-Examples/blob/master/canny_points.cpp">canny_points.cpp</a>
 					</p>
 			<p>
-				The algorithm follows a very simple logic, starting from the already shown previous pointillism art, it'll paint new circles 2 additional times as the 
-				user chooses 2 canny thresholds. The original circle radius is decreased by 1 each time, and the idea is that we choose a higher threshold in the second 
-				run so we can paint smaller circles for more important lines, which will make those lines more visible. 
+				The algorithm follows a very simple logic, starting from the already shown previous pointillism art, it'll paint new circles 2 additional times as the
+				user chooses 2 canny thresholds. The original circle radius is decreased by 1 each time, and the idea is that we choose a higher threshold in the second
+				run so we can paint smaller circles for more important lines, which will make those lines more visible.
 			</p>
 			<p>
 				To prevent the algorithm from paiting circles on top of one another inside an iteration (note that it can, and should, paint new circles on top
@@ -1589,8 +1579,8 @@ int main(int argc, char **argv){
 				<img src="./images/canny_points/fate_cannypoints_th2.png" alt="canny image" class="center">
 			</p>
 			<p>
-				The end result is a pointillism art that better shows transitions and more accurately draw the original lines. Note that the result can be 
-				controlled with the thresholds chosen. Since the first threshold was fairly generous, the end result looks incredibly filled with almost no 
+				The end result is a pointillism art that better shows transitions and more accurately draw the original lines. Note that the result can be
+				controlled with the thresholds chosen. Since the first threshold was fairly generous, the end result looks incredibly filled with almost no
 				blank white-space.
 			</p>
 			<p>
@@ -1611,32 +1601,32 @@ int main(int argc, char **argv){
 			<br>
 			<br><h3 id="kmeans">K-means art</h3>
 			<p>
-				K-means clustering is a unsurpervised data-mining machine learning algorithm used to classify elements. The algorithm has several characteristics, 
+				K-means clustering is a unsurpervised data-mining machine learning algorithm used to classify elements. The algorithm has several characteristics,
 				the first of them is that it'll always find the specified number of classes regardless of the topography of the data-set (the optimal number of classes
 				can be discovered through the elbow method). The second prominent characteristic, and the most important one for us in this demonstration, is that since
-				our centroids (which classify elements) have their starting locations randomised, each run will tend to result in slightly different final centroid locations 
-				and therefore slightly different element classifications.   
+				our centroids (which classify elements) have their starting locations randomised, each run will tend to result in slightly different final centroid locations
+				and therefore slightly different element classifications.
 			</p>
 			<p>
-				With this brief introduction, now we can start learning how the algorithm actually works. The first thing done is the creation of the initial centroids, 
-				the most common starting method is to simply randomly throw them anywhere (we'll understand why later) and simply let the algorithm itself converge to a 
-				sane state in the end. Usually, you'll want to run the program multiple times and pick your best run though. 
+				With this brief introduction, now we can start learning how the algorithm actually works. The first thing done is the creation of the initial centroids,
+				the most common starting method is to simply randomly throw them anywhere (we'll understand why later) and simply let the algorithm itself converge to a
+				sane state in the end. Usually, you'll want to run the program multiple times and pick your best run though.
 				<br>
-				Since the initialisation is important, there are multiple different initialisation methods that aim to be more accurate than simply throwing the centroids anywhere 
+				Since the initialisation is important, there are multiple different initialisation methods that aim to be more accurate than simply throwing the centroids anywhere
 				randomly. In this demonstration our aim is to show how different our results can be, so we'll randomly initialise our centroids.
 			</p>
 			<p>
-				With the creation of the centroids done, now we need to understand what centroids even are and what they do. This is very simple and straightforward, a centroid 
+				With the creation of the centroids done, now we need to understand what centroids even are and what they do. This is very simple and straightforward, a centroid
 				is simply a point in our data-set which all the elements will get their distances measured against and classified with a label that identifies which of the centroids
 				is closer to it. So, in other words, we classify each element in the class represented by the closest centroid.
 			</p>
 			<p>
-				Once we finish classifying all the elements, for each centroid we calculate the summation of all the distances between this given centroid and all the elements 
+				Once we finish classifying all the elements, for each centroid we calculate the summation of all the distances between this given centroid and all the elements
 				that were classified in its class. This median will result in a vector that points exactly to the middle of all the elements classified by a given centroid.
 				<br>
-				Then, we move each centroid to the new calculated position (in the middle of the elements that were classified by the centroid), and redo all the classification 
-				process all over again. We repeat this step until it reaches the iteration count limit, or when there aren't any classification differences between consecutive 
-				iterations anymore.   
+				Then, we move each centroid to the new calculated position (in the middle of the elements that were classified by the centroid), and redo all the classification
+				process all over again. We repeat this step until it reaches the iteration count limit, or when there aren't any classification differences between consecutive
+				iterations anymore.
 			</p>
 			<p>
 				All those steps can be easily seen in the following GIF:
@@ -1700,7 +1690,7 @@ return 0;
 						<a href="https://github.com/Artoriuz/OpenCV-Examples/blob/master/kmeans.cpp">kmeans.cpp</a>
 					</p>
 			<p>
-				Without further ado, we'll run the k-means algorithm in an image and switch all the colour values to their final classifications. You can see the 
+				Without further ado, we'll run the k-means algorithm in an image and switch all the colour values to their final classifications. You can see the
 				input image used below:
 			</p>
 			<p>
@@ -1708,7 +1698,7 @@ return 0;
 			</p>
 			<p>
 				Since the k-means machine learning algorithm has a random centroid starting location, each run will reach a relatively different result.
-				We can see 10 runs of the program below: 
+				We can see 10 runs of the program below:
 			</p>
 			<p>
 				<img src="./images/kmeans/output_variance.gif" alt="output images" class="center">

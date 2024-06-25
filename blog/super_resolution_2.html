@@ -2,16 +2,6 @@
 <html lang="en">
 
 <head>
-        <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135192850-1"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-
-        gtag('config', 'UA-135192850-1');
-    </script>
-
     <title>Machine Learning Super-Resolution Part 2 - Can we Beat Waifu2x?</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" type="text/css" href="./css/default.css" />
@@ -38,18 +28,18 @@
     <section>
         <h3 id="introduction">Introduction</h3>
         <p>
-            This blog post is supposed to be a follow-up to <a href="./super_resolution.html">Machine Learning Super-Resolution - An Introduction to AI Upsampling</a>. If you somehow arrived at this page, 
-            I strongly advise you to read that other page first if you haven't done it already. 
+            This blog post is supposed to be a follow-up to <a href="./super_resolution.html">Machine Learning Super-Resolution - An Introduction to AI Upsampling</a>. If you somehow arrived at this page,
+            I strongly advise you to read that other page first if you haven't done it already.
         </p>
         <p>
-            Assuming you already know how Convolutional Neural Networks work, and that you have a relatively good understanding of image resampling, we can essentially summarise what we're doing here as 
-            "learning how to restore high-frequency information". Images look relatively blurry when we upscale them with FIR filters, this happens because we do not have all the high-frequency components required for 
+            Assuming you already know how Convolutional Neural Networks work, and that you have a relatively good understanding of image resampling, we can essentially summarise what we're doing here as
+            "learning how to restore high-frequency information". Images look relatively blurry when we upscale them with FIR filters, this happens because we do not have all the high-frequency components required for
             abrupt changes in signal intensity. The super-resolution blog post linked above gives a good overview of the basic SISR CNNs, and this one will cover the more "state of the art" techniques employed by recent works.
         </p>
         <h3 id="PSNRvsPerceptual">PSNR-Oriented vs Perceptually Driven SISR CNNs</h3>
         <p>
-            The SISR CNNs can be classified as either PSNR-oriented, which attempt to reconstruct the image as close as possible and minimise a pixel-wise loss function between the generated HR images 
-            and the reference HR images, and perceptually driven networks, which attempt to generate HR images that look like real images to the human visual system. These networks are usually GAN based 
+            The SISR CNNs can be classified as either PSNR-oriented, which attempt to reconstruct the image as close as possible and minimise a pixel-wise loss function between the generated HR images
+            and the reference HR images, and perceptually driven networks, which attempt to generate HR images that look like real images to the human visual system. These networks are usually GAN based
             and the rationale behind them comes from the fact that minimising pixel-wise differences usually results in smooth images devoid of texture.
         </p>
         <p>
@@ -69,7 +59,7 @@
             <img src="./images/husbando2x/edsr1.png" alt="EDSR" class="center" width="700" height="480">
         </p>
         <p>
-            This architecture treats the features as a set of images that are gradually improved throughout the residual blocks until they resemble the HR reference. 
+            This architecture treats the features as a set of images that are gradually improved throughout the residual blocks until they resemble the HR reference.
             Upsampling is handled by the depth-to-space/pixel-shuffle operation introduced by ESPCN.
         </p>
         <p>
@@ -77,13 +67,13 @@
         </p>
         <h3 id="rdn">RDN</h3>
         <p>
-            RDN stands for Residual Dense Network and it expands the residual training approach from EDSR with concatenations. 
-            According to the authors, previous networks neglect to fully use the information from each convolutional layer and therefore are incapable of capturing hierarchical features of varying scales, 
+            RDN stands for Residual Dense Network and it expands the residual training approach from EDSR with concatenations.
+            According to the authors, previous networks neglect to fully use the information from each convolutional layer and therefore are incapable of capturing hierarchical features of varying scales,
             viewing angles and aspect ratios
         </p>
         <p>
-            To address this issue, RDN introduces the residual dense block. RDB consists of dense connected layers and local feature fusion (LFF) with local residual learning (LRL). 
-            The output of one RDB has direct access to each layer of the next RDB, resulting in a contiguous state pass. 
+            To address this issue, RDN introduces the residual dense block. RDB consists of dense connected layers and local feature fusion (LFF) with local residual learning (LRL).
+            The output of one RDB has direct access to each layer of the next RDB, resulting in a contiguous state pass.
             Each convolutional layer in a RDB has access to all the subsequent layers and passes on the information that needs to be preserved.
         </p>
         <p>
@@ -93,7 +83,7 @@
             <img src="./images/husbando2x/rdn2.png" alt="RDN" class="center" width="900" height="250">
         </p>
         <p>
-            RDN receives the LR image as its input and performs the depth-to-space operation from ESPCN to upscale the LR feature maps. 
+            RDN receives the LR image as its input and performs the depth-to-space operation from ESPCN to upscale the LR feature maps.
             The RDB allows the network to recreate fine details with much better precision than previous works.
         </p>
         <p>
@@ -104,14 +94,14 @@
         </p>
         <h3 id="rcan">RCAN</h3>
         <p>
-            RCAN stands for Residual Channel Attention Networks and it introduced attention mechanisms into the SR problem. 
-            Attention is being widely used in several other areas within machine learning, especially in natural language processing and it was the basis for the development of the transformer. 
-            Attention mechanisms can be used in the SR problem to adaptively rescale features by considering interdependencies among feature channels. In other words, 
+            RCAN stands for Residual Channel Attention Networks and it introduced attention mechanisms into the SR problem.
+            Attention is being widely used in several other areas within machine learning, especially in natural language processing and it was the basis for the development of the transformer.
+            Attention mechanisms can be used in the SR problem to adaptively rescale features by considering interdependencies among feature channels. In other words,
             allowing the network to give more emphasis to informative pixels.
         </p>
         <p>
-            The channel attention block introduced by RCAN first shrinks a HxW input with C features maps using global average pooling. 
-            The resulting layer has a dimension of 1x1xC. The next step is a channel downscaling convolutional layer with fewer output feature maps that shrinks the number of channels to C/r. 
+            The channel attention block introduced by RCAN first shrinks a HxW input with C features maps using global average pooling.
+            The resulting layer has a dimension of 1x1xC. The next step is a channel downscaling convolutional layer with fewer output feature maps that shrinks the number of channels to C/r.
             Afterwards, the number of channels is brought back to C with another convolutional layer, and then goes through a sigmoidal activation layer before an element-wise multiplication with the original HxWxC input layer.
         </p>
         <p>
@@ -121,8 +111,8 @@
             <img src="./images/husbando2x/rcan2.png" alt="RCAN" class="center" width="900" height="250">
         </p>
         <p>
-            The network arranges the residual-channel attention blocks in a way that allows residual training to be done in multiple levels. 
-            Unlike RDN, RCAN does not employ channel concatenation. Instead, element-wise sums are used whenever information needs to be passed to the following layers. 
+            The network arranges the residual-channel attention blocks in a way that allows residual training to be done in multiple levels.
+            Unlike RDN, RCAN does not employ channel concatenation. Instead, element-wise sums are used whenever information needs to be passed to the following layers.
             This reduces the amount of redundant information being passed on and also decreases the number of parameters since concatenation linearly increases the size of the filters.
         </p>
         <p>
@@ -142,8 +132,8 @@
         </p>
         <h3 id="overview">PSNR-Oriented SISR CNNs Overview</h3>
         <p>
-            While several techniques have been developed to tackle the super-resolution problem, convolutional neural networks are currently the state of the art both in reconstruction quality and perceptual fidelity. 
-            Deep complex networks can recreate detail and create outputs that look extremely close to real images, but this comes as a computational cost. 
+            While several techniques have been developed to tackle the super-resolution problem, convolutional neural networks are currently the state of the art both in reconstruction quality and perceptual fidelity.
+            Deep complex networks can recreate detail and create outputs that look extremely close to real images, but this comes as a computational cost.
             The following image depicts the relationship between the number of operations in the networks and their performance:
         </p>
         <p>
@@ -157,12 +147,12 @@
         </p>
         <h3 id="husbando2x">So... Can We Beat Waifu2x?</h3>
         <p>
-            Using RCAN as the starting point since it's the best performing model, I first made its size smaller by using only 2 RGs with 5 RCABs each. The convolutional layers output 64 feature maps and they all use 3x3 filters 
+            Using RCAN as the starting point since it's the best performing model, I first made its size smaller by using only 2 RGs with 5 RCABs each. The convolutional layers output 64 feature maps and they all use 3x3 filters
             with the exception of the layers related to the attention mechanism (1x1 filters are used to contract and expand the number of feature maps).
         </p>
         <p>
-            The network was trained with 200 anime screenshots. The input images were downscaled with a box filter to 480x270 and the output ones downscaled to 960x540. The box filter does not introduce any artifacts 
-            other than some aliasing when it's used to downscale images by an integer scaling factor, and using smaller images helps the network a little bit since we attenuate the high-frequency noise and force it to learn how 
+            The network was trained with 200 anime screenshots. The input images were downscaled with a box filter to 480x270 and the output ones downscaled to 960x540. The box filter does not introduce any artifacts
+            other than some aliasing when it's used to downscale images by an integer scaling factor, and using smaller images helps the network a little bit since we attenuate the high-frequency noise and force it to learn how
             to reconstruct spatially small details.
         </p>
         <p>
@@ -368,7 +358,7 @@ cv2.imwrite('./prediction.png', predictions)
             </pre>
         </p>
         <p>
-            The MAE loss function reached 0.8539 with an SSIM score of 0.9902 after approximately 500 epochs (around 6 hours), which is an amazing result. 
+            The MAE loss function reached 0.8539 with an SSIM score of 0.9902 after approximately 500 epochs (around 6 hours), which is an amazing result.
         </p>
         <p>
             We can see how the trained network, nicknamed "Husbando2x" as a joke, compares to Waifu2x in the following image:
@@ -383,26 +373,26 @@ cv2.imwrite('./prediction.png', predictions)
             <img src="./images/husbando2x/comparison2.png" alt="Comparison" class="center" width="900" height="1710">
         </p>
         <p>
-            This might be extremely hard to see if you don't know where to look, but the lines are a little bit cleaner in the image generated by the small RCAN (Husbando2x). The PSNR in this test image is also 0.5 dB higher which 
-            confirms the image generated by the network are indeed closer to the ground truth pixel-wise. 
+            This might be extremely hard to see if you don't know where to look, but the lines are a little bit cleaner in the image generated by the small RCAN (Husbando2x). The PSNR in this test image is also 0.5 dB higher which
+            confirms the image generated by the network are indeed closer to the ground truth pixel-wise.
         </p>
         <p>
-            Have we beaten Waifu2x then? Maybe, maybe not. Waifu2x has several models with varying levels of denoising and/or scaling factors. The network has changed its architecture a couple times and the most recent model actually 
+            Have we beaten Waifu2x then? Maybe, maybe not. Waifu2x has several models with varying levels of denoising and/or scaling factors. The network has changed its architecture a couple times and the most recent model actually
             employs the exact same residual channel attention block from RCAN. It makes perfect sense that the outcome here was extremely similar.
         </p>
         <h3 id="perspectives">Future Perspectives</h3>
         <p>
-            In this blog post, and in the one that came before it, we've seen how PSNR-oriented SISR CNNs work and how the images they output usually look like. These networks are indisputably better than normal FIR filters in the 
-            image upscaling problem, but training them to generate realistic pictures that do not look slightly blurry is extremely difficult due to the intrinsic nature of the loss functions used. Super-resolution is not a "closed" 
-            problem, we don't only have a single answer that's correct for a given low-resolution input. When we downscale, we're making a linear combination of N pixels and turning them into a single one. When we upscale, we have to turn 
+            In this blog post, and in the one that came before it, we've seen how PSNR-oriented SISR CNNs work and how the images they output usually look like. These networks are indisputably better than normal FIR filters in the
+            image upscaling problem, but training them to generate realistic pictures that do not look slightly blurry is extremely difficult due to the intrinsic nature of the loss functions used. Super-resolution is not a "closed"
+            problem, we don't only have a single answer that's correct for a given low-resolution input. When we downscale, we're making a linear combination of N pixels and turning them into a single one. When we upscale, we have to turn
             each pixel into N pixels. For this reason, there are multiple possible answers and the networks usually converge between all of them.
         </p>
         <p>
-            Generative Adversarial Networks aim to "pick" one of these possible solutions that look realistic and full of details. An adversarial loss is imployed to force the SISR CNN into learning how to trick a classifier into thinking 
+            Generative Adversarial Networks aim to "pick" one of these possible solutions that look realistic and full of details. An adversarial loss is imployed to force the SISR CNN into learning how to trick a classifier into thinking
             the fake images are real, and that's why these networks are called "perceptually-driven". They might not be as good in absolute numeric terms when we evaluate PSNR or SSIM, but they tend to look better to the human eye.
         </p>
         <p>
-           If I feel motivated to do it, I might attempt to train an ESRGAN-like CNN with anime content to see what we get. Will it produce better results or will the artifacts look ugly? We might never know! 
+           If I feel motivated to do it, I might attempt to train an ESRGAN-like CNN with anime content to see what we get. Will it produce better results or will the artifacts look ugly? We might never know!
         </p>
         <h3 id="references">References</h3>
         [1]	X. Wang et al., ‘ESRGAN: Enhanced Super-Resolution Generative Adversarial Networks’, ArXiv180900219 Cs, Sep. 2018, Accessed: Dec. 17, 2020. [Online]. Available: http://arxiv.org/abs/1809.00219

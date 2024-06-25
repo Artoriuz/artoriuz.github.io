@@ -2,16 +2,6 @@
 <html lang="en">
 
 <head>
-        <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135192850-1"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-
-        gtag('config', 'UA-135192850-1');
-    </script>
-
     <title>Imagemagick Resampling</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" type="text/css" href="./css/default.css" />
@@ -38,9 +28,9 @@
     <section>
         <h3 id="introduction">Introduction</h3>
         <p>
-            Some of you may be familiar with the blog post I made about mpv's scaling filters a while ago, but it was never really meant to be shared as much as it did. That page 
-            was originally the result of an assignment that I had during my undergrad, when I was formally studying digital image processing for the first time. Naturally, it was 
-            full of mistakes and the results weren't particularly scientific. I got a lot of feedback and the page ended up evolving in an organic way, 
+            Some of you may be familiar with the blog post I made about mpv's scaling filters a while ago, but it was never really meant to be shared as much as it did. That page
+            was originally the result of an assignment that I had during my undergrad, when I was formally studying digital image processing for the first time. Naturally, it was
+            full of mistakes and the results weren't particularly scientific. I got a lot of feedback and the page ended up evolving in an organic way,
             but it still has some fundamental issues that can not be fixed without a major change in the methodology.
         </p>
         <p>
@@ -52,7 +42,7 @@
                 <li>I created a bunch of different test cases but didn't really have the motivation to keep all of them up to date.</li>
                 <li>I originally used Matlab to compute the metrics and Excel to plot the tables, which means updating the page was a major pain in the ass.</li>
                 <li>I used catmull-rom in gamma light to downscale the test images.</li>
-            </ol> 
+            </ol>
         </p>
         <p>
             So, to address these issues:
@@ -63,14 +53,14 @@
                 <li>I chose to only test a few things, don't ask me to add your niche use cases because I won't do it.</li>
                 <li>I chose to automate everything with a Python script so updating the numbers should be trivial (if this is needed at all).</li>
                 <li>I chose to use the box filter in linear light to downsample this time. Since I'm downsampling to 0.5x this should be a simple average of 4 pixels, which is the best case scenario and doesn't introduce any blurriness or ringing.</li>
-            </ol> 
+            </ol>
         </p>
         <p>
             With that out of the way, we can proceed with the real introduction.
         </p>
         <h3 id="resampling">Resampling</h3>
         <p>
-            Resampling is the process of changing the number of samples of a discrete signal to obtain a new discrete representation of the underlying continuous signal. This definition comes from the idea of having 
+            Resampling is the process of changing the number of samples of a discrete signal to obtain a new discrete representation of the underlying continuous signal. This definition comes from the idea of having
             a sensor of some kind producing an analog continuous-time voltage/current variance which is then periodically sampled and quantised into predefined amplitude levels so we can store it in bits/bytes.
         </p>
         <p>
@@ -79,25 +69,25 @@
             interpolation is the simplest interpolation algorithm, the easiest to compute and probably the most widespread one.
         </p>
         <p>
-            But can something as simple as just drawing a line between 2 points give us good results? Sometimes it does, sometimes it doesn't. It really depends on the signal. Instead of taking 2 points 
-            and drawing a line, we could take more than 2 points and draw a higher-degree curve. The shape of the curve depends on the weights used in the calculation, and these weights depend on the chosen filter. The number 
-            of input samples in the calculation depends on the length/radius/support of the filter. If you want to understand how this is actually done, I suggest simply 
+            But can something as simple as just drawing a line between 2 points give us good results? Sometimes it does, sometimes it doesn't. It really depends on the signal. Instead of taking 2 points
+            and drawing a line, we could take more than 2 points and draw a higher-degree curve. The shape of the curve depends on the weights used in the calculation, and these weights depend on the chosen filter. The number
+            of input samples in the calculation depends on the length/radius/support of the filter. If you want to understand how this is actually done, I suggest simply
             reading <a href="https://entropymine.com/imageworsener/resample/">this explanation</a>.
         </p>
         <p>
-            In short, the most common way of resampling images is treating each row/column as an independent 1-D signal and simply going over all of them until you have resampled the entire image. This means you have to choose a dimension 
-            to resample first but this is pretty much inconsequential to the end result. The resampling algorithm itself is pretty simple, for each output sample you simply centralise the filter on top of it and 
+            In short, the most common way of resampling images is treating each row/column as an independent 1-D signal and simply going over all of them until you have resampled the entire image. This means you have to choose a dimension
+            to resample first but this is pretty much inconsequential to the end result. The resampling algorithm itself is pretty simple, for each output sample you simply centralise the filter on top of it and
             see which input samples end up inside of the window after you compute their equivalent positions, then you multiply these inputs by their corresponding weights depending on their distance to the centre.
         </p>
         <p>
-            There's a different method, usually called polar/cylindrical/elliptical resampling, that does the operation in the 2-D domain directly. The only difference here is that all samples that fit inside the 2-D filter will now 
+            There's a different method, usually called polar/cylindrical/elliptical resampling, that does the operation in the 2-D domain directly. The only difference here is that all samples that fit inside the 2-D filter will now
             be weighted simultaenously, which may drastically change how some filters behave since we're only calling the filter once per output pixel rather than twice as before.
         </p>
         <p>
             <img src="./images/imagemagick_resampling/orthogonal_vs_polar.png" alt="Ortho_polar_comparison" class="center" width="900" height="285">
         </p>
         <p>
-            In this page I'll include results for both orthogonal and polar resampling. It's important to note that polar resampling implementations are generally slower and most filters weren't really designed to be used in this way 
+            In this page I'll include results for both orthogonal and polar resampling. It's important to note that polar resampling implementations are generally slower and most filters weren't really designed to be used in this way
             (the most "famous" exception being polar lanczos, since we replace the sinc function with its 2-D "equivalent", the jinc/sombrero function).
         </p>
         <h3 id="upsampling_methodology">Upsampling Methodology</h3>
@@ -154,22 +144,22 @@
         'Welch']
         </code>
         <p>
-            For a much better explanation of these filters, <a href="https://imagemagick.org/Usage/filter/">please check this page from Imagemagick.</a> 
+            For a much better explanation of these filters, <a href="https://imagemagick.org/Usage/filter/">please check this page from Imagemagick.</a>
         </p>
         </p>
         <p>
-            The result is then evaluated with MAE, PSNR, SSIM and MS-SSIM. All calculations are done with all three RGB channels and in double-precision floating-point for accuracy. Metrics are normalised between [0, 1] and then 
+            The result is then evaluated with MAE, PSNR, SSIM and MS-SSIM. All calculations are done with all three RGB channels and in double-precision floating-point for accuracy. Metrics are normalised between [0, 1] and then
             averaged together with a normal arithmetic mean.
         </p>
         <p>
             Please note that some of those filters are just aliases to other filters or aliases to sinc/jinc with different windows.
         </p>
         <p>
-            LanczosRadius is supposed to be a jinc-windowed jinc sharpened to have its third zero crossing 
+            LanczosRadius is supposed to be a jinc-windowed jinc sharpened to have its third zero crossing
             at 3 instead of 3.2383154841662362.
         </p>
         <p>
-            LanczosSharp and Lanczos2Sharp are both supposed to be sharper jinc-windowed jincs since the original filters ended up too soft when compared to their sinc-windowed sinc orthogonal 
+            LanczosSharp and Lanczos2Sharp are both supposed to be sharper jinc-windowed jincs since the original filters ended up too soft when compared to their sinc-windowed sinc orthogonal
             equivalents.
         </p>
         <h3 id="upsampling_results">Upsampling Results</h3>
@@ -242,32 +232,32 @@
         </p>
         <h3 id="upsampling_commentary">Upsampling Commentary</h3>
         <p>
-            We started this little adventure to provide a bit more robustness to the numbers compared to my previous comparison done using mpv, and there are a few surprises in the results. The first one is that 
+            We started this little adventure to provide a bit more robustness to the numbers compared to my previous comparison done using mpv, and there are a few surprises in the results. The first one is that
             orthogonal LanczosSharp ended up on top of the table, an option that shouldn't even be in the comparison. If you want to give it a try on mpv, you can use <inline_code>--scale=lanczos --scale-blur=0.9812505644269356</inline_code>.
         </p>
         <p>
             The second surprise is that Polar_Catrom is at the second place with the best scores for both SSIM and MS-SSIM. Polar_Catrom is an extremely sharp filter, albeit with too much aliasing and ringing.
-            Since it only rings once (when it overshoots), it's trivial to remove all ringing if we just clip the output of each pixel to the limits set by the surrounding input pixels. 
-            <a href="https://github.com/Artoriuz/glsl-pixel-clipper/">I have actually written a shader for it</a>, but you can also just use libplacebo's native AR now. 
+            Since it only rings once (when it overshoots), it's trivial to remove all ringing if we just clip the output of each pixel to the limits set by the surrounding input pixels.
+            <a href="https://github.com/Artoriuz/glsl-pixel-clipper/">I have actually written a shader for it</a>, but you can also just use libplacebo's native AR now.
             If you want to give the filter a try on mpv, you can use <inline_code>--scale=ewa_robidoux --scale-param1=0 --scale-param2=0.5</inline_code>.
         </p>
         <p>
-            The third surprise is that there are some Lanczos variants on top of the baseline Lanczos: Hamming, Cosine and Welch. For the last two all you gotta do is set <inline_code>--scale=lanczos --scale-window=window</inline_code>, 
+            The third surprise is that there are some Lanczos variants on top of the baseline Lanczos: Hamming, Cosine and Welch. For the last two all you gotta do is set <inline_code>--scale=lanczos --scale-window=window</inline_code>,
             but for the first you also have to set <inline_code>--scale-radius=4</inline_code>.
         </p>
         <p>
-            Finally, it's also a little bit funny to see Lanczos2 beating Catmull_Rom in the "orthogonal filters with radius = 2" category. And it's even funnier that Lanczos2Sharp beat them both, another filter that shouldn't even be here. 
+            Finally, it's also a little bit funny to see Lanczos2 beating Catmull_Rom in the "orthogonal filters with radius = 2" category. And it's even funnier that Lanczos2Sharp beat them both, another filter that shouldn't even be here.
             To use Lanczos2 on mpv you can simply do <inline_code>--scale=lanczos --scale-radius=2</inline_code>, and for Lanczos2Sharp add <inline_code>--scale-blur=0.9549963639785485</inline_code>.
         </p>
         <p>
-            You might have also noticed that Polar_LanczosRadius is on top of Polar_LanczosSharp. Polar_LanczosRadius is sharpened to have its third zero crossing exactly at 3, 
-            which corresponds to a blur factor of 0.9264075766146068 (3.0/3.2383154841662362). To try it on mpv you can use <inline_code>--scale=ewa_lanczos --scale-blur=0.9264075766146068</inline_code>. 
+            You might have also noticed that Polar_LanczosRadius is on top of Polar_LanczosSharp. Polar_LanczosRadius is sharpened to have its third zero crossing exactly at 3,
+            which corresponds to a blur factor of 0.9264075766146068 (3.0/3.2383154841662362). To try it on mpv you can use <inline_code>--scale=ewa_lanczos --scale-blur=0.9264075766146068</inline_code>.
             On <inline_code>--vo=gpu</inline_code> you also have to specify <inline_code>--scale-radius=3.2383154841662362</inline_code>.
         </p>
         <p>
-            Overall it looks like the filters were more or less ranked from sharpest to softest. This makes perfect sense as the main problem with image upsampling is unintended blurriness. PSNR is calculated using the MSE so it's overly 
-            sensitive to outliers, which naturally end up being the sharp transitions. SSIM was also literally designed to give good scores to distorted images that have similarish structures, which also favours sharpness. MAE is a little more 
-            neutral than PSNR which is why we generally use it as our target when training distortion-based CNNs, so it should punish filters that are too sharp in detriment to ringing, aliasing and blocking. That's the main reason why most of those 
+            Overall it looks like the filters were more or less ranked from sharpest to softest. This makes perfect sense as the main problem with image upsampling is unintended blurriness. PSNR is calculated using the MSE so it's overly
+            sensitive to outliers, which naturally end up being the sharp transitions. SSIM was also literally designed to give good scores to distorted images that have similarish structures, which also favours sharpness. MAE is a little more
+            neutral than PSNR which is why we generally use it as our target when training distortion-based CNNs, so it should punish filters that are too sharp in detriment to ringing, aliasing and blocking. That's the main reason why most of those
             CNNs end up generating images that look like oil painting. MS-SSIM was added to neutralise stupidly minor differences as we wouldn't be able to see them anyway from normal viewing distances.
         </p>
         <p>
@@ -278,12 +268,12 @@
         </p>
         <h3 id="downsampling_methodology">Downsampling Methodology</h3>
         <p>
-            The problem with downsampling evaluation is that we do not have a "ground truth" image, making it impossible for us to use the standard full-reference quality metrics. However, in the previous section I already made the 
-            concession that, at a 0.5x scaling ratio, the box filter is as good as it gets without producing any artifacts. 
+            The problem with downsampling evaluation is that we do not have a "ground truth" image, making it impossible for us to use the standard full-reference quality metrics. However, in the previous section I already made the
+            concession that, at a 0.5x scaling ratio, the box filter is as good as it gets without producing any artifacts.
         </p>
         <p>
-            If we make the leap of faith that resampling filters will more or less keep their character regardless of scaling factor, we can use the output of box as the reference and compare other filters against it. 
-            So, in short, we want to find a filter that, at any scaling factor, will behave similarly to box at 0.5x. 
+            If we make the leap of faith that resampling filters will more or less keep their character regardless of scaling factor, we can use the output of box as the reference and compare other filters against it.
+            So, in short, we want to find a filter that, at any scaling factor, will behave similarly to box at 0.5x.
             I'm calling this a leap of faith because this hypothesis most likely falls apart with extreme scaling factors, but as long as you keep it close to 0.5x it probably makes sense.
         </p>
         <p>
@@ -1122,19 +1112,19 @@
         </p>
         <h3 id="downsampling_commentary">Downsampling Commentary</h3>
         <p>
-            The results were relatively predictable, but there are a few things worth mentioning. The first one is that this methodology seems to really like filters with only 1 or 2 lobes. 
+            The results were relatively predictable, but there are a few things worth mentioning. The first one is that this methodology seems to really like filters with only 1 or 2 lobes.
             Lanczos2Sharp (<inline_code>--dscale=lanczos --dscale-radius=2 --dscale-blur=0.9549963639785485</inline_code>) takes the podium but the other BC-Splines and the normal Lanczos2 aren't far behind.
         </p>
         <p>
-            It's a bit funny to see Polar_Hermite (<inline_code>--dscale=ewa_robidoux --dscale-param1=0 --dscale-param2=0</inline_code>) so high in the list, but I actually think it makes sense. Hermite is a short (radius 1) filter that does not have any negative sections, so using it to downscale makes the 
+            It's a bit funny to see Polar_Hermite (<inline_code>--dscale=ewa_robidoux --dscale-param1=0 --dscale-param2=0</inline_code>) so high in the list, but I actually think it makes sense. Hermite is a short (radius 1) filter that does not have any negative sections, so using it to downscale makes the
             operation very close to an "area average", the only difference is that pixels are weighted based on distance. Hermit is usually described as a "smoothed" triangle, but it scored much higher than the normal triangle.
         </p>
         <p>
-            It's also interesting to see that Polar_Robidoux wasn't the best polar BC-Spline, considering the filter was specifically designed to be good at <inline_code>-distort</inline_code>. In any case, it's only slightly behind 
+            It's also interesting to see that Polar_Robidoux wasn't the best polar BC-Spline, considering the filter was specifically designed to be good at <inline_code>-distort</inline_code>. In any case, it's only slightly behind
             Polar_Mitchell. Please remember that these BC-splines are all sharper when used in polar resampling, so Polar_Mitchell is actually a pretty sharp filter and a relatively good alternative to Catrom if you prefer the look of polar resampling.
         </p>
         <p>
-            Both Lanczos (orthogonal sinc-sinc) and Polar_Lanczos (polar jinc-jinc) were pretty mediocre at best. That's a good thing because it shows the methodology can actually punish filters that are too sharp. Polar_Catrom, the sharpest filter we have in the comparison, 
+            Both Lanczos (orthogonal sinc-sinc) and Polar_Lanczos (polar jinc-jinc) were pretty mediocre at best. That's a good thing because it shows the methodology can actually punish filters that are too sharp. Polar_Catrom, the sharpest filter we have in the comparison,
             actually scored as one of the worst filters.
         </p>
         <p>
