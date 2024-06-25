@@ -33,25 +33,17 @@
         </p>
         <h3 id="gamma_upsampling">The Effect of the Downsampler in Upsampling Evaluation</h3>
         <p>
-            Downsampling in linear light is widely accepted as the "usually correct" approach, it can better preserve bright highlights which can make a huge difference depending on what you're downsampling. That doesn't mean that
-            linear light downsampling will absolutely always look better, if you're downsampling black text on a white background you're probably better off doing it in gamma light to prevent the background from dilating into the text
-            for example, since that would hurt legibility.
+            All luma doublers are trained with artificial data, which means the LR images are obtained by downsampling the HR references. The implication here is that if the test procedure matches whatever was done to train a model,
+            the model will obviously score higher. This creates an unfair playing ground if these models are trained differently, as testing with images downsampled in linear light for example would greatly favour any models trained
+            with images that were equally downsampled in linear light. The choice of filter is also very important, as different filters produce images with different characteristics.
         </p>
         <p>
-            This usually isn't a problem when using the built-in filters because mpv doesn't upsample in either linear or gamma light by default, it does it in sigmoid light instead to reduce ringing artifacts. However, that's
-            usually not true for shaders, specially not when they're trained with artificial data (the LR image is created by downsampling the HR reference). If the test procedure includes downsampling in linear light,
-            it's obvious that any model trained with images downsampled in linear light is going to have an unfair advantage.
+            Downsampling in linear light dilates bright structures while eroding dark ones relative to downsampling in gamma light. This is generally accepted as correct but it might not always be ideal depending on the content.
         </p>
         <p>
-            In short, downsampling in linear light dilates bright structures while eroding dark ones (relative to downsampling in gamma light). This is generally accepted as correct but it might not always be ideal depending on the content.
-        </p>
-        <p>
-            The problem arises when we have to decide how to downsample training data before feeding it to a model. If we feed images that have been downsampled in linear light, the model will produce images with dilated dark highlights
+            Interestingly, most models seem to show better reconstruction quality when you feed them LR images that have been downsampled in gamma light, and pretty much all mpv shaders have been trained with
+            data downsampled in gamma light (including NNEDI3, FSRCNNX, RAVU, ArtCNN, etc). If we use images that have been downsampled in linear light, the model will produce images with dilated dark highlights
             and eroded bright features. The exact opposite of what happens when you downsample in linear light. The model is simply learning how to "undo" what linear light downsampling "does", so this behaviour makes perfect sense.
-        </p>
-        <p>
-            Interestingly though, most models seem to show better reconstruction quality when you feed them LR images that have been downsampled in gamma light, and pretty much all mpv shaders have been trained with
-            data downsampled in gamma light (including NNEDI3, FSRCNNX, RAVU, etc).
         </p>
         <p>
             For these reasons, the upsampling tests will be done with an image downsampled in gamma light.
