@@ -50,13 +50,13 @@
         </p>
         <h3 id="upsampling_shaders">Upsampling Shaders</h3>
         <p>
-            I still do not have a good way of automating mpv tests and therefore I'll have to stick to a single test image, which is going to be aoko.png:
+            I still do not have a good way of automating mpv tests and therefore I'll have to stick to a single test image, which is going to be the luma portion of reina.png:
         </p>
         <p>
-            <img src="./images/mpv_upscaling/upsampling/aoko.png" alt="Aoko" class="center" width="960" height="540">
+            <img src="./images/mpv_upscaling/upsampling/reina.png" alt="Reina" class="center" width="960" height="540">
         </p>
         <p>
-            The small number of samples under test makes this very unscientific, but it is what it is.
+            Testing with a single image makes this very unscientific, but it is what it is.
         </p>
         <h3 id="upsampling_methodology">Upsampling Methodology</h3>
         <p>
@@ -71,20 +71,9 @@
         <p>
             The test image is downsampled with:
         </p>
-        <code>magick convert aoko.png -filter box -resize 50% downsampled.png</code>
+        <code>magick convert reina.png -filter box -resize 50% downsampled.png</code>
         <p>
-            It is then converted to grayscale with:
-        </p>
-        <code>magick convert downsampled.png -colorspace gray downsampled.png</code>
-        <p>
-            The original image is also converted to grayscale using the same command to create the reference:
-        </p>
-        <code>magick convert aoko.png -colorspace gray reference.png</code>
-        <p>
-            We need to convert them to grayscale because some of these shaders do not have RGB support.
-        </p>
-        <p>
-            The images were then upsampled back with:
+            The image is then upsampled back with:
         </p>
         <code>mpv --no-config --vo=gpu-next --no-hidpi-window-scale --window-scale=2.0 --pause=yes --screenshot-format=png --sigmoid-upscaling --deband=no --dither-depth=no --screenshot-high-bit-depth=no --glsl-shader="path/to/meme/shader" downsampled.png</code>
         <h3 id="upsampling_results">Upsampling Results</h3>
@@ -105,179 +94,179 @@
               <td>Mean</td>
             </tr>
             <tr>
-              <td>ArtCNN_C4F32</td>
-              <td>5.28E-03</td>
-              <td>35.8650</td>
-              <td>0.9897</td>
-              <td>0.9994</td>
-              <td></td>
-              <td>1.0000</td>
-              <td>1.0000</td>
-              <td>1.0000</td>
-              <td>1.0000</td>
-              <td></td>
-              <td>1.0000</td>
-            </tr>
-            <tr>
-              <td>ArtCNN_C4F16</td>
-              <td>6.20E-03</td>
-              <td>34.6585</td>
-              <td>0.9867</td>
+              <td>ArtCNN_C4F32_CMP</td>
+              <td>2.02E-03</td>
+              <td>46.9876</td>
+              <td>0.9928</td>
               <td>0.9993</td>
               <td></td>
-              <td>0.9376</td>
-              <td>0.8808</td>
-              <td>0.9533</td>
-              <td>0.9845</td>
+              <td>1.0000</td>
+              <td>1.0000</td>
+              <td>1.0000</td>
+              <td>1.0000</td>
               <td></td>
-              <td>0.9390</td>
+              <td>1.0000</td>
             </tr>
             <tr>
-              <td>ArtCNN_C4F8</td>
-              <td>8.09E-03</td>
-              <td>32.8551</td>
-              <td>0.9806</td>
-              <td>0.9989</td>
+              <td>ArtCNN_C4F16_CMP</td>
+              <td>2.20E-03</td>
+              <td>46.1707</td>
+              <td>0.9921</td>
+              <td>0.9992</td>
               <td></td>
-              <td>0.8090</td>
-              <td>0.7026</td>
-              <td>0.8609</td>
-              <td>0.9550</td>
+              <td>0.8968</td>
+              <td>0.9046</td>
+              <td>0.9322</td>
+              <td>0.9708</td>
               <td></td>
-              <td>0.8319</td>
+              <td>0.9261</td>
             </tr>
             <tr>
-              <td>FSRCNNX_x2_16-0-4-1</td>
-              <td>9.75E-03</td>
-              <td>31.7201</td>
-              <td>0.9758</td>
-              <td>0.9976</td>
+              <td>ArtCNN_C4F8_CMP</td>
+              <td>2.26E-03</td>
+              <td>45.7913</td>
+              <td>0.9919</td>
+              <td>0.9992</td>
               <td></td>
-              <td>0.6966</td>
-              <td>0.5905</td>
-              <td>0.7872</td>
-              <td>0.8298</td>
+              <td>0.8592</td>
+              <td>0.8603</td>
+              <td>0.8997</td>
+              <td>0.9771</td>
               <td></td>
-              <td>0.7260</td>
-            </tr>
-            <tr>
-              <td>FSRCNNX_x2_8-0-4-1</td>
-              <td>1.08E-02</td>
-              <td>31.0438</td>
-              <td>0.9705</td>
-              <td>0.9975</td>
-              <td></td>
-              <td>0.6278</td>
-              <td>0.5236</td>
-              <td>0.7059</td>
-              <td>0.8205</td>
-              <td></td>
-              <td>0.6695</td>
-            </tr>
-            <tr>
-              <td>ravu-lite-ar-r4</td>
-              <td>1.09E-02</td>
-              <td>30.4805</td>
-              <td>0.9681</td>
-              <td>0.9974</td>
-              <td></td>
-              <td>0.6196</td>
-              <td>0.4680</td>
-              <td>0.6691</td>
-              <td>0.8126</td>
-              <td></td>
-              <td>0.6423</td>
+              <td>0.8991</td>
             </tr>
             <tr>
               <td>ravu-zoom-ar-r3</td>
-              <td>1.11E-02</td>
-              <td>30.0447</td>
-              <td>0.9684</td>
-              <td>0.9972</td>
+              <td>2.28E-03</td>
+              <td>43.9290</td>
+              <td>0.9916</td>
+              <td>0.9992</td>
               <td></td>
-              <td>0.6045</td>
-              <td>0.4249</td>
-              <td>0.6740</td>
-              <td>0.7916</td>
+              <td>0.8466</td>
+              <td>0.6428</td>
+              <td>0.8745</td>
+              <td>0.9341</td>
               <td></td>
-              <td>0.6237</td>
+              <td>0.8245</td>
+            </tr>
+            <tr>
+              <td>ravu-lite-ar-r4</td>
+              <td>2.32E-03</td>
+              <td>44.0397</td>
+              <td>0.9914</td>
+              <td>0.9991</td>
+              <td></td>
+              <td>0.8246</td>
+              <td>0.6557</td>
+              <td>0.8504</td>
+              <td>0.9192</td>
+              <td></td>
+              <td>0.8125</td>
+            </tr>
+            <tr>
+              <td>FSRCNNX_x2_16-0-4-1</td>
+              <td>2.41E-03</td>
+              <td>44.5079</td>
+              <td>0.9915</td>
+              <td>0.9991</td>
+              <td></td>
+              <td>0.7714</td>
+              <td>0.7104</td>
+              <td>0.8558</td>
+              <td>0.8842</td>
+              <td></td>
+              <td>0.8054</td>
+            </tr>
+            <tr>
+              <td>FSRCNNX_x2_8-0-4-1</td>
+              <td>2.46E-03</td>
+              <td>44.5067</td>
+              <td>0.9912</td>
+              <td>0.9991</td>
+              <td></td>
+              <td>0.7433</td>
+              <td>0.7103</td>
+              <td>0.8225</td>
+              <td>0.9069</td>
+              <td></td>
+              <td>0.7957</td>
             </tr>
             <tr>
               <td>ravu-lite-ar-r3</td>
-              <td>1.12E-02</td>
-              <td>30.2648</td>
-              <td>0.9666</td>
-              <td>0.9974</td>
+              <td>2.37E-03</td>
+              <td>43.7651</td>
+              <td>0.9912</td>
+              <td>0.9991</td>
               <td></td>
-              <td>0.5988</td>
-              <td>0.4467</td>
-              <td>0.6456</td>
-              <td>0.8110</td>
+              <td>0.7927</td>
+              <td>0.6237</td>
+              <td>0.8242</td>
+              <td>0.9185</td>
               <td></td>
-              <td>0.6255</td>
-            </tr>
-            <tr>
-              <td>ravu-lite-ar-r2</td>
-              <td>1.14E-02</td>
-              <td>29.7235</td>
-              <td>0.9660</td>
-              <td>0.9975</td>
-              <td></td>
-              <td>0.5842</td>
-              <td>0.3932</td>
-              <td>0.6368</td>
-              <td>0.8196</td>
-              <td></td>
-              <td>0.6084</td>
+              <td>0.7897</td>
             </tr>
             <tr>
               <td>ravu-zoom-ar-r2</td>
-              <td>1.15E-02</td>
-              <td>29.6350</td>
-              <td>0.9661</td>
-              <td>0.9970</td>
+              <td>2.39E-03</td>
+              <td>43.2409</td>
+              <td>0.9911</td>
+              <td>0.9991</td>
               <td></td>
-              <td>0.5782</td>
-              <td>0.3844</td>
-              <td>0.6385</td>
-              <td>0.7673</td>
+              <td>0.7841</td>
+              <td>0.5624</td>
+              <td>0.8146</td>
+              <td>0.8989</td>
               <td></td>
-              <td>0.5921</td>
+              <td>0.7650</td>
+            </tr>
+            <tr>
+              <td>ravu-lite-ar-r2</td>
+              <td>2.45E-03</td>
+              <td>43.0866</td>
+              <td>0.9908</td>
+              <td>0.9991</td>
+              <td></td>
+              <td>0.7477</td>
+              <td>0.5444</td>
+              <td>0.7842</td>
+              <td>0.9191</td>
+              <td></td>
+              <td>0.7488</td>
             </tr>
             <tr>
               <td>lanczos</td>
-              <td>1.53E-02</td>
-              <td>28.3051</td>
-              <td>0.9497</td>
-              <td>0.9962</td>
+              <td>3.07E-03</td>
+              <td>41.0629</td>
+              <td>0.9880</td>
+              <td>0.9989</td>
               <td></td>
-              <td>0.3226</td>
-              <td>0.2530</td>
-              <td>0.3867</td>
-              <td>0.6953</td>
+              <td>0.3833</td>
+              <td>0.3081</td>
+              <td>0.4710</td>
+              <td>0.8039</td>
               <td></td>
-              <td>0.4144</td>
+              <td>0.4916</td>
             </tr>
             <tr>
               <td>polar_lanczossharp</td>
-              <td>1.61E-02</td>
-              <td>27.8741</td>
-              <td>0.9448</td>
-              <td>0.9949</td>
+              <td>3.15E-03</td>
+              <td>40.7366</td>
+              <td>0.9876</td>
+              <td>0.9988</td>
               <td></td>
-              <td>0.2643</td>
-              <td>0.2105</td>
-              <td>0.3120</td>
-              <td>0.5767</td>
+              <td>0.3371</td>
+              <td>0.2700</td>
+              <td>0.4199</td>
+              <td>0.7282</td>
               <td></td>
-              <td>0.3409</td>
+              <td>0.4388</td>
             </tr>
             <tr>
               <td>bilinear</td>
-              <td>2.00E-02</td>
-              <td>25.7442</td>
-              <td>0.9245</td>
-              <td>0.9889</td>
+              <td>3.72E-03</td>
+              <td>38.4250</td>
+              <td>0.9838</td>
+              <td>0.9975</td>
               <td></td>
               <td>0.0000</td>
               <td>0.0000</td>
@@ -291,7 +280,7 @@
     <h3 id="upsampling_commentary">Upsampling Commentary</h3>
     <p>
         As we can see in the table above, ArtCNN is seems to be the best option when it comes to luma doubling. I personally think the C4F16 version of it should be good enough for most
-        video content, but if your hardware can handle the bigger models and you don't mind the heat/noise then why not.
+        video content, but if your hardware can handle the bigger models well then why not. I also strongly recommend trying the compute variants on Vulkan as that tends to perform much better.
     </p>
     <p>
         For lower scaling factors between 1x and 2x you can expect this list to remain mostly the same as long as you use a sharp downsampling filter for the luma doublers. The choice of filter
@@ -299,6 +288,12 @@
         also becomes smaller as you decrease the scaling factor.
     </p>
     <h3 id="chroma_shaders">Chroma Shaders</h3>
+    <p>
+      Using real anime content to test chroma shaders is difficult because we almost never have it available without chroma subsampling, so a promotional art will be used instead:
+    </p>
+    <p>
+        <img src="./images/mpv_upscaling/chroma/aoko.png" alt="Aoko" class="center" width="960" height="540">
+    </p>
     <p>
       The following shaders were "benchmarked":
       <ol>
@@ -315,7 +310,7 @@
     <code>avifenc aoko.png --min 0 --max 0 -y 420 420.avif</code>
     </p>
     <p>
-        mpv options remains the same with the exception that we don't need <inline_code>--window-scale=2.0</inline_code> anymore, and since we're comparing chroma here, the images weren't converted to grayscale.
+        mpv options remains the same with the exception that we don't need <inline_code>--window-scale=2.0</inline_code> anymore.
     </p>
     <h3 id="chroma_results">Chroma Results</h3>
     <table>
