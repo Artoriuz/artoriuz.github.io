@@ -1117,7 +1117,7 @@
         </p>
         <p>
             It's a bit funny to see Polar_Hermite (<inline_code>--dscale=ewa_robidoux --dscale-param1=0 --dscale-param2=0</inline_code>) so high in the list, but I actually think it makes sense. Hermite is a short (radius 1) filter that does not have any negative sections, so using it to downscale makes the
-            operation very close to an "area average", the only difference is that pixels are weighted based on distance. Hermit is usually described as a "smoothed" triangle, but it scored much higher than the normal triangle.
+            operation very close to an "area average", the only difference is that pixels are weighted based on distance. Hermite is usually described as a "smooth" triangle, but it scores much higher than the "normal" triangle.
         </p>
         <p>
             It's also interesting to see that Polar_Robidoux wasn't the best polar BC-Spline, considering the filter was specifically designed to be good at <inline_code>-distort</inline_code>. In any case, it's only slightly behind
