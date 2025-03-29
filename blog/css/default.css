@@ -6,21 +6,15 @@ body {
     line-height:1.4em;
     color:#d8d1c8;
     background-color:#000000;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Roboto Flex', sans-serif;
+    font-optical-sizing: auto;
    }
-   h1 {
-    line-height:1.1em;
+   h1, h2, h3,h4,h5,h6 {
+    font-family: 'Roboto Slab', sans-serif;
     color:#c79a3a;
-    font-family: 'Roboto Slab', serif;
    }
-   h2 {
-    line-height:1.1em;
-    font-family: 'Roboto Slab', serif;
-   }
-   h3,h4,h5,h6 {
-    line-height:1.1em;
-    color:#c79a3a;
-    font-family: 'Roboto Slab', serif;
+   table {
+    font-family: 'Roboto Mono', monospace;
    }
    a {
     color:#5ab7ff
@@ -112,12 +106,8 @@ body {
     margin-left: auto;
     margin-right: auto;
    }
-   code {
-    color: coral;   
-    font-size: 16px;
-   }
-   inline_code {
-    font: monospace;
+   code, inline_code {
+    font-family: "Roboto Mono", monospace;
     color: coral;
    }
    @media (prefers-color-scheme: dark) {
