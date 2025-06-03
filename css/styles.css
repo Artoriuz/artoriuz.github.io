@@ -256,9 +256,9 @@ footer {
 
 #lead {
 	position: relative;
-	height: 100vh;
+	height: 50vh;
 	min-height: 500px;
-	max-height: 1080px;
+	max-height: 1000px;
 	background: url(../images/lead-bg.jpg);
 	background-size: cover;
 	padding: 15px;
@@ -269,7 +269,7 @@ footer {
     width: 200px;
     height: 200px;
     border-radius: 100%;
-    margin-bottom: 25px;
+    margin-bottom: 2px;
  }
 #lead-content {
 	position: absolute;
@@ -280,24 +280,32 @@ footer {
 	text-align: center
 }
 
-#lead-content h1,
-#lead-content h2 {
-	margin: 0
-}
 
 #lead-content h1 {
 	color: #fff;
 	font-family: 'Inter', sans-serif;
 	font-size: 4em;
-	font-weight: 500;
-	line-height: 0.5em;
-    text-shadow: 0px 1px 3px rgba(0, 0, 0, .5)
+	font-weight: 400;
+	line-height: 1em;
+    text-shadow: 0px 1px 3px rgba(0, 0, 0, .5);
+	margin: 0
+}
+
+#lead-content h2 {
+	color: #fff;
+	font-family: 'Inter', sans-serif;
+	font-size: 2em;
+	font-weight: 400;
+	line-height: 1.25em;
+    text-shadow: 0px 1px 3px rgba(0, 0, 0, .5);
+	margin: 0
 }
 
 #lead-content p {
 	color: #fff;
-	font-size: 2.25em;
+	font-size: 3em;
     text-shadow: 0px 1px 3px rgba(0, 0, 0, .5);
+	margin: 0
 }
 
 #lead-content a {
