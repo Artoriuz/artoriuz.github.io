@@ -45,7 +45,7 @@ body.active {
 
 .no-js #experience-timeline>div p {
 	color: #74808a;
-	font-size: 0.9em;
+	font-size: 1em;
 	margin: 0
 }
 
@@ -142,7 +142,7 @@ header.sticky {
 }
 
 #mobile-menu-close span {
-	font-size: 0.5em;
+	font-size: 1em;
 	text-transform: uppercase
 }
 
@@ -514,7 +514,7 @@ footer {
 
 .vtimeline-content p {
 	color: #74808a;
-	font-size: 0.9em;
+	font-size: 1em;
 	margin: 0
 }
 
@@ -595,7 +595,7 @@ footer {
 .education-block ul {
 	margin: 0;
 	color: #74808a;
-	font-size: 0.9em
+	font-size: 1em
 }
 
 .education-block ul {
@@ -646,7 +646,7 @@ footer {
 .project-info p {
 	color: #74808a;
 	margin: 0 0 15px 0;
-	font-size: 0.9em
+	font-size: 1em
 }
 
 .no-image .project-info {
@@ -804,7 +804,7 @@ footer {
 .optional-section-block ul {
 	margin: 0 0 15px 0;
 	color: #74808a;
-	font-size: 0.9em
+	font-size: 1em
 }
 
 .optional-section-block ul {
@@ -931,7 +931,7 @@ footer {
 		font-size: 1em
 	}
 	#lead-content a {
-		font-size: 0.9em;
+		font-size: 1em;
 		padding: 5px 10px
 	}
 }
