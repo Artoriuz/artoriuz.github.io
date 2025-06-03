@@ -4,9 +4,9 @@ body {
     margin:auto;
     padding:1em;
     line-height:1.4em;
-    color:#d8d1c8;
+    color:#d4d4d4;
     background-color:#000000;
-    font-family: 'Roboto Flex', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-optical-sizing: auto;
    }
    h1, h2, h3,h4,h5,h6 {
@@ -14,7 +14,8 @@ body {
     color:#c79a3a;
    }
    table {
-    font-family: 'Roboto Mono', monospace;
+    font-family: 'Inter', sans-serif;
+    font-feature-settings: 'tnum' on;
    }
    a {
     color:#5ab7ff
