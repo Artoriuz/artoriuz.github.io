@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>Building a Pipelined CPU Core - An Introduction to Computer Architecture and Digital Design</title>
+    <title>Building a RISC-V CPU Core - An Introduction to Computer Architecture and Digital Design</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" type="text/css" href="./css/default.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,7 +14,7 @@
     <header>
         <hgroup>
             <h1>
-                Building a Pipelined CPU Core
+                Building a RISC-V CPU Core
             </h1>
             <h2>An Introduction to Computer Architecture and Digital Design by João Vitor Rafael Chrisóstomo</h2>
         </hgroup>
@@ -29,16 +29,137 @@
     <section>
         <h3 id="introduction">Introduction</h3>
         <p>
+            Before talking about open hardware, it's important to understand why the topic has been revived recently and why it might be important from now on.
+            Semiconductors have arguably changed how we live our lives and the transistor is probably the single most important invention humans have ever come
+            up with, moreover, we've been constantly making those transistors smaller, reducing costs for existing designs and making it possible for large scale
+            integration to exist within a single extremely complex integrated circuit.
+        </p>
+        <img src="./images/open_hardware/45_years.png" alt="45 years of microprocessor trends" class="center" width="600" height="401">
+        <center>Source: Christopher Celio</center>
+        <p>
+            As a result, nearly everything these days relies on electronics in a way or another, and with IoT on the rise, we often see embedded systems in unexpected places such as fridges and ovens.
+        </p>
+
+        <p>
+            Simplifying things, processors work retrieving some data from memory, executing operations on said data and then saving it back in memory. The operations the processors must do are encoded in what we call instructions.
+            Processors are split into 2 parts, a control unit and its datapath. The control unit is responsible for generating the proper control signals that dictate the path the data will take within the datapath, which is made of
+            logic units like registers, multiplexers and ALUs. Complex CPU cores nowadays execute code in an out-of-order fashion, which means threads are broken into smaller independent pieces that get speculatively executed in parallel.
+        </p>
+        <p>
+            Naturally, multiple studies are being conducted in order to increase performance, decrease price, make the nodes even smaller, etc. We've been seeing companies
+            constantly talking about EUV, 3D stacking and nanowires, but it's clear that making better nodes has been getting exponentially harder and gains have to be gotten from other sources.
+        </p>
+        <p>
+            AMD's Infinity Fabric is an excellent example of clever innovation, monolithic multi-core CPUs can get pretty large nowadays
+            (check the newest Xeons die size or IBM's POWER9), and the SoCs also have to integrate multiple IPs such as memory controllers, A/V encoders and decoders, I/O controllers,
+            GPUs, NGUs, Camera related circuitry, modems, etc. Those are called accelerators and they offload tasks from the general purpose CPU cores.
+        </p>
+        <p>
+            The thing is, not every single IP within a modern SoC actually needs the absolute best node, and splitting it into several smaller dies may also significantly improve yields.
+            AMD embraced the multi-die strategy in their first iteration of Zen SKUs, and then went further by manufacturing certain portions of the CPUs at different foundries (TSMC and GlobalFoundries),
+            allowing them to leave performance uncritical parts at an IO die on a bigger node. This also allowed them to reuse the same chiplet silicon across different markets, while its main competitor,
+            Intel, suffered from yields problems with their gigantic dies (Intel has been stuck in their 14nm process for a while, their 10nm efforts haven't worked out as expected).
+        </p>
+        <img src="./images/open_hardware/amd_epyc_interconnect.jpg" alt="epyc interconnect" class="center" width="500" height="335">
+        <center>Source: AMD Epyc Tech Day</center>
+        <br>
+        <img src="./images/open_hardware/naples_vs_rome.png" alt="naples vs rome" class="center" width="600" height="208">
+        <p>
+            Any complex algorithm being executed in a CPU must first be broken into smaller, and simple, instructions. That's what your compiler does and it allows the same general purpose CPU to execute basically anything.
+        </p>
+        <p>
+            General purpose computing is usually great because you can reuse the same processor for an infinite number of processing needs, however,
+            it's never really the most efficient way of performing a complex task and that's precisely why we have dedicated hardware for basically anything that's performance or power critical,
+            GPUs being the most straightforward example (have you ever tried playing games software rendering on your CPU? It might be a cool slideshow experience).
+        </p>
+        <img src="./images/open_hardware/a12_floor_plan.jpg" alt="Apple A12 floor plan" class="center">
+        <center>Source: Anandtech</center>
+        <p>
+            It's not uncommon nowadays for supercomputers to have more GPUs or FPGAs than CPUs, going with specialised hardware is always better when aiming for maximum performance at a given power envelope,
+            GPGPU has been an excellent field of study simply because GPUs are much better than CPUs at workloads that can be easily parallelised (and many things can!).
+        </p>
+        <img src="./images/open_hardware/summit_node.png" alt="Summit node" class="center" width="500" height="281">
+        <center>Source: Wikichip</center>
+        <p>
+            CPUs themselves nowadays come with specialised hardware for certain operations, which is the case with SSE/AVX instructions for x86 or SVE/NEON for ARM.
+            Vector instructions are nothing more than a way to use SIMD operations, extremely useful for concurrent matrix multiplications or anything with a large number of simple mathematical operations, really.
+        </p>
+        <img src="./images/open_hardware/ARM_SIMD_vs_C.png" alt="NEON vs C" class="center" width="600" height="392">
+        <center>Source: Jean-Baptiste Kempf</center>
+        <p>
+            The point I'm trying to make here is reasonably simple, domain-specific architectures are now in demand and we do have the technology to integrate a large number of IPs within the same ASIC.
+            We do not need to rely on the main CPU for everything anymore, we can design accelerators to offload certain important tasks in order to improve performance or efficiency.
+        </p>
+        <p>
+            Problem is, most CPU cores are closed-source IPs that you can either license or buy an ASIC that incorporates it. ARM, the company responsible for the most successful family of ISAs,
+            doesn't actually manufacture any of their IPs and while you can get a license to actually modify things or make your own implementation from scratch (like Apple, Marvell, or Fujitsu), doesn't come cheap.
+        </p>
+        <img src="./images/open_hardware/ARM_licensing.png" alt="ARM licensing" class="center" width="600" height="316">
+        <center>Source: ARM</center>
+        <p>
+            Linux created an open-source revolution in the software world by offering a base to build things on top, and nowadays you can find open solutions to basically all of your software infrastructure,
+            including compilers, operating systems, libraries, databases, filesystems, hypervisors, etc. People can more easily innovate because they don't have to re-implement or reinvent the wheel every
+            single time they want to pursue an idea, they can freely reuse the existing catalog of open-source software and go straight to the point.
+        </p>
+        <p>
+            The idea of open hardware is allowing engineers to do the same with open-sources IPs, that would create an immense potential for FPGAs utilisation even at home. However,
+            while we do have several standards that facilitate software co-operation and reutilisation (like POSIX and OpenGL), hardware is plagued with proprietary solutions that are usually
+            only fully understood by the responsible company and certainly can't be easily integrated into someone else's workflow. IEEE does have a few extremely important standards though
+            (like for floating point) and you should always comply when possible.
+        </p>
+        <p>
+            Moreover, in recent times we've gotten accustomed to hearing about new security flaws found on many out-of-order-execution CPUs with branch prediction (mainly from Intel),
+            and maybe we could've been able to realise the problem earlier if the designs themselves were open, making it possible for more engineers to look at it and possibly find something.
+            There's only so much a single company can do by itself, and it's undoubtedly easier to find issues when you can get help from others.
+        </p>
+        <p>
+            With this in mind, I can probably start talking about RISC-V, a modular and royalty-free ISA initially developed at UC Berkeley for their internal endeavours.
+            Or at least that was the plan, until 3rd parties started complaining about changes, then several universities got involved, then companies from the entire semiconductor industry
+            and now the ISA is the current ambassador for open hardware, leapfrogging other alternatives like MIPS, SPARC and OpenRISC.
+        </p>
+        <img src="./images/open_hardware/risc-v_platinum_members.png" alt="RISC-V platinum members" class="center" width="800" height="476">
+        <center>Source: RISC-V Foundation</center>
+        <p>
+            The momentum behind RISC-V is so tremendous that IBM ended up making POWER, their own ISA, royalty-free. The OpenPower Foundation also joined the Linux Foundation, however that might've been a little bit too late.
+        </p>
+        <p>
+            Why would anyone choose to support RISC-V, a new contender, when alternatives already existed though? You might be asking yourself that, and the answer is pretty simple.
+            The ISA is very well thought. Its modular design allows it to be used in an incredible range of applications, from small and extremely simple IoT edge devices to HPC supercomputers.
+            Its permissive license allows companies to freely do whatever they need with it without creating legal problems and that's exactly what ends up benefiting everyone.
+        </p>
+        <p>
+            MIPS has always been a trademark nightmare, and including branch delay slots in the ISA itself isn't exactly a good decision when you decouple the ISA from implementations,
+            it only makes sense for classic 5-stage pipelines found on simple in-order cores.
+        </p>
+        <p>
+            SPARC on the other hand, while also royalty-free and widely used in space applications by ESA (see the LEON series of CPU cores) has register windows and that's a complexity better avoided when designing simple cores.
+        </p>
+        <p>
+            OpenRISC is licensed under the GPL and that's probably an issue by itself, however it doesn't stop there, the ISA does not have a modular design,
+            it doesn't include shorter instruction encoding (16 bits long, like ARM's Thumb) and it doesn't have support for quad FP.
+        </p>
+        <p>
+            POWER might be a good option due to its time in the market, the software support around it is fantastic when compared to basically any other royalty-free ISA and you can license
+            high performing cores from IBM today. However, it's an ISA from another era and it's plagued with numerous complicated extensions, making simple designs somewhat complicated if
+            you want to take advantage of the existing compilers.
+        </p>
+        <p>
+            That leaves us with a few choices, but for new cores or modifications of existing open-sourced cores RISC-V is currently the best option.
+            There are several implementations that are free to use and modify, including projects from UC Berkeley itself, ETH Zurich, ITT Madras and Western Digital, to give a few examples.
+        </p>
+        <img src="./images/open_hardware/pulp_chips.jpg" alt="PULP chips" class="center" width="900" height="300">
+        <center>Source: ETH Zurich and Università di Bologna</center>
+        <p>
             Computing has evolved in such a way that it has become increasingly impossible to be fully understood without several abstractions layers hiding complexities.
             A computer programmer does not need to directly interact with the machine anymore, high level programming languages (which simply means abstracted programming languages)
-            allow you to write what you want the computer to do in a way that’s more easily understood by humans, making it significantly easier to express complex algorithms and mathematical ideas in general.
+            allow you to write what you want the computer to do in a way that's more easily understood by humans, making it significantly easier to express complex algorithms and mathematical ideas in general.
         </p>
         <p>
             <img src="./images/building_a_cpu/hardware-abstraction.png" alt="Hardware Abstraction" class="center" width="500" height="591">
         </p>
         <p>
             High level programming languages are usually transformed into machine code through the help of compilers, assemblers and linkers. In a nutshell, their job is to take your written code and “convert”
-            it into the actual instructions a computer can “understand”. Note that this allows the same piece of code to target different instruction set architectures since you don’t actually need to rewrite
+            it into the actual instructions a computer can “understand”. Note that this allows the same piece of code to target different instruction set architectures since you don't actually need to rewrite
             the code itself, you just need to recompile it.
         </p>
         <p>
@@ -47,12 +168,12 @@
         <p>
             But what is an instruction set architecture? An ISA defines which instructions are available, what their behaviour is and how they are encoded. It also defines the set of registers,
             what they represent, how you can access them, the memory model and the levels of privilege. You might feel tempted to think the ISA dictates how a given processor internally works but this is not true.
-            The ISA is just the software/hardware interface, it’s merely a standard that needs to be followed if you want programs to work in a wide array of processors with different characteristics without having
+            The ISA is just the software/hardware interface, it's merely a standard that needs to be followed if you want programs to work in a wide array of processors with different characteristics without having
             to recompile it each time.
         </p>
         <p>
             How can CPUs with the same ISA be different then? To answer this I first want you to think about it in a software way. The action of sorting only has a single valid output (the sorted result)
-            but you can achieve the same thing using different algorithms (binary search, bubble sort, quick sort, etc). It’s the exact same thing for an ISA. An instruction defines what the output should be
+            but you can achieve the same thing using different algorithms (binary search, bubble sort, quick sort, etc). It's the exact same thing for an ISA. An instruction defines what the output should be
             for a given input, but it does not define how this output should be computed.
         </p>
         <p>
@@ -61,12 +182,12 @@
         </p>
         <p>
             The following sections will guide you through the implementation of a 5-stage pipeline in-order execution scalar RV32I CPU core written in VHDL, this might sound relatively complicated
-            right now but if you continue you’ll see it’s actually quite simple.
+            right now but if you continue you'll see it's actually quite simple.
         </p>
         <h3 id="riscv">The RV32I ISA</h3>
         <p>
             RISC-V is an open-source and royalty-free ISA that has been gaining a lot of traction in the last few years.
-            Think of it as a competitor to x86 and ARM (you’ve heard those 2 names several times right?) that allows universities and companies to freely innovate building accelerators and custom domain-specific systems.
+            Think of it as a competitor to x86 and ARM (you've heard those 2 names several times right?) that allows universities and companies to freely innovate building accelerators and custom domain-specific systems.
             The ISA aims to be the Linux of hardware and I highly recommend reading my blog post on open-hardware.
         </p>
         <p>
@@ -80,10 +201,10 @@
             <img src="./images/building_a_cpu/isa-shootout.png" alt="RISC-V vs x86 and ARM" class="center" width="600" height="400">
         </p>
         <p>
-            Without further ado, I’ll briefly introduce the RISC-V ISA so we can understand what we’ll be implementing in the next sections.
+            Without further ado, I'll briefly introduce the RISC-V ISA so we can understand what we'll be implementing in the next sections.
         </p>
         <p>
-            RISC-V is a modular ISA, which means not all instructions (or registers) need to be implemented if your implementation doesn’t need them. The base set with only the integer
+            RISC-V is a modular ISA, which means not all instructions (or registers) need to be implemented if your implementation doesn't need them. The base set with only the integer
             instructions is called the I subset, and it exists in 32b, 64b and 128b versions, RV32I, RV64I and RV128I, respectively.
             The I subset defines 32 internal general purpose registers but a reduced version for embedded systems exists with 16 only, the E subset (RV32E, RV64E and RV128E).
         </p>
@@ -97,7 +218,7 @@
         </p>
         <p>
             Instructions are grouped into encoding schemes by the kind of operation they perform, and the least significant bits tell the encoder how long the
-            instruction is (in the case there’s support for the C extension).
+            instruction is (in the case there's support for the C extension).
         </p>
         <img src="./images/open_hardware/encoding2.png" alt="RISC-V instructions" class="center" width="900" height="145">
         <center>Source: RISC-V ISA Specification Volume 1</center>
@@ -113,7 +234,7 @@
         <img src="./images/open_hardware/ops.png" alt="RISC-V OPs" class="center" width="900" height="507">
         <center>Source: RISC-V ISA Specification Volume 1</center>
         <p>
-            You may notice that there is no MOV instruction, and that’s because the register x0 always has its value set to 0, which means you can simply ADD using it as either rs1 or rs2 to move data to another register.
+            You may notice that there is no MOV instruction, and that's because the register x0 always has its value set to 0, which means you can simply ADD using it as either rs1 or rs2 to move data to another register.
         </p>
         <p>
             Memory access instructions are split into loads and stores, for the various supported bit lengths, B for 8 bits (byte), H for 16 bits (half-word) and W for 32 bits (word).
@@ -125,7 +246,7 @@
         <img src="./images/open_hardware/stores.png" alt="RISC-V stores" class="center" width="900" height="90">
         <center>Source: RISC-V ISA Specification Volume 1</center>
         <p>
-            There’s also an instruction to load an upper immediate (most significant bits) into a register.
+            There's also an instruction to load an upper immediate (most significant bits) into a register.
             Most other instructions only fit a lower immediate due to the encoding constraints, which means you usually need 2 separate instructions in order to fully modify a single register or the program counter.
             AUIPC adds an upper immediate into the current value stored in PC, and this will make sense as soon as we show the branching instructions.
         </p>
@@ -157,9 +278,9 @@
         </p>
         <h3 id="rtl">RTL Design Basics</h3>
         <p>
-            RTL stands for register transfer level, if you’ve somehow managed to reach this far without knowing what registers are, then allow me to introduce them in a simple way.
+            RTL stands for register transfer level, if you've somehow managed to reach this far without knowing what registers are, then allow me to introduce them in a simple way.
             Registers are structures made of logic gates capable of holding logic values. We usually employ registers when designing synchronous digital systems, since they allow us
-            to break the problems into smaller portions, avoid race conditions and hold results (whether or not they’re transient).
+            to break the problems into smaller portions, avoid race conditions and hold results (whether or not they're transient).
         </p>
         <p>
             We can see a simple example in the image below. The NOT gate simply inverts the bit coming out of the register, and then this is written into the register itself whenever
@@ -184,17 +305,17 @@ end process;
             </pre>
         </p>
         <p>
-            You might be thinking that this does not look all that different from programming languages, and you’re right. Hardware description is very similar to programming
-            in various ways, but don’t let them make you think it’s the exact same thing, because it’s not. When you’re programming, you’re describing an algorithm that will be
+            You might be thinking that this does not look all that different from programming languages, and you're right. Hardware description is very similar to programming
+            in various ways, but don't let them make you think it's the exact same thing, because it's not. When you're programming, you're describing an algorithm that will be
             executed by a physical structure called a processor. Your code gets compiled into small instructions and each instruction tells the processor to perform a simple task.
             The execution of those several small instructions result in your program as a whole.
         </p>
         <p>
-            When you’re describing hardware the story is a little bit different, you’re literally describing what the structure is. You’re not telling a processor what to do,
-            you’re literally creating a description that will map to physical transistors and create a maze called a datapath (the literal path the data will take).
+            When you're describing hardware the story is a little bit different, you're literally describing what the structure is. You're not telling a processor what to do,
+            you're literally creating a description that will map to physical transistors and create a maze called a datapath (the literal path the data will take).
             Software code is usually executed in a procedural manner but hardware description is not even “executed” in the first place. The structures you describe
-            will always be there and you need to remember that, it’s like parallel programming in the sense that you can have several things going on at the same time,
-            but it’s not because you have several threads, you literally have physical structures that are always there.
+            will always be there and you need to remember that, it's like parallel programming in the sense that you can have several things going on at the same time,
+            but it's not because you have several threads, you literally have physical structures that are always there.
         </p>
         <p>
             Our example here was pretty simple, only 2 things could happen at all and the behaviour was entirely automatic depending solely on a clock input.
@@ -214,9 +335,9 @@ end process;
             We already know the decoder needs to be able to receive instructions, decode them and generate control signals, but the datapath is still undisclosed.
         </p>
         <p>
-            Let’s take a simple load instruction as an example “lb rd, rs1, imm”. This instruction needs to take a value from the internal register rs1, then add it to imm in the ALU to generate the address,
+            Let's take a simple load instruction as an example “lb rd, rs1, imm”. This instruction needs to take a value from the internal register rs1, then add it to imm in the ALU to generate the address,
             then access the memory at the generated address and then save its contents into the internal register rd. From this alone we can infer a few steps: register read, address generation, memory access
-            and register write. But let’s not forget that we also need to fetch the instruction from memory and decode it. The following image depicts this step by step procedure in what we call the classic RISC pipeline.
+            and register write. But let's not forget that we also need to fetch the instruction from memory and decode it. The following image depicts this step by step procedure in what we call the classic RISC pipeline.
         </p>
         <p>
             <img src="./images/building_a_cpu/classic-risc-pipeline.png" alt="Classic RISC Pipeline" class="center" width="800" height="64">
@@ -242,13 +363,13 @@ end process;
         </p>
         <p>
             A simple CPU implementation has all those operations stacked in series in a procedural way, which means there are no registers in-between and everything can be done in a single clock cycle.
-            This however, means the clock period needs to be long so there’s enough time for the signal to propagate through all the logic gates in the path (logic gates are implemented with transistors,
+            This however, means the clock period needs to be long so there's enough time for the signal to propagate through all the logic gates in the path (logic gates are implemented with transistors,
             and logic values are nothing more than voltage in a literal wire). The maximum clock frequency you can input and your circuit will still work is limited by what we call the critical path,
             which is the longest continuous logic path in a given circuit.
         </p>
         <p>
             The technique of pipelining allows us to greatly reduce the critical path by inserting registers to hold values between the stages.
-            In this case, instead of finishing the entire instruction in a single clock period we’ll only finish part of it,
+            In this case, instead of finishing the entire instruction in a single clock period we'll only finish part of it,
             the entire instruction will need 5 clock cycles (for a 5-stage pipeline) instead of a single one.
         </p>
         <p>
@@ -267,14 +388,14 @@ end process;
         </p>
         <p>
             Pipelining greatly increases performance but it can also create problems. To give you an easy example, what should the CPU do after receiving a branch instruction? Naturally
-            it would simply keep incrementing the program counter but now we don’t know which instruction is supposed to be the next one, this problem is called a control hazard and it
+            it would simply keep incrementing the program counter but now we don't know which instruction is supposed to be the next one, this problem is called a control hazard and it
             has created an entire subfield of computer architecture dedicated exclusively to researching branch prediction and how to improve it (current state of the art CPUs have a
             guess rate of over 99%!). For a simple CPU though, we can simply assume the branch is not taken,
-            which means we don’t need to do anything about the branch until it’s proven that it should’ve been taken.
+            which means we don't need to do anything about the branch until it's proven that it should've been taken.
         </p>
         <p>
             Ok but what happens if the branch condition is indeed true? Well the first problem is that now we have to discard the instructions that we should not have started executing.
-            This is called pipeline flushing and can be done directly to the registers separating the stages (handy, isn’t it?). The second problem is flushing causes more severe
+            This is called pipeline flushing and can be done directly to the registers separating the stages (handy, isn't it?). The second problem is flushing causes more severe
             performance issues the longer your pipeline is, and we can only get away with something as simple as this because your pipeline is very short (modern CPUs are usually almost 20 stages long).
         </p>
         <p>
@@ -288,7 +409,7 @@ end process;
             falling edges of the clock, you're guaranteed to have the correct values before the next rising edge which is when those get passed to the next stage.
         </p>
         <p>
-            The last problem you might encounter with pipelining is structural hazards, when you have 2 or more instructions that depend on the same structure at the same time, but this won’t happen in this implementation
+            The last problem you might encounter with pipelining is structural hazards, when you have 2 or more instructions that depend on the same structure at the same time, but this won't happen in this implementation
             as it was thought out to be pipelined from the start. The final high level schematic can be seen in the following image, and this is what will be implemented in the following sections.
         </p>
         <p>
@@ -296,10 +417,10 @@ end process;
         </p>
         <h3 id="VHDL">The VHDL Implementation</h3>
         <p>
-            Before continuing, I’d like to know that I do not recommend you to write VHDL the way I did in these files, those were written to be extremely easy to understand by students.
-            It’s not a good representation of production ready code and I’m sure there are better ways to write many things (especially the register file).
-            VHDL is an old language originally intended for representation only and not synthesis, it’s very limited in features and extremely verbose.
-            If you want to work with digital design in the current industry I’d highly recommend learning SystemVerilog instead, but VHDL is still widely taught in Europe and South America and this core was
+            Before continuing, I'd like to know that I do not recommend you to write VHDL the way I did in these files, those were written to be extremely easy to understand by students.
+            It's not a good representation of production ready code and I'm sure there are better ways to write many things (especially the register file).
+            VHDL is an old language originally intended for representation only and not synthesis, it's very limited in features and extremely verbose.
+            If you want to work with digital design in the current industry I'd highly recommend learning SystemVerilog instead, but VHDL is still widely taught in Europe and South America and this core was
             originally intended as a learning resource for Brazilian students.
         </p>
         <p>
@@ -312,14 +433,14 @@ end process;
             Registers simply hold a value, but they can be controlled through control signals and obviously need to follow a clock in order to be useful.
             For the following explanation please take a look at my VHDL description of a <a href="https://github.com/Artoriuz/maestro/blob/master/Project/Components/reg32b.vhd">32 bits rising edge register</a>.
             The first thing to note is that our register has an asynchronous clear input signal that simply sets it to 0 regardless of the clock.
-            Asynchronous clears are extremely common and widely used. The second thing to note is that we’re modifying an internal signal instead of dealing with the output directly.
+            Asynchronous clears are extremely common and widely used. The second thing to note is that we're modifying an internal signal instead of dealing with the output directly.
             Why? Because if we do this we can make sure the signal is initialised with 0 which means our register is very well defined even before the first clock cycle.
         </p>
         <p>
             Multiplexers are very different, they take multiple inputs but only output a single one of them, based on a control signal.
             For the following explanation please take a look at my VHDL description of a <a href="https://github.com/Artoriuz/maestro/blob/master/Project/Components/mux_5_1.vhd">32 bits 5 to 1 multiplexer</a>.
-            Since the mux is a literal “router” in our case, it doesn’t need internal signals, its output is simply hardwired to a given input based on the signal named selection.
-            VHDL syntax is not particularly pretty, but this could’ve been written with a switch statement too if you prefer it to be more C-like.
+            Since the mux is a literal “router” in our case, it doesn't need internal signals, its output is simply hardwired to a given input based on the signal named selection.
+            VHDL syntax is not particularly pretty, but this could've been written with a switch statement too if you prefer it to be more C-like.
             The repository contains several other muxes and registers, but they all follow the same logic.
         </p>
         <p>
@@ -336,7 +457,7 @@ end process;
         </p>
         <p>
             The PC, its incrementing logic and the mux responsible for switching between the 2 possible values were implemented as a single component named program counter.
-            You might be asking where’s the incrementing logic after all, but the answer is simple, it’s in the instantiation of this structure inside its higher level component.
+            You might be asking where's the incrementing logic after all, but the answer is simple, it's in the instantiation of this structure inside its higher level component.
             you can find the following piece of code in datapath.vhd:
         </p>
         <p>
@@ -349,7 +470,7 @@ std_logic_vector(unsigned(PC_output) + 4), JTU_output, PC_next_address, PC_outpu
         </p>
         <p>
             The other element in the IF stage is the actual program memory, this implementation has separate program and data memories,
-            this is called harvard architecture and it’s somewhat common in very low power embedded systems (your computer is von-neumann though).
+            this is called harvard architecture and it's somewhat common in very low power embedded systems (your computer is von-neumann though).
             Since the main targets were Intel/Altera FPGAs at the time, for lower resource utilisation I decided to instantiate Altera memory blocks
             (which make sure actual memory is used and not synthesised from logic blocks). This introduces a few problems, the first is that Cyclone
             FPGAs do not support unregistered memory inputs, and the second is that since RISC-V expects each instruction to be separated by ± 4 address
@@ -358,23 +479,23 @@ std_logic_vector(unsigned(PC_output) + 4), JTU_output, PC_next_address, PC_outpu
             and it instantiates the actual memory as a component.
         </p>
         <p>
-            The amount of boilerplate code just to shift the address 2 steps to the right is surprising and this could’ve been done in several different ways,
+            The amount of boilerplate code just to shift the address 2 steps to the right is surprising and this could've been done in several different ways,
             but this way makes the intent look extremely obvious. A clean alternative here would be performing the shift within the port mapping of progmem,
-            but that would need it to go from 15 downto 2 which might look somewhat confusing. I’m discarding more than half the upper bits because the memory
-            in place isn’t big enough to use them for addressing.
+            but that would need it to go from 15 downto 2 which might look somewhat confusing. I'm discarding more than half the upper bits because the memory
+            in place isn't big enough to use them for addressing.
         </p>
         <p>
             Now, finally, to end this stage all we need is something with some registers between it and the next stage.
-            Note that we could’ve simply inserted those registers before the output signals in each module,
+            Note that we could've simply inserted those registers before the output signals in each module,
             but since my aim here was to make the code easily understood I decided to create modules with the
             sole purpose of splitting stages. Please check the code of <a href="https://github.com/Artoriuz/maestro/blob/master/Project/Components/IF_ID_DIV.vhd">IF_ID_DIV</a>.
         </p>
         <p>
-            Notice how I’m avoiding driving the outputs directly from the inputs, there’s always an internal signal in between them which increases the length of the code dramatically.
-            But there’s a good reason for this, if I needed to perform any mathematical operation whatsoever with those signals I would not have to rewrite the modules,
-            and the EDA tools can optimise this for me when I’m just connecting things together. It does look like I added a bunch of boilerplate code for no good reason,
+            Notice how I'm avoiding driving the outputs directly from the inputs, there's always an internal signal in between them which increases the length of the code dramatically.
+            But there's a good reason for this, if I needed to perform any mathematical operation whatsoever with those signals I would not have to rewrite the modules,
+            and the EDA tools can optimise this for me when I'm just connecting things together. It does look like I added a bunch of boilerplate code for no good reason,
             and that is somewhat accurate, but EDA tools are terrible in telling you the problems in your code and this is the kind of thing you sometimes do to make sure you get no warnings.
-            I plan to rewrite the entire thing in SystemVerilog at some point, and when it happens I’ll make sure to refactor anything that looks weirdly convoluted.
+            I plan to rewrite the entire thing in SystemVerilog at some point, and when it happens I'll make sure to refactor anything that looks weirdly convoluted.
         </p>
         <p>
             Well, with that said we can go to the next stage. Instruction Decode contains the
@@ -387,7 +508,7 @@ std_logic_vector(unsigned(PC_output) + 4), JTU_output, PC_next_address, PC_outpu
         </p>
         <p>
             The controller is described in a very long piece of VHDL, since it needs to generate control signals for every single instruction.
-            It is split into 2 distinct processes internally because it was adapted from a single-cycle CPU with asynchronous clear and wasn’t refactored to a more streamlined version of itself.
+            It is split into 2 distinct processes internally because it was adapted from a single-cycle CPU with asynchronous clear and wasn't refactored to a more streamlined version of itself.
             But ignoring this detail we can clearly see that the instruction is first decoded and then the proper signals are
             generated based on the information encoded into the instruction itself (opcode, rd, rs1, rs2, imm, etc).
         </p>
@@ -410,13 +531,13 @@ std_logic_vector(unsigned(PC_output) + 4), JTU_output, PC_next_address, PC_outpu
             The stage also has a <a href="https://github.com/Artoriuz/maestro/blob/master/Project/Components/forwarding_unit.vhd">Forwarding Unit</a> responsible for figuring out when forwarding needs to be done
             (this action is performed through the comparison of addresses contained in the current
             instruction in EX and the past 2 that are currently in MEM and WB) and 2 forwarding muxes
-            to actually replace the ALU inputs when forwarding needs to be done. It’s important to note
+            to actually replace the ALU inputs when forwarding needs to be done. It's important to note
             that operations with immediate values also depend on a mux to replace rs2 with imm.
             The EX stage signals IF that a jump or branch is taken through an OR port that
             receives both the branch result from the ALU and the Jump control signal
             (the result is then inputted into the PC Mux and tells it to use what JTU is outputting instead of PC + 4).
             You might be asking yourself why there are such long internal signals inside the ALU,
-            and that’s because operations with 2 32 bits values might not fit into 32 bits,
+            and that's because operations with 2 32 bits values might not fit into 32 bits,
             the output is only 32 bits wide but the internals are not.
         </p>
         <p>
@@ -444,7 +565,7 @@ std_logic_vector(unsigned(PC_output) + 4), JTU_output, PC_next_address, PC_outpu
             Branch+4/8/12 are simply instructions that come after the brunch instruction directly (in the following memory addresses).
             Destination is the instruction the branch points to in the case it's taken.
             Those tables show that the default behaviour is always assuming the branches are not taken, simply keeping the PC incrementing to PC + 4 as usual.
-            When the branch instruction reaches the EX stage however, it’s condition is actually going to be tested, if the test returns true (the branch should’ve been taken)
+            When the branch instruction reaches the EX stage however, it's condition is actually going to be tested, if the test returns true (the branch should've been taken)
             then the Flushing Unit will clear the instructions currently in ID and EX, replacing them with NOPs. If the condition is returned false by the ALU, nothing needs
             to be done and we actually guessed correctly! Note that most branches are indeed not taken, think of it with a for loop, a C for repeats the same
             thing N times before actually having to go out of the loop.
