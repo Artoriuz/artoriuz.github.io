@@ -1,0 +1,232 @@
+ <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Super Resolution Part I</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="./css/default.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <hgroup>
+            <h1>
+              Super Resolution Part I
+            </h1>
+            <h2>An introduction to ML image upscaling</h2>
+        </hgroup>
+    </header>
+    <nav>
+        <menu>
+            <a href="../index.html">Home</a>
+            <a href="https://github.com/Artoriuz">GitHub</a>
+            <a href="https://www.linkedin.com/in/jvrchrisostomo/">LinkedIn</a>
+        </menu>
+    </nav>
+    <section>
+        <h3 id="introduction">Introduction</h3>
+        <p>
+            In an age dominated by multimedia consumption, demand for high-quality visual content is rising. However, there's an ever-growing library of content produced in the past targeting lower resolution displays,
+            and factors like the available bandwidth limit the resolution in which modern content can be served.
+        </p>
+        <p>
+            Image resampling is generally used to map low-resolution content into high-resolution displays, but classic approaches such as bilinear and bicubic interpolation can not synthesise high-frequency information,
+            resulting in images that are perceived as soft or blurry.
+        </p>
+        <p>
+            Machine learning has eclipsed classical algorithms in computer vision and image processing, showing state-of-the-art performance in several problems including image resampling.
+        </p>
+        <h3 id="degradations">Degradations</h3>
+        <p>
+            The standard procedure when creating training data is to collect high-resolution reference images and then apply a "degradation model" to artificially create the corresponding low-resolution inputs.
+        </p>
+        <p>
+            The degradation model essentially defines the "problem" your model will attempt to solve. Since we're talking about super-resolution models, one of the steps is naturally downsampling the images. Many filters can be used
+            to downsample, and you should pick a filter that corresponds to how you want your model to look like. If you pick a filter that blurs the image, like Hermite, then your model will do the opposite (it'll sharpen!).
+        </p>
+        <p>
+            This is one of the reasons why training super-resolution models is so tricky. You must create training data that matches the content you're actually trying to upscale, but to do that you need to downsample and no
+            downsampling filter is perfect. I like using box for my models, but that's nothing more than personal preference.
+        </p>
+        <p>
+            You may also want your model to be able to deal with compression artifacts. For that all you have to do is to add compression artifacts to the low-resolution images. As long as you know how to artificially create the problem
+            you're trying to solve, then you can quite literally just add it to your images and your model will attempt to learn how to reverse it (which doesn't mean it'll succeed in a satisfactory way).
+        </p>
+        <h3 id="losses">Losses</h3>
+        <p>
+            But how do we measure whether our model is doing a good job solving the problem? We need a loss function.
+        </p>
+        <p>
+            A loss function is nothing more than a metric used as our optimisation target during training. When talking about super-resolution models, there are 2 kinds of metrics we can use for this. Distortion metrics and perception metrics.
+        </p>
+        <p>
+            Distortion metrics focus on measuring pixel distances without worrying too much about how humans perceive different kinds of distortions. Metrics like MAE, MSE, PSNR and SSIM are all distortion metrics.
+            These metrics are often fairly straightforward mathematical functions that simply compute per pixel distances and average them in some way.
+        </p>
+        <p>
+            Perception metrics attempt to model how humans perceive different distortions, without worrying too much about how individual pixels look. Metrics like LPIPS, DISTS and BRISQUE are all perception metrics.
+            These metrics were originally trained based on human quality scores, but modern variations are all based on extracting features from deep classification models. Think of it this way,
+            a model trained to identify and classify dogs needs to give the same output ("dog") for pictures of different dogs. Therefore, you can leverage this to measure how "similar" 2 images are
+            even when their pixels are completely different.
+        </p>
+        <p>
+            A few years ago, it was also very common to include adversarial components in an attempt to train more "realistic" models. This was achieved by adding another model to the mix entirely dedicated to
+            judging whether the images you're producing with your generator look "real". This judgement is passed to the generator as a hint of what to do so it can "fool" the discriminator/critic into "thinking"
+            the images are real. The problem with using adversarial losses by themselves is that your generator will have no incentive to generate images that look even remotely close to their respective references,
+            so they were always mixed together with something else.
+        </p>
+        <p>
+            When trained on distortion losses entirely, super-resolution models will produce very "safe" images that tend to lack some high-frequency components and ultimately look a little soft or devoid of texture.
+            This happens because the "optimal solution" is to be equally wrong towards all possible solutions. When trained with perception losses, which includes adversarial losses,
+            the models can "pick" one of the possible solutions even if it's the wrong one. This can be easily seen in the picture below:
+        </p>
+        <p>
+            <img src="./images/super_resolution_part_1/mse_vs_gan.png" alt="mse vs gan" class="center" width="700" height="260">
+            <center>Source: <a href="https://arxiv.org/abs/1612.07919">EnhanceNet: Single Image Super-Resolution Through Automated Texture Synthesis</a></center>
+        </p>
+        <p>
+            After downsampling the high-resolution image, the resulting low-resolution image has identical squares for all rectangles. With the distortion loss, the best solution is to be equally wrong (and right!) towards all possibilities.
+            With the adversarial loss, the model simply picks one of the possible solutions regardless of whether it's correct. When analysing the same thing on "real images", the difference is perceived as added texture
+            (note how the "fake" texture does not match the texture in the actual reference):
+        </p>
+        <p>
+            <img src="./images/super_resolution_part_1/srgan.png" alt="srgan" class="center" width="900" height="386">
+            <center>Source: <a href="https://arxiv.org/abs/1609.04802">Photo-Realistic Single Image Super-Resolution Using a Generative Adversarial Network</a></center>
+        </p>
+        <h3 id="blocks">Building Blocks</h3>
+        <p>
+            Many blocks are used to build modern super-resolution models, and it's impossible to cover all novel ideas in a blog post like this. However, some ideas have stood the test of time and are commonly found on most models.
+        </p>
+        <h4 id="conv">Convolutions</h4>
+        <p>
+            The most common building block, of course, is the convolution layer. CNNs have completely changed the computer vision landscape and are still widely used today even taking into consideration the ascension of Transformer models.
+        </p>
+        <p>
+            The convolution is the operation obtained by "sliding" a filter/kernel through the image computing weighted averages of the area covered by the filter. Each output pixel will contain a value that is obtained by multiplying some
+            input pixels by some weights, and these weights are the same regardless of "where" in the image the filter is.
+        </p>
+        <p>
+            This gives us a very important property... Convolutions are equivariant in space. This gives them a very strong inductive bias to solve vision problems.
+        </p>
+        <p>
+            <img src="./images/super_resolution_part_1/conv.gif" alt="convolution animation" class="center" width="400" height="450">
+            <center>Source: <a href="https://hannibunny.github.io/mlbook/neuralnetworks/convolutionDemos.html">Prof. Dr. Johannes Maucher</a></center>
+        </p>
+        <p>
+            Unlike a normal 2D convolution, which is depicted in the animation above, the "Conv2D" layer is generally done using 3D filters. That's the case because each filter matches the input feature maps in depth,
+            which means they also have 3 dimensions even if they only "slide" through 2 dimensions. naturally, we can use 1x1 convolutions to "combine" the features between different channels without taking spatial information into account,
+            and this is equivalent to a "linear" or "dense" layer. When we apply a different kernel for each channel, we call the operation a "depthwise convolution".
+        </p>
+        <p>
+            All major machine learning libraries have excellent built-in support for convolution layers. I'll go over a few common parameters and how they affect the operation:
+        </p>
+        <p>
+            <ul>
+                <li>Filters: Number of times we'll perform the whole operation producing an output channel. The number of filters corresponds to the number of channels in the final output. Each filter is independent and has its own weights.</li>
+                <li>Kernel Size: The spatial size of the filter. This is usually given as an integer to make symmetrical filters, but there's nothing stopping you from defining asymmetrical ones (see: <a href="https://arxiv.org/abs/2303.16900">InceptionNeXt: When Inception Meets ConvNeXt</a>). 3x3 is the most common size.</li>
+                <li>Strides: The size of the "step" when sliding through the input. Usually this is defined as (1, 1), but this can be set higher to "skip" pixels and reduce the size of the output feature maps.</li>
+                <li>Padding: What to do when the kernel would otherwise go "out of bonds". You can choose to only use valid values in the computations, which will ultimately reduce the size of the feature maps, or you can "pad" the input. Padding the input with zeros is the most common choice.</li>
+                <li>Dilation Rate: Used to increase the receptive field. You can define this to increase the "size" of the filter without increasing the number of weights (which means it won't use all the pixels inside the window).</li>
+                <li>Groups: Used to split the input channels into independent chunks. The most common value for this is 1, but recent vision models like to increase it and sometimes even match the number of input channels (which is the equivalent of a depthwise convolution).</li>
+            </ul>
+        </p>
+        <h4 id="activations">Activations</h4>
+        <p>
+            Activation functions are what allow machine learning models to solve complex problems. This is done by putting the data through a non-linear function that transforms it. The most common activation function is the ReLU, but smoother alternatives like the SiLU and the
+            GELU are becoming very popular in recent times.
+        </p>
+        <p>
+            <img src="./images/super_resolution_part_1/activations.png" alt="activations" class="center" width="700" height="370">
+            <center>Source: <a href="https://arxiv.org/abs/2310.20360">Mathematical Introduction to Deep Learning: Methods, Implementations, and Theory</a></center>
+        </p>
+        <h4 id="skip">Skip Connections</h4>
+        <p>
+            Skip connections are also found in literally every single modern super-resolution model. Without them, it becomes impossible to train deeper models as things simply become very unstable.
+        </p>
+        <p>
+            Skip connections can be implemented either via the identity (simply adding the input back to the output of a given block) or via concatenation (taking the input feature maps and "appending" them to the output feature maps).
+            Both options are perfectly valid, but since the identity doesn't modify the shape of the features, it's often preferred.
+        </p>
+        <p>
+            Short skip connections are those added after a relatively low number of operations, like a few convolution layers for example. These are found on "residual blocks", which are the main building blocks of pretty much any large model. Rather than entirely modifying
+            the input feature maps, creating a whole new output in the process, adding the input back to the output allows residual blocks to simply modify the input feature maps. This can be understood as a conveyor belt where each worker does something to the product being
+            built. Some workers just tighten a few screws, others just plug some cables, etc.
+        </p>
+        <p>
+            <img src="./images/super_resolution_part_1/residual_block.png" alt="residual blocks" class="center" width="600" height="200">
+            <center>Source: <a href="https://arxiv.org/abs/1904.07523">A Deep Journey into Super-resolution: A survey</a></center>
+        </p>
+        <p>
+            Long skip connections are those added after a relatively large number of operations. On super-resolution models, they can almost always be found linking features maps right after the input to those right before the output. This allows the model to learn "what is missing"
+            in the output, which is the high-frequency components.
+        </p>
+        <h4 id="shuffling">Pixel Shuffling</h4>
+        <p>
+            Ok, we can reduce the size of the feature maps by increasing the stride in the convolution layer, but how do we increase it? Well... You could do the same with a transposed convolution, which used to be popular in the past, but there's an even simpler operation.
+        </p>
+        <p>
+            Pixel shuffling, sometimes also called "depth to space", is nothing more than reshaping the feature maps to increase width and height while reducing depth. Say you have 4 channels, you can just rearrange the information so those 4 channels becomes a single
+            channel with 4x as many pixels. Since we can easily control how many feature maps we want to output from a convolution layer (this matches the number of filters), it's trivial to increase spatial size as needed.
+        </p>
+        <p>
+            <img src="./images/super_resolution_part_1/shuffle.png" alt="pixel shuffle" class="center" width="600" height="260">
+            <center>Source: <a href="https://arxiv.org/abs/1904.07523">A Deep Journey into Super-resolution: A survey</a></center>
+        </p>
+        <p>
+            This can also be done to the other direction to reduce width and height while increasing depth, which is usually called "pixel unshuffling" or "space to depth", but it is not nearly as common.
+        </p>
+        <h3 id="alltogether">Putting it All Together</h3>
+        <p>
+            Now that the main building blocks have all been presented, how does a modern super resolution model look like?
+        </p>
+        <p>
+            We start by extracting some features from the input. We then put this data through a series of residual blocks. Finally, we add a long-skip connection to pass the low-frequency information forward, and then reshape the feature maps. It really is that simple!
+        </p>
+        <p>
+            The following image depicts RCAN, the state-of-the-art in 2018 (7 years ago at the time of writing):
+        </p>
+        <p>
+            <img src="./images/super_resolution_part_1/rcan.png" alt="RCAN" class="center" width="900" height="315">
+            <center>Source: <a href="https://arxiv.org/abs/1807.02758">Image Super-Resolution Using Very Deep Residual Channel Attention Networks</a></center>
+        </p>
+        <p>
+            The next one depicts HAT, the state-of-the-art in in 2022 (3 years ago at the time of writing):
+        </p>
+        <p>
+            <img src="./images/super_resolution_part_1/hat.png" alt="HAT" class="center" width="900" height="450">
+            <center>Source: <a href="https://arxiv.org/abs/2205.04437">Activating More Pixels in Image Super-Resolution Transformer</a></center>
+        </p>
+        <p>
+            The winner of NTIRE 2025 Challenge on Image Super-Resolution (x4), SamsungAICamera, still used the exact same HAT architecture, so it's safe to say this is pretty much still the state-of-the-art today (if it isn't clear by now, I'm writing this in 2025).
+        </p>
+        <p>
+            Of course, there are many differences between RCAN and HAT. The latter is pretty much an "evolution" of the former in the sense that everything that was present in RCAN is still present in HAT. However, a few new things were also introduced.
+        </p>
+        <p>
+            Instead of relying entirely on convolutions, HAT also leverages building blocks commonly found on Transformers. If we removed the CAB from the HAB, the resulting block would essentially be a Swin transformer. I'm not gonna go into the specifics here, but
+            the main advantage is that transformers can learn global information much better than traditional convolutions. The vision transformer learns how each patch relate to every other patch in the image. By contrast, convolutions are generally much more localised.
+            You generally have to stack several convolution layers to learn any kind of global information.
+        </p>
+        <p>
+            HAT combines both convolutions and transformers to hopefully achieve the best of both worlds, and so far it seems to be working. The major downside to transformers is that they're often much slower than simple convolution layers, which means they're only
+            commonly found on big models that do not care about inference performance. And besides, we've been shown time and time again that they're not necessarily required. We've had many papers in other fields showing that pure CNNs are still competitive
+            (see: <a href="https://arxiv.org/abs/2201.03545">A ConvNet for the 2020s</a>, <a href="https://arxiv.org/abs/2310.16764">ConvNets Match Vision Transformers at Scale</a>).
+        </p>
+</section>
+        <br>
+        <br>
+        <nav>
+            <menu>
+                <a href="../index.html">Home</a>
+                <a href="#introduction">Introduction</a>
+                <a href="https://github.com/Artoriuz">GitHub</a>
+                <a href="https://www.linkedin.com/in/jvrchrisostomo/">LinkedIn</a>
+            </menu>
+        </nav>
+        <br>
+        <br>
+</body>
+</html>
