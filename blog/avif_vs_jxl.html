@@ -1,0 +1,126 @@
+ <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>AVIF vs JPEG XL</title>
+    <link rel="icon" type="image/x-icon" href="../favicon.png">
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="./css/default.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <hgroup>
+            <h1>
+                AVIF vs JPEG XL
+            </h1>
+            <h2>A comparison between state of the art image formats on anime-style art</h2>
+        </hgroup>
+    </header>
+    <nav>
+        <menu>
+            <a href="../index.html">Home</a>
+            <a href="https://github.com/Artoriuz">GitHub</a>
+            <a href="https://www.linkedin.com/in/jvrchrisostomo/">LinkedIn</a>
+        </menu>
+    </nav>
+    <section>
+        <h3 id="introduction">Introduction</h3>
+        <p>
+            AVIF and JPEG XL are the two most relevant "next-gen" image formats today. AVIF is built on top of AV1, which is primarily a video codec. On the other hand, JPEG XL evolved from Pik and FUIF, and it was built from the ground up to be an image codec.
+            While this does not sound particularly important, as a video key-frame is essentially an image as well, JPEG XL has a few advantages:
+        </p>
+        <p>
+            <ul>
+                <li>Higher-resolution images are properly supported (AVIF is capped at 65536x65536).</li>
+                <li>Higher colour-depths are properly supported (AVIF is capped at 12 bits).</li>
+                <li>Progressive decoding is properly supported.</li>
+              </ul>
+        </p>
+        <p>
+            Whether or not these differences are super relevant will depend on the use-case, but it's undeniable that JPEG XL is more future-proof than AVIF at the moment but the latter does have a few advantages too:
+        </p>
+        <p>
+            <ul>
+                <li>It has hardware decoding support inherited from AV1.</li>
+                <li>It has stellar animation support since it's literally a video codec.</li>
+                <li>It's slightly better supported (all major browsers support AVIF).</li>
+              </ul>
+        <p>
+            Why am I writing all of this? Well... In 2022 Google made the controversial decision of removing JPEG XL support from Chromium. Naturally, this was a significant blow to its general adoption. However, Apple has recently (2024) adopted JPEG XL, which
+            prompted Google to seemingly reconsider its original stance on the matter.
+        </p>
+        <p>
+            It's relatively easy to find articles comparing these formats, but they're almost always somewhat biased towards one or the other... I don't think I've ever seen any proper comparison focused on anime-style art either.
+        </p>
+        <p>
+            Hopefully my motivations are pretty clear now: As an outsider who has nothing to do with either format, I simply want to compare them on anime-style art.
+        </p>
+        <p>
+            32 anime-style 1920x1080 images were encoded. The thumbnails below show what they look like:
+        </p>
+        <p>
+            <img src="./images/avif_jxl_comparison/thumbnails.png" alt="thumbnails" class="center" width="960" height="1080">
+        </p>
+        <h3 id="lossy">Lossy Compression</h3>
+        <p>
+            AVIF and JPEG XL images were encoded calling avifenc and cjxl directly:
+        </p>
+        <p>
+            <code>avifenc input.png -q [quality] -y 444 output.avif</code><br>
+            <code>cjxl input.png -q [quality] output.jxl</code>
+        </p>
+        <p>
+            JPEG (mozjpeg) was also added to the mix as a comparison point.
+        </p>
+        <p>
+            For [quality], 16 equally spaced values between 50 and 99 were used. This was done to constrain the results to the "usable" range.
+        </p>
+        <p>
+            The choice of metric is controversal... For now I'll stick to MAE as a relatively neutral distortion metric:
+        </p>
+        <p>
+            <img src="./images/avif_jxl_comparison/mae_vs_filesize.png" alt="lossy_comparison" class="center" width="960" height="570">
+        </p>
+        <h3 id="lossless">Lossless Compression</h3>
+        <p>
+            To create the lossless encodes, avifenc and cjxl were called with the following arguments:
+        </p>
+        <p>
+            <code>avifenc input.png -l output.avif</code><br>
+            <code>cjxl input.png -q 100 output.jxl</code>
+        </p>
+        <p>
+            PNG and WebP were both added to the mix as comparison points.
+        </p>
+        <p>
+            Since the outputs are lossless, no quality metric is needed, we can simply use a compression metric like bits per pixel instead:
+        </p>
+        <p>
+            <img src="./images/avif_jxl_comparison/lossless_bpp_comparison.png" alt="lossless_comparison" class="center" width="960" height="594">
+        </p>
+        <h3 id="conclusion">Conclusion</h3>
+        <p>
+            For lossy compression on mostly default settings, AVIF outperforms JPEG XL on most quality targets. JPEG XL, however, has an edge on very high quality settings (-q 99).
+        </p>
+        <p>
+            For lossless compression, they're not even close, JPEG XL is simply way ahead. AVIF is actually worse than WebP, which is its spiritual predecessor.
+        </p>
+</section>
+        <br>
+        <br>
+        <nav>
+            <menu>
+                <a href="../index.html">Home</a>
+                <a href="#introduction">Introduction</a>
+                <a href="https://github.com/Artoriuz">GitHub</a>
+                <a href="https://www.linkedin.com/in/jvrchrisostomo/">LinkedIn</a>
+            </menu>
+        </nav>
+        <br>
+        <br>
+</body>
+</html>
