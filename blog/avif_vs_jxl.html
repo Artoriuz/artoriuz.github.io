@@ -99,6 +99,9 @@
             <img src="./images/avif_jxl_comparison/lossy_compression_mae.png" alt="lossy_compression_mae" class="center" width="960" height="570">
         </p>
         <p>
+            <img src="./images/avif_jxl_comparison/lossy_compression_psnr.png" alt="lossy_compression_psnr" class="center" width="960" height="570">
+        </p>
+        <p>
             <img src="./images/avif_jxl_comparison/lossy_compression_dssim.png" alt="lossy_compression_dssim" class="center" width="960" height="570">
         </p>
         <p>
@@ -125,8 +128,9 @@
         <p>
             For lossy compression on mostly default settings, AVIF outperforms JPEG XL on the lower filesizes. JPEG XL pulls ahead at higher quality settings, but the difference between the two isn't dramatic.
             The point in which JPEG XL outpaces AVIF depends on the metric.
+        <p>
             For MAE, they're evenly matched somewhere around 500 KiB. For DSSIM and SSIMULACRA2, this happens somewhere around 200 KiB.
-        </p>
+            For PSNR it never really happens... AVIF is tuned to optimise PSNR by default, so this is somewhat expected.
         <p>
             For lossless compression they're not even close, JPEG XL is simply way ahead. AVIF doesn't even beat WebP.
         </p>
