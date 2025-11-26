@@ -77,13 +77,13 @@
             JPEG (mozjpeg) was also added to the mix as a comparison point.
         </p>
         <p>
-            For [quality], 16 equally spaced values between 50 and 99 were used. This was done to constrain the results to the "usable" range.
+            For [quality], 24 equally-spaced values between 5 and 99 were used.
         </p>
         <p>
             The choice of metric is controversal... For now I'll stick to MAE as a relatively neutral distortion metric:
         </p>
         <p>
-            <img src="./images/avif_jxl_comparison/mae_vs_filesize.png" alt="lossy_comparison" class="center" width="960" height="570">
+            <img src="./images/avif_jxl_comparison/lossy_comparison.png" alt="lossy_comparison" class="center" width="960" height="570">
         </p>
         <h3 id="lossless">Lossless Compression</h3>
         <p>
@@ -100,14 +100,15 @@
             Since the outputs are lossless, no quality metric is needed, we can simply use a compression metric like bits per pixel instead:
         </p>
         <p>
-            <img src="./images/avif_jxl_comparison/lossless_bpp_comparison.png" alt="lossless_comparison" class="center" width="960" height="594">
+            <img src="./images/avif_jxl_comparison/lossless_comparison.png" alt="lossless_comparison" class="center" width="960" height="570">
         </p>
         <h3 id="conclusion">Conclusion</h3>
         <p>
-            For lossy compression on mostly default settings, AVIF outperforms JPEG XL on most quality targets. JPEG XL, however, has an edge on very high quality settings (-q 99).
+            For lossy compression on mostly default settings, AVIF outperforms JPEG XL on most quality targets. JPEG XL, however, has an edge on very high quality settings. They're evenly matched somewhere between quality levels 95 and 99,
+            which lands around 500 KiB.
         </p>
         <p>
-            For lossless compression, they're not even close, JPEG XL is simply way ahead. AVIF is actually worse than WebP, which is its spiritual predecessor.
+            For lossless compression they're not even close, JPEG XL is simply way ahead. AVIF doesn't even beat WebP.
         </p>
 </section>
         <br>
