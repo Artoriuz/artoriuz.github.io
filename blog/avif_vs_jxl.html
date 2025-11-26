@@ -80,10 +80,16 @@
             For [quality], 24 equally-spaced values between 5 and 99 were used.
         </p>
         <p>
-            The choice of metric is controversal... For now I'll stick to MAE as a relatively neutral distortion metric:
+            The choice of metric is controversal... This is a pick your poison kind of situation, so I'll just include a few different metrics:
         </p>
         <p>
-            <img src="./images/avif_jxl_comparison/lossy_comparison.png" alt="lossy_comparison" class="center" width="960" height="570">
+            <img src="./images/avif_jxl_comparison/lossy_compression_mae.png" alt="lossy_compression_mae" class="center" width="960" height="570">
+        </p>
+        <p>
+            <img src="./images/avif_jxl_comparison/lossy_compression_dssim.png" alt="lossy_compression_dssim" class="center" width="960" height="570">
+        </p>
+        <p>
+            <img src="./images/avif_jxl_comparison/lossy_compression_ssimulacra2.png" alt="lossy_compression_ssimulacra2" class="center" width="960" height="570">
         </p>
         <h3 id="lossless">Lossless Compression</h3>
         <p>
@@ -100,15 +106,20 @@
             Since the outputs are lossless, no quality metric is needed, we can simply use a compression metric like bits per pixel instead:
         </p>
         <p>
-            <img src="./images/avif_jxl_comparison/lossless_comparison.png" alt="lossless_comparison" class="center" width="960" height="570">
+            <img src="./images/avif_jxl_comparison/lossless_compression.png" alt="lossless_compression" class="center" width="960" height="570">
         </p>
         <h3 id="conclusion">Conclusion</h3>
         <p>
-            For lossy compression on mostly default settings, AVIF outperforms JPEG XL on most quality targets. JPEG XL, however, has an edge on very high quality settings. They're evenly matched somewhere between quality levels 95 and 99,
-            which lands around 500 KiB.
+            For lossy compression on mostly default settings, AVIF outperforms JPEG XL on the lower filesizes. JPEG XL pulls ahead at higher quality settings, but the difference between the two isn't dramatic.
+            The point in which JPEG XL outpaces AVIF depends on the metric.
+            For MAE, they're evenly matched somewhere around 500 KiB. For DSSIM and SSIMULACRA2, this happens somewhere around 200 KiB.
         </p>
         <p>
             For lossless compression they're not even close, JPEG XL is simply way ahead. AVIF doesn't even beat WebP.
+        </p>
+        <p>
+            This draws a very clear picture of how to choose between these codecs when it comes to anime-style art:
+            AVIF should be generally preferred when targetting lower filesizes, while JPEG XL should be generally preferred for lossless or near-lossless compression.
         </p>
 </section>
         <br>
