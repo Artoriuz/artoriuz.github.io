@@ -73,19 +73,9 @@
         <div class="container">
             <h2 class="heading">About Me</h2>
             <p>
-                I'm an Electrical Engineer passionate about digital signal processing and machine learning.
-            </p>
-            <p>
-                I hold a MSc in Electrical Engineering from the State University of Campinas (UNICAMP).
-            </p>
-            <p>
-                My research was about accelerating convolutional neural networks for real-time inference on integrated GPUs.
-            </p>
-            <p>
-                During my undergrad, I implemented an RV32I RISC-V CPU core in VHDL.
-            </p>
-            <p>
-                I'm currently working as a contractor at Wind River, building software for distributed edge cloud infrastructure.
+                I hold a MSc in Electrical Engineering from the State University of Campinas (UNICAMP) and a BSc in Electrical Engineering from the Federal University of Rio Grande do Norte (UFRN).
+                I specialise mostly in digital image processing and machine learning, with a focus on tasks like super-resolution and restoration.
+                My other interests include image/video compression, hardware design, embedded systems, etc...
             </p>
         </div>
     </div>
@@ -147,7 +137,7 @@
         <div class="education-block">
             <h3>State University of Campinas</h3>
             <span class="education-date">2020 - 2024</span>
-            <h4>Master of Science in Electrical and Computer Engineering</h4>
+            <h4>Master of Science in Electrical Engineering</h4>
             <p>
                 My work is about accelerating Convolutional Neural Networks for real-time super-resolution on integrated GPUs.
             </p><br>
@@ -186,9 +176,7 @@
                     <div class="project-info">
                         <h3>ArtCNN</h3>
                         <p>
-                            Single-Image Super-Resolution Convolutional Neural Networks as GLSL shaders for mpv. The model is relatively simple with a
-                            feed-forward architecture, a single long-skip connection and a pixel shuffle layer to upscale the feature maps. Different degradation models
-                            and dataset preparation steps were used to tackle different problems, and the model is offered in various flavours.
+                            Convolutional Neural Networks for super-resolution and restoration of anime-style art. Available as GLSL shaders and in the ONNX format.
                         </p>
                         <a href="https://github.com/Artoriuz/ArtCNN">View Project</a>
                     </div>
@@ -205,26 +193,8 @@
                         <h3>Chroma From Luma Prediction</h3>
                         <p>
                             CfL is a GLSL shader that implements chroma upscaling based on the closed least squares solution for linear regression, inspired by the adoption of the same technique in modern video codecs.
-                            Since a simple linear regression obviously doesn't take into account pixel distance, the prediction is mixed with the output of a normal resampling filter based on how high the
-                            correlation between luma and chroma is.
                         </p>
                         <a href="https://github.com/Artoriuz/glsl-chroma-from-luma-prediction">View Project</a>
-                    </div>
-                    <!-- End .project-info -->
-                </div>
-                <!-- End .project -->
-
-                <div class="project shadow-large">
-                    <div class="project-image">
-                        <img src="images/jointbilateral.png" height=300px width=300px />
-                    </div>
-                    <!-- End .project-image -->
-                    <div class="project-info">
-                        <h3>Joint Bilateral</h3>
-                        <p>
-                            Joint Bilateral is a simple implementation of joint bilateral chroma upsampling in GLSL. It uses the luma plane as a guide to achieve sharper edges without introducing any ringing.
-                        </p>
-                        <a href="https://github.com/Artoriuz/glsl-joint-bilateral">View Project</a>
                     </div>
                     <!-- End .project-info -->
                 </div>
@@ -248,22 +218,6 @@
 
                 <div class="project shadow-large">
                     <div class="project-image">
-                        <img src="images/osee.png" height=300px width=300px />
-                    </div>
-                    <!-- End .project-image -->
-                    <div class="project-info">
-                        <h3>OSEE</h3>
-                        <p>
-                            OSEE consists of a series of online courses and textbook recommendations that together cover most of the basic Electrical Engineering knowledge, similarly to a bachelor's degree.
-                        </p>
-                        <a href="https://github.com/Artoriuz/OSEE">View Project</a>
-                    </div>
-                    <!-- End .project-info -->
-                </div>
-                <!-- End .project -->
-
-                <div class="project shadow-large">
-                    <div class="project-image">
                         <img src="images/maestro.png" height=300px width=300px />
                     </div>
                     <!-- End .project-image -->
@@ -274,90 +228,6 @@
                             The project is entirely academic, it's written in VHDL in a beginner-friendly way so computer architecture students can also learn about hardware design.
                         </p>
                         <a href="https://github.com/Artoriuz/maestro">View Project</a>
-                    </div>
-                    <!-- End .project-info -->
-                </div>
-                <!-- End .project -->
-
-                <div class="project shadow-large">
-                    <div class="project-image">
-                        <img src="images/testbench.jpg" height=300px width=300px />
-                    </div>
-                    <!-- End .project-image -->
-                    <div class="project-info">
-                        <h3>EDC testbench</h3>
-                        <p>
-                            The environmental data collector is a Cubsat-compatible payload capable of decoding up to 12 <a href="https://www.argos-system.org/">ARGOS-2</a> PTT signals.<br><br>
-                            During my internship I was in charge of developing a way of simulating the system to catch bugs and evaluate its performance. The testbench was composed of a hardware in the loop test-routine
-                            and the required code to emulate an on-board-computer utilising an x86 Workstation running Matlab as a master, an Arduino Due as an I²C bridge and a Rohde&Schwarz SMBV100A Vector Signal Generator.
-                        </p>
-                    </div>
-                    <!-- End .project-info -->
-                </div>
-                <!-- End .project -->
-
-                <div class="project shadow-large">
-                    <div class="project-image">
-                        <img src="images/upscaling.jpg" height=300px width=300px />
-                    </div>
-                    <!-- End .project-image -->
-                    <div class="project-info">
-                        <h3>Upscaling Evaluation</h3>
-                        <p>
-                            Conducted a performance and picture quality evaluation of different upscaling algorithms supported
-                            by the popular video player mpv, which includes a wide variety of choices, from polynomial interpolation to convolutional
-                            neural-network based shaders and measurements such as SSIM and PSNR.
-                        </p>
-                        <a href="https://artoriuz.github.io/blog/mpv_upscaling.html">View Project</a>
-                    </div>
-                    <!-- End .project-info -->
-                </div>
-                <!-- End .project -->
-
-                <div class="project shadow-large">
-                    <div class="project-image">
-                        <img src="images/camera.png" height=300px width=300px />
-                    </div>
-                    <!-- End .project-image -->
-                    <div class="project-info">
-                        <h3>Motus Camera</h3>
-                        <p>
-                            Motus Camera is a movement detection surveillance program written in C++ using OpenCV.<br><br>
-                            Upon movement detection, the recording is then written to disk encoded into an AVC clip until the scene becomes still.
-                        </p>
-                        <a href="https://github.com/Artoriuz/motus-camera">View Project</a>
-                    </div>
-                    <!-- End .project-info -->
-                </div>
-                <!-- End .project -->
-
-                <div class="project shadow-large">
-                    <div class="project-image">
-                        <img src="images/maglock.jpg" height=300px width=300px />
-                    </div>
-                    <!-- End .project-image -->
-                    <div class="project-info">
-                        <h3>PIC Maglock</h3>
-                        <p>
-                            Magnetic lock prototype controlled by a PIC16 with a numpad made of push buttons and code wittren in ASM.
-                        </p>
-                        <a href="https://github.com/Artoriuz/PIC-ASM-Maglock">View Project</a>
-                    </div>
-                    <!-- End .project-info -->
-                </div>
-                <!-- End .project -->
-
-                <div class="project shadow-large">
-                    <div class="project-image">
-                        <img src="images/de2.jpg" height=300px width=300px />
-                    </div>
-                    <!-- End .project-image -->
-                    <div class="project-info">
-                        <h3>NIOS II Fast Fingers</h3>
-                        <p>
-                            Memory game implemented using Qsys, NIOS II soft core and a Cyclone II FPGA.
-                        </p>
-                        <a href="https://github.com/Artoriuz/Altera-Platform-Fast-Fingers">View Project</a>
                     </div>
                     <!-- End .project-info -->
                 </div>
