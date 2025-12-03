@@ -17,7 +17,7 @@
             <h1>
                 Gamma Correction
             </h1>
-            <h2>Why you should care by João Vitor Rafael Chrisóstomo</h2>
+            <h2>Why you should care</h2>
         </hgroup>
     </header>
     <nav>
@@ -89,7 +89,7 @@
             room. What we want to do with gamma correction (in this case) is preserve the intent taking into consideration the differences between viewing conditions.
         </p>
         <p>
-            Since you're probably reading this on a computer display, let's start with untouched content gamma on an sRGB gamma display:
+            Since you're probably reading this on a computer display, let's start with untouched content gamma on an assumed to be sRGB gamma display:
         </p>
         <code>mpv --no-config --screenshot-format=png</code>
         <p>
@@ -107,7 +107,7 @@
             We can, however, force it to perform gamma correction if we give it an ICC profile or set the EOTF with the <inline_code>--target-trc</inline_code> flag. And this is exactly what
             we're going to do next:
         </p>
-        <code>mpv --no-config --screenshot-format=png --target-trc=srgb</code>
+        <code>mpv --no-config --screenshot-format=png --target-contrast=inf --target-trc=srgb</code>
         <p>
             <img src="./images/gamma_correction/corrected_srgb.png" alt="Corrected to sRGB" class="center" width="960" height="540">
         </p>
@@ -128,17 +128,17 @@
         <h3 id="srgb">Video Content on sRGB Displays With Gamma Correction and Gamma Boost</h3>
         <p>
             Wait, there's more...? Remember when I made sure to say sRGB gamma is just APPROXIMATELY a 2.2 power law curve? Using <inline_code>--target-trc=srgb</inline_code> does take that into consideration
-            but it also makes the image darker (to target a dark room). But what if we want to fix the lower contrast issue without making the entire picture noticeably darker?
+            but it also makes the image darker (to target a dark room). But what if we want to fix the lower contrast issue without making the entire picture noticeably darker when watching gamma2.4/bt.1886 content?
         </p>
         <p>
             You can achieve this by using <inline_code>--target-trc=srgb</inline_code> alongside <inline_code>--gamma-factor=1.1</inline_code>:
         </p>
-        <code>mpv --no-config --screenshot-format=png --target-trc=srgb --gamma-factor=1.1</code>
+        <code>mpv --no-config --screenshot-format=png --target-contrast=inf --target-trc=srgb --gamma-factor=1.1</code>
         <p>
             <img src="./images/gamma_correction/corrected_srgb_boost.png" alt="Corrected to sRGB plus Boost" class="center" width="960" height="540">
         </p>
         <p>
-            Now we're telling mpv that the display follows sRGB gamma (it's not always the case with monitors, some manufacturers just ignore the sRGB gamma technicality and go for a 2.2 power law gamma),
+            Now we're telling mpv that the display follows sRGB gamma (it's not always the case with monitors, in fact 2.2 power law gamma displays might be more common),
             so it compensates the source by making the dark areas slightly darker (because sRGB gamma is slightly brighter than a 2.2 power law curve towards the darker tones) and also makes the bright
             areas slightly brighter (again to compensate the fact that sRGB gamma is slightly darker towards the brighter tones).
         </p>
