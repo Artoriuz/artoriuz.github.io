@@ -43,18 +43,18 @@
                 <li>I also kept adding meme shaders since people requested them.</li>
                 <li>I created a bunch of different test cases but didn't really have the motivation to keep all of them up to date.</li>
                 <li>I originally used Matlab to compute the metrics and Excel to plot the tables, which means updating the page was a major pain in the ass.</li>
-                <li>I used catmull-rom in gamma light to downscale the test images.</li>
+                <li>I used catmull-rom to downscale the test images.</li>
             </ol>
         </p>
         <p>
             So, to address these issues:
             <ol>
                 <li>I chose to use the entire Manga109 dataset this time, which is probably the best widely-used dataset we have for line-art.</li>
-                <li>I chose to stick to the standard distortion metrics, I'll think about adding perception metrics to the mix but only if they have decent Python implementations and actually compute at a decent speed.</li>
-                <li>I chose to exclude all meme shaders. I'll stick to resampling filters this time. A following work with meme shaders isn't out of question but this is harder to automate.</li>
-                <li>I chose to only test a few things, don't ask me to add your niche use cases because I won't do it.</li>
-                <li>I chose to automate everything with a Python script so updating the numbers should be trivial (if this is needed at all).</li>
-                <li>I chose to use the box filter in linear light to downsample this time. Since I'm downsampling to 0.5x this should be a simple average of 4 pixels, which is the best case scenario and doesn't introduce any blurriness or ringing.</li>
+                <li>I chose to stick to the standard distortion metrics.</li>
+                <li>I chose to exclude all meme shaders. I'll stick to resampling filters this time.</li>
+                <li>I chose to only test 2x upsampling and 0.5x downsampling.</li>
+                <li>I chose to fully automate everything so updating the numbers should be trivial.</li>
+                <li>I chose to use the box filter to downsample this time. Since I'm downsampling to 0.5x this should be a simple average of 4 pixels, which is the best case scenario and doesn't introduce any blurriness or ringing.</li>
             </ol>
         </p>
         <p>
@@ -100,17 +100,17 @@
             <img src="./images/imagemagick_resampling/manga109.png" alt="Manga109" class="center" width="960" height="340">
         </p>
         <p>
-            The dataset is downscaled with:
+            The dataset is downsampled with:
         </p>
-        <code>magick mogrify -colorspace rgb -filter box -resize 50% -colorspace srgb -path low_res inputs/*.png</code>
+        <code>magick mogrify -filter box -resize 50% -path low_res inputs/*.png</code>
         <p>
             The dataset is then brought back up with the following command for orthogonal resampling:
         </p>
-        <code>magick mogrify -colorspace RGB +sigmoidal-contrast 7.5 -filter {resampling_filter} -resize 200% -sigmoidal-contrast 7.5 -colorspace sRGB -path high_res low_res/*.png</code>
+        <code>magick mogrify -filter {resampling_filter} -resize 200% -path high_res low_res/*.png</code>
         <p>
             And the following command for polar resampling:
         </p>
-        <code>magick mogrify -colorspace RGB +sigmoidal-contrast 7.5 -filter {resampling_filter} -distort Resize 200% -sigmoidal-contrast 7.5 -colorspace sRGB -path high_res low_res/*.png</code>
+        <code>magick mogrify -filter {resampling_filter} -distort Resize 200% -path high_res low_res/*.png</code>
         <p>The <inline_code>{resampling_filter}</inline_code> argument is replaced by all available resampling filters:
         <code>
         ['Bartlett',
@@ -146,127 +146,61 @@
         'Welch']
         </code>
         <p>
-            For a much better explanation of these filters, <a href="https://imagemagick.org/Usage/filter/">please check this page from Imagemagick.</a>
+            For a better explanation of these filters, <a href="https://imagemagick.org/Usage/filter/">please check this page from Imagemagick.</a>
         </p>
         </p>
         <p>
-            The result is then evaluated with MAE, PSNR, SSIM and MS-SSIM. All calculations are done with all three RGB channels and in double-precision floating-point for accuracy. Metrics are normalised between [0, 1] and then
-            averaged together with a normal arithmetic mean.
+            The result is then evaluated with MAE, PSNR, SSIM and MS-SSIM. All calculations are done after grayscale conversion and in double-precision floating-point for accuracy. Metrics are normalised between [0, 1] and then averaged together.
         </p>
         <p>
             Please note that some of those filters are just aliases to other filters or aliases to sinc/jinc with different windows.
         </p>
         <p>
-            LanczosRadius is supposed to be a jinc-windowed jinc sharpened to have its third zero crossing
-            at 3 instead of 3.2383154841662362.
-        </p>
-        <p>
-            LanczosSharp and Lanczos2Sharp are both supposed to be sharper jinc-windowed jincs since the original filters ended up too soft when compared to their sinc-windowed sinc orthogonal
-            equivalents.
+            LanczosRadius is a jinc-windowed jinc squished to have its third zero crossing at 3 instead of 3.2383154841662362. Likewise, LanczosSharp and Lanczos2Sharp are also just squished jinc-windowed jincs.
         </p>
         <h3 id="upsampling_results">Upsampling Results</h3>
         <p>
-            <table>
-                <tr><td>Filter</td><td>MAE</td><td>PSNR</td><td>SSIM</td><td>MS-SSIM</td><td>MAE (N)</td><td>PSNR (N)</td><td>SSIM (N)</td><td>MS-SSIM (N)</td><td>Mean</td></tr>
-                <tr><td>LanczosSharp</td><td>0.0163</td><td>30.3992</td><td>0.9391</td><td>0.9952</td><td>1.0000</td><td>0.9973</td><td>0.9716</td><td>0.9944</td><td>0.9908</td></tr>
-                <tr><td>Polar_Catrom</td><td>0.0164</td><td>30.2800</td><td>0.9411</td><td>0.9953</td><td>0.9860</td><td>0.9704</td><td>1.0000</td><td>1.0000</td><td>0.9891</td></tr>
-                <tr><td>Hamming</td><td>0.0163</td><td>30.4113</td><td>0.9384</td><td>0.9950</td><td>0.9932</td><td>1.0000</td><td>0.9621</td><td>0.9826</td><td>0.9845</td></tr>
-                <tr><td>Cosine</td><td>0.0164</td><td>30.3786</td><td>0.9378</td><td>0.9950</td><td>0.9859</td><td>0.9926</td><td>0.9536</td><td>0.9796</td><td>0.9779</td></tr>
-                <tr><td>Polar_Lagrange</td><td>0.0166</td><td>30.3581</td><td>0.9396</td><td>0.9949</td><td>0.9686</td><td>0.9880</td><td>0.9784</td><td>0.9766</td><td>0.9779</td></tr>
-                <tr><td>Welch</td><td>0.0164</td><td>30.3915</td><td>0.9376</td><td>0.9949</td><td>0.9834</td><td>0.9955</td><td>0.9497</td><td>0.9781</td><td>0.9767</td></tr>
-                <tr><td>Lanczos</td><td>0.0164</td><td>30.3221</td><td>0.9379</td><td>0.9949</td><td>0.9837</td><td>0.9799</td><td>0.9550</td><td>0.9791</td><td>0.9744</td></tr>
-                <tr><td>LanczosRadius</td><td>0.0164</td><td>30.3221</td><td>0.9379</td><td>0.9949</td><td>0.9837</td><td>0.9799</td><td>0.9550</td><td>0.9791</td><td>0.9744</td></tr>
-                <tr><td>Hann</td><td>0.0165</td><td>30.2987</td><td>0.9377</td><td>0.9948</td><td>0.9779</td><td>0.9746</td><td>0.9515</td><td>0.9716</td><td>0.9689</td></tr>
-                <tr><td>Kaiser</td><td>0.0165</td><td>30.2733</td><td>0.9378</td><td>0.9948</td><td>0.9784</td><td>0.9688</td><td>0.9533</td><td>0.9731</td><td>0.9684</td></tr>
-                <tr><td>Bartlett</td><td>0.0165</td><td>30.2282</td><td>0.9377</td><td>0.9949</td><td>0.9764</td><td>0.9586</td><td>0.9520</td><td>0.9752</td><td>0.9656</td></tr>
-                <tr><td>Blackman</td><td>0.0166</td><td>30.1354</td><td>0.9372</td><td>0.9947</td><td>0.9636</td><td>0.9377</td><td>0.9440</td><td>0.9667</td><td>0.9530</td></tr>
-                <tr><td>Bohman</td><td>0.0166</td><td>30.1085</td><td>0.9371</td><td>0.9947</td><td>0.9613</td><td>0.9316</td><td>0.9425</td><td>0.9667</td><td>0.9505</td></tr>
-                <tr><td>Polar_LanczosRadius</td><td>0.0167</td><td>30.1668</td><td>0.9355</td><td>0.9946</td><td>0.9536</td><td>0.9448</td><td>0.9205</td><td>0.9570</td><td>0.9440</td></tr>
-                <tr><td>Parzen</td><td>0.0168</td><td>29.9988</td><td>0.9364</td><td>0.9946</td><td>0.9473</td><td>0.9068</td><td>0.9329</td><td>0.9612</td><td>0.9371</td></tr>
-                <tr><td>Polar_RobidouxSharp</td><td>0.0172</td><td>29.7304</td><td>0.9337</td><td>0.9946</td><td>0.9070</td><td>0.8462</td><td>0.8951</td><td>0.9598</td><td>0.9020</td></tr>
-                <tr><td>Lanczos2Sharp</td><td>0.0172</td><td>29.6361</td><td>0.9344</td><td>0.9947</td><td>0.8993</td><td>0.8249</td><td>0.9048</td><td>0.9644</td><td>0.8984</td></tr>
-                <tr><td>Polar_CubicSpline</td><td>0.0176</td><td>29.7738</td><td>0.9369</td><td>0.9933</td><td>0.8587</td><td>0.8560</td><td>0.9408</td><td>0.8811</td><td>0.8842</td></tr>
-                <tr><td>Sinc</td><td>0.0179</td><td>30.2249</td><td>0.9297</td><td>0.9937</td><td>0.8327</td><td>0.9579</td><td>0.8377</td><td>0.9046</td><td>0.8832</td></tr>
-                <tr><td>SincFast</td><td>0.0179</td><td>30.2249</td><td>0.9297</td><td>0.9937</td><td>0.8327</td><td>0.9579</td><td>0.8377</td><td>0.9046</td><td>0.8832</td></tr>
-                <tr><td>Polar_LanczosSharp</td><td>0.0173</td><td>29.8697</td><td>0.9308</td><td>0.9936</td><td>0.8888</td><td>0.8777</td><td>0.8534</td><td>0.8982</td><td>0.8795</td></tr>
-                <tr><td>CubicSpline</td><td>0.0175</td><td>29.6101</td><td>0.9318</td><td>0.9938</td><td>0.8765</td><td>0.8190</td><td>0.8676</td><td>0.9129</td><td>0.8690</td></tr>
-                <tr><td>Lanczos2</td><td>0.0175</td><td>29.5422</td><td>0.9322</td><td>0.9940</td><td>0.8708</td><td>0.8037</td><td>0.8741</td><td>0.9248</td><td>0.8683</td></tr>
-                <tr><td>Catrom</td><td>0.0175</td><td>29.4788</td><td>0.9320</td><td>0.9940</td><td>0.8687</td><td>0.7894</td><td>0.8705</td><td>0.9261</td><td>0.8637</td></tr>
-                <tr><td>Polar_Cosine</td><td>0.0176</td><td>29.7521</td><td>0.9289</td><td>0.9932</td><td>0.8627</td><td>0.8511</td><td>0.8266</td><td>0.8749</td><td>0.8538</td></tr>
-                <tr><td>Polar_Lanczos</td><td>0.0176</td><td>29.7521</td><td>0.9289</td><td>0.9932</td><td>0.8627</td><td>0.8511</td><td>0.8266</td><td>0.8749</td><td>0.8538</td></tr>
-                <tr><td>Polar_Welch</td><td>0.0176</td><td>29.7521</td><td>0.9289</td><td>0.9932</td><td>0.8627</td><td>0.8511</td><td>0.8266</td><td>0.8749</td><td>0.8538</td></tr>
-                <tr><td>Polar_Hann</td><td>0.0177</td><td>29.6535</td><td>0.9285</td><td>0.9931</td><td>0.8511</td><td>0.8288</td><td>0.8214</td><td>0.8713</td><td>0.8432</td></tr>
-                <tr><td>Polar_Bartlett</td><td>0.0177</td><td>29.6043</td><td>0.9287</td><td>0.9931</td><td>0.8513</td><td>0.8177</td><td>0.8231</td><td>0.8712</td><td>0.8408</td></tr>
-                <tr><td>Polar_Mitchell</td><td>0.0179</td><td>29.2988</td><td>0.9290</td><td>0.9935</td><td>0.8295</td><td>0.7487</td><td>0.8283</td><td>0.8956</td><td>0.8255</td></tr>
-                <tr><td>Polar_Hamming</td><td>0.0179</td><td>29.5229</td><td>0.9275</td><td>0.9928</td><td>0.8322</td><td>0.7993</td><td>0.8062</td><td>0.8509</td><td>0.8222</td></tr>
-                <tr><td>Polar_Kaiser</td><td>0.0180</td><td>29.4493</td><td>0.9272</td><td>0.9927</td><td>0.8248</td><td>0.7827</td><td>0.8022</td><td>0.8506</td><td>0.8151</td></tr>
-                <tr><td>Polar_Lanczos2Sharp</td><td>0.0182</td><td>29.2163</td><td>0.9269</td><td>0.9929</td><td>0.8015</td><td>0.7301</td><td>0.7981</td><td>0.8571</td><td>0.7967</td></tr>
-                <tr><td>Lagrange</td><td>0.0182</td><td>29.1906</td><td>0.9267</td><td>0.9926</td><td>0.7976</td><td>0.7243</td><td>0.7959</td><td>0.8413</td><td>0.7898</td></tr>
-                <tr><td>Polar_Blackman</td><td>0.0184</td><td>29.1789</td><td>0.9251</td><td>0.9923</td><td>0.7852</td><td>0.7216</td><td>0.7728</td><td>0.8260</td><td>0.7764</td></tr>
-                <tr><td>Polar_Robidoux</td><td>0.0184</td><td>29.0213</td><td>0.9258</td><td>0.9927</td><td>0.7766</td><td>0.6860</td><td>0.7818</td><td>0.8489</td><td>0.7733</td></tr>
-                <tr><td>Polar_Bohman</td><td>0.0184</td><td>29.1470</td><td>0.9249</td><td>0.9923</td><td>0.7808</td><td>0.7144</td><td>0.7698</td><td>0.8252</td><td>0.7725</td></tr>
-                <tr><td>Polar_Lanczos2</td><td>0.0187</td><td>28.9992</td><td>0.9232</td><td>0.9919</td><td>0.7511</td><td>0.6810</td><td>0.7450</td><td>0.8007</td><td>0.7445</td></tr>
-                <tr><td>Polar_Parzen</td><td>0.0188</td><td>28.8898</td><td>0.9227</td><td>0.9918</td><td>0.7397</td><td>0.6563</td><td>0.7383</td><td>0.7960</td><td>0.7326</td></tr>
-                <tr><td>RobidouxSharp</td><td>0.0193</td><td>28.5601</td><td>0.9204</td><td>0.9912</td><td>0.6857</td><td>0.5818</td><td>0.7054</td><td>0.7614</td><td>0.6836</td></tr>
-                <tr><td>Polar_Hermite</td><td>0.0202</td><td>27.7627</td><td>0.9180</td><td>0.9933</td><td>0.5937</td><td>0.4017</td><td>0.6713</td><td>0.8806</td><td>0.6369</td></tr>
-                <tr><td>Mitchell</td><td>0.0199</td><td>28.3003</td><td>0.9166</td><td>0.9903</td><td>0.6288</td><td>0.5232</td><td>0.6517</td><td>0.7060</td><td>0.6274</td></tr>
-                <tr><td>Hermite</td><td>0.0202</td><td>27.8860</td><td>0.9170</td><td>0.9923</td><td>0.5953</td><td>0.4296</td><td>0.6571</td><td>0.8217</td><td>0.6259</td></tr>
-                <tr><td>Robidoux</td><td>0.0202</td><td>28.1364</td><td>0.9141</td><td>0.9896</td><td>0.5916</td><td>0.4861</td><td>0.6161</td><td>0.6689</td><td>0.5907</td></tr>
-                <tr><td>Polar_Triangle</td><td>0.0207</td><td>27.8375</td><td>0.9122</td><td>0.9900</td><td>0.5479</td><td>0.4186</td><td>0.5888</td><td>0.6903</td><td>0.5614</td></tr>
-                <tr><td>Box</td><td>0.0220</td><td>26.5260</td><td>0.9105</td><td>0.9950</td><td>0.4101</td><td>0.1224</td><td>0.5649</td><td>0.9801</td><td>0.5194</td></tr>
-                <tr><td>Point</td><td>0.0220</td><td>26.5260</td><td>0.9105</td><td>0.9950</td><td>0.4101</td><td>0.1224</td><td>0.5649</td><td>0.9801</td><td>0.5194</td></tr>
-                <tr><td>Polar_Box</td><td>0.0220</td><td>26.5260</td><td>0.9105</td><td>0.9950</td><td>0.4101</td><td>0.1224</td><td>0.5649</td><td>0.9801</td><td>0.5194</td></tr>
-                <tr><td>Polar_Point</td><td>0.0213</td><td>27.6369</td><td>0.9069</td><td>0.9880</td><td>0.4762</td><td>0.3733</td><td>0.5140</td><td>0.5715</td><td>0.4838</td></tr>
-                <tr><td>Polar_Sinc</td><td>0.0213</td><td>27.6369</td><td>0.9069</td><td>0.9880</td><td>0.4762</td><td>0.3733</td><td>0.5140</td><td>0.5715</td><td>0.4838</td></tr>
-                <tr><td>Polar_SincFast</td><td>0.0213</td><td>27.6369</td><td>0.9069</td><td>0.9880</td><td>0.4762</td><td>0.3733</td><td>0.5140</td><td>0.5715</td><td>0.4838</td></tr>
-                <tr><td>Triangle</td><td>0.0213</td><td>27.6369</td><td>0.9069</td><td>0.9880</td><td>0.4762</td><td>0.3733</td><td>0.5140</td><td>0.5715</td><td>0.4838</td></tr>
-                <tr><td>Jinc</td><td>0.0214</td><td>27.8115</td><td>0.9049</td><td>0.9868</td><td>0.4681</td><td>0.4127</td><td>0.4854</td><td>0.5026</td><td>0.4672</td></tr>
-                <tr><td>Polar_Quadratic</td><td>0.0228</td><td>27.0915</td><td>0.8960</td><td>0.9850</td><td>0.3285</td><td>0.2501</td><td>0.3577</td><td>0.3992</td><td>0.3339</td></tr>
-                <tr><td>Polar_Gaussian</td><td>0.0231</td><td>26.9436</td><td>0.8941</td><td>0.9849</td><td>0.2939</td><td>0.2167</td><td>0.3308</td><td>0.3926</td><td>0.3085</td></tr>
-                <tr><td>Gaussian</td><td>0.0231</td><td>26.9424</td><td>0.8940</td><td>0.9849</td><td>0.2936</td><td>0.2164</td><td>0.3305</td><td>0.3923</td><td>0.3082</td></tr>
-                <tr><td>Quadratic</td><td>0.0233</td><td>26.8872</td><td>0.8920</td><td>0.9840</td><td>0.2718</td><td>0.2040</td><td>0.3009</td><td>0.3367</td><td>0.2783</td></tr>
-                <tr><td>Polar_Jinc</td><td>0.0247</td><td>26.9115</td><td>0.8953</td><td>0.9820</td><td>0.1285</td><td>0.2095</td><td>0.3489</td><td>0.2231</td><td>0.2275</td></tr>
-                <tr><td>Polar_Cubic</td><td>0.0255</td><td>26.1276</td><td>0.8741</td><td>0.9792</td><td>0.0446</td><td>0.0324</td><td>0.0472</td><td>0.0553</td><td>0.0449</td></tr>
-                <tr><td>Polar_Spline</td><td>0.0255</td><td>26.1276</td><td>0.8741</td><td>0.9792</td><td>0.0446</td><td>0.0324</td><td>0.0472</td><td>0.0553</td><td>0.0449</td></tr>
-                <tr><td>Cubic</td><td>0.0260</td><td>25.9843</td><td>0.8708</td><td>0.9782</td><td>0.0000</td><td>0.0000</td><td>0.0000</td><td>0.0000</td><td>0.0000</td></tr>
-                <tr><td>Spline</td><td>0.0260</td><td>25.9843</td><td>0.8708</td><td>0.9782</td><td>0.0000</td><td>0.0000</td><td>0.0000</td><td>0.0000</td><td>0.0000</td></tr>
-                </table>
+          <table><tbody><tr><td>Filter</td><td>MAE</td><td>PSNR</td><td>SSIM</td><td>MS-SSIM</td><td></td><td>MAE (N)</td><td>PSNR (N)</td><td>SSIM (N)</td><td>MS-SSIM (N)</td><td></td><td>Mean</td></tr><tr><td>LanczosSharp</td><td>1.63E-02</td><td>30.6337</td><td>0.9424</td><td>0.9963</td><td></td><td>1.0000</td><td>0.9987</td><td>0.9912</td><td>1.0000</td><td></td><td>0.9975</td></tr><tr><td>Hamming</td><td>1.64E-02</td><td>30.6396</td><td>0.9415</td><td>0.9961</td><td></td><td>0.9914</td><td>1.0000</td><td>0.9783</td><td>0.9876</td><td></td><td>0.9893</td></tr><tr><td>Cosine</td><td>1.64E-02</td><td>30.6098</td><td>0.9410</td><td>0.9960</td><td></td><td>0.9839</td><td>0.9932</td><td>0.9712</td><td>0.9859</td><td></td><td>0.9836</td></tr><tr><td>Welch</td><td>1.65E-02</td><td>30.6264</td><td>0.9407</td><td>0.9960</td><td></td><td>0.9801</td><td>0.9970</td><td>0.9656</td><td>0.9848</td><td></td><td>0.9819</td></tr>
+            <tr><td>Lanczos</td><td>1.64E-02</td><td>30.5507</td><td>0.9413</td><td>0.9960</td><td></td><td>0.9837</td><td>0.9797</td><td>0.9746</td><td>0.9853</td><td></td><td>0.9808</td></tr><tr><td>LanczosRadius</td><td>1.64E-02</td><td>30.5507</td><td>0.9413</td><td>0.9960</td><td></td><td>0.9837</td><td>0.9797</td><td>0.9746</td><td>0.9853</td><td></td><td>0.9808</td></tr><tr><td>Hann</td><td>1.65E-02</td><td>30.5460</td><td>0.9410</td><td>0.9959</td><td></td><td>0.9790</td><td>0.9786</td><td>0.9703</td><td>0.9793</td><td></td><td>0.9768</td></tr><tr><td>Kaiser</td><td>1.65E-02</td><td>30.5161</td><td>0.9412</td><td>0.9959</td><td></td><td>0.9804</td><td>0.9718</td><td>0.9729</td><td>0.9803</td><td></td><td>0.9764</td></tr><tr><td>Bartlett</td><td>1.65E-02</td><td>30.4825</td><td>0.9409</td><td>0.9960</td><td></td><td>0.9757</td><td>0.9641</td><td>0.9693</td><td>0.9832</td><td></td><td>0.9731</td></tr>
+            <tr><td>Blackman</td><td>1.66E-02</td><td>30.3811</td><td>0.9407</td><td>0.9958</td><td></td><td>0.9680</td><td>0.9410</td><td>0.9657</td><td>0.9751</td><td></td><td>0.9625</td></tr><tr><td>Bohman</td><td>1.66E-02</td><td>30.3536</td><td>0.9406</td><td>0.9958</td><td></td><td>0.9658</td><td>0.9347</td><td>0.9644</td><td>0.9752</td><td></td><td>0.9600</td></tr><tr><td>Polar_Catrom</td><td>1.67E-02</td><td>30.2479</td><td>0.9430</td><td>0.9957</td><td></td><td>0.9532</td><td>0.9106</td><td>1.0000</td><td>0.9688</td><td></td><td>0.9581</td></tr><tr><td>Polar_Lagrange</td><td>1.70E-02</td><td>30.3406</td><td>0.9418</td><td>0.9952</td><td></td><td>0.9296</td><td>0.9317</td><td>0.9824</td><td>0.9476</td><td></td><td>0.9478</td></tr><tr><td>Parzen</td><td>1.67E-02</td><td>30.2463</td><td>0.9399</td><td>0.9957</td><td></td><td>0.9532</td><td>0.9102</td><td>0.9553</td><td>0.9705</td><td></td><td>0.9473</td></tr>
+            <tr><td>Polar_LanczosRadius</td><td>1.68E-02</td><td>30.3589</td><td>0.9387</td><td>0.9955</td><td></td><td>0.9477</td><td>0.9359</td><td>0.9378</td><td>0.9593</td><td></td><td>0.9452</td></tr><tr><td>Lanczos2Sharp</td><td>1.72E-02</td><td>29.9065</td><td>0.9380</td><td>0.9958</td><td></td><td>0.9073</td><td>0.8326</td><td>0.9267</td><td>0.9769</td><td></td><td>0.9109</td></tr><tr><td>Polar_RobidouxSharp</td><td>1.72E-02</td><td>29.9422</td><td>0.9371</td><td>0.9956</td><td></td><td>0.9070</td><td>0.8408</td><td>0.9142</td><td>0.9651</td><td></td><td>0.9068</td></tr><tr><td>Lanczos2</td><td>1.74E-02</td><td>29.8084</td><td>0.9359</td><td>0.9950</td><td></td><td>0.8808</td><td>0.8102</td><td>0.8964</td><td>0.9385</td><td></td><td>0.8815</td></tr><tr><td>Polar_LanczosSharp</td><td>1.74E-02</td><td>30.0370</td><td>0.9339</td><td>0.9942</td><td></td><td>0.8808</td><td>0.8624</td><td>0.8683</td><td>0.9010</td><td></td><td>0.8781</td></tr>
+            <tr><td>CubicSpline</td><td>1.74E-02</td><td>29.8369</td><td>0.9353</td><td>0.9947</td><td></td><td>0.8816</td><td>0.8167</td><td>0.8888</td><td>0.9239</td><td></td><td>0.8777</td></tr><tr><td>Catrom</td><td>1.75E-02</td><td>29.7356</td><td>0.9356</td><td>0.9951</td><td></td><td>0.8773</td><td>0.7936</td><td>0.8928</td><td>0.9398</td><td></td><td>0.8759</td></tr><tr><td>Sinc</td><td>1.83E-02</td><td>30.3542</td><td>0.9306</td><td>0.9941</td><td></td><td>0.7953</td><td>0.9348</td><td>0.8197</td><td>0.8925</td><td></td><td>0.8606</td></tr><tr><td>SincFast</td><td>1.83E-02</td><td>30.3542</td><td>0.9306</td><td>0.9941</td><td></td><td>0.7953</td><td>0.9348</td><td>0.8197</td><td>0.8925</td><td></td><td>0.8606</td></tr><tr><td>Polar_Cosine</td><td>1.77E-02</td><td>29.9092</td><td>0.9320</td><td>0.9938</td><td></td><td>0.8540</td><td>0.8333</td><td>0.8400</td><td>0.8776</td><td></td><td>0.8512</td></tr>
+            <tr><td>Polar_Lanczos</td><td>1.77E-02</td><td>29.9092</td><td>0.9320</td><td>0.9938</td><td></td><td>0.8540</td><td>0.8333</td><td>0.8400</td><td>0.8776</td><td></td><td>0.8512</td></tr><tr><td>Polar_Welch</td><td>1.77E-02</td><td>29.9092</td><td>0.9320</td><td>0.9938</td><td></td><td>0.8540</td><td>0.8333</td><td>0.8400</td><td>0.8776</td><td></td><td>0.8512</td></tr><tr><td>Polar_Bartlett</td><td>1.78E-02</td><td>29.7965</td><td>0.9319</td><td>0.9938</td><td></td><td>0.8462</td><td>0.8075</td><td>0.8392</td><td>0.8784</td><td></td><td>0.8428</td></tr><tr><td>Polar_CubicSpline</td><td>1.81E-02</td><td>29.6894</td><td>0.9386</td><td>0.9929</td><td></td><td>0.8094</td><td>0.7831</td><td>0.9359</td><td>0.8384</td><td></td><td>0.8417</td></tr><tr><td>Polar_Hann</td><td>1.78E-02</td><td>29.8095</td><td>0.9317</td><td>0.9937</td><td></td><td>0.8451</td><td>0.8105</td><td>0.8365</td><td>0.8741</td><td></td><td>0.8416</td></tr>
+            <tr><td>Polar_Mitchell</td><td>1.79E-02</td><td>29.5418</td><td>0.9326</td><td>0.9944</td><td></td><td>0.8359</td><td>0.7494</td><td>0.8493</td><td>0.9080</td><td></td><td>0.8356</td></tr><tr><td>Polar_Hamming</td><td>1.79E-02</td><td>29.7119</td><td>0.9308</td><td>0.9933</td><td></td><td>0.8305</td><td>0.7882</td><td>0.8225</td><td>0.8578</td><td></td><td>0.8248</td></tr><tr><td>Polar_Kaiser</td><td>1.80E-02</td><td>29.6355</td><td>0.9305</td><td>0.9933</td><td></td><td>0.8248</td><td>0.7708</td><td>0.8192</td><td>0.8574</td><td></td><td>0.8180</td></tr><tr><td>Polar_Lanczos2Sharp</td><td>1.82E-02</td><td>29.4531</td><td>0.9305</td><td>0.9936</td><td></td><td>0.8089</td><td>0.7291</td><td>0.8188</td><td>0.8695</td><td></td><td>0.8066</td></tr><tr><td>Lagrange</td><td>1.82E-02</td><td>29.4284</td><td>0.9304</td><td>0.9933</td><td></td><td>0.8074</td><td>0.7235</td><td>0.8170</td><td>0.8562</td><td></td><td>0.8010</td></tr>
+            <tr><td>Polar_Robidoux</td><td>1.84E-02</td><td>29.2776</td><td>0.9294</td><td>0.9935</td><td></td><td>0.7861</td><td>0.6890</td><td>0.8032</td><td>0.8648</td><td></td><td>0.7858</td></tr><tr><td>Polar_Blackman</td><td>1.83E-02</td><td>29.3886</td><td>0.9286</td><td>0.9929</td><td></td><td>0.7901</td><td>0.7144</td><td>0.7916</td><td>0.8367</td><td></td><td>0.7832</td></tr><tr><td>Polar_Bohman</td><td>1.84E-02</td><td>29.3591</td><td>0.9284</td><td>0.9929</td><td></td><td>0.7859</td><td>0.7077</td><td>0.7887</td><td>0.8363</td><td></td><td>0.7796</td></tr><tr><td>Polar_Lanczos2</td><td>1.86E-02</td><td>29.2216</td><td>0.9267</td><td>0.9924</td><td></td><td>0.7591</td><td>0.6763</td><td>0.7642</td><td>0.8132</td><td></td><td>0.7532</td></tr><tr><td>Polar_Parzen</td><td>1.87E-02</td><td>29.1267</td><td>0.9263</td><td>0.9924</td><td></td><td>0.7491</td><td>0.6546</td><td>0.7583</td><td>0.8111</td><td></td><td>0.7433</td></tr>
+            <tr><td>RobidouxSharp</td><td>1.92E-02</td><td>28.8410</td><td>0.9242</td><td>0.9918</td><td></td><td>0.7012</td><td>0.5894</td><td>0.7279</td><td>0.7840</td><td></td><td>0.7006</td></tr><tr><td>Polar_Hermite</td><td>1.99E-02</td><td>28.1264</td><td>0.9212</td><td>0.9944</td><td></td><td>0.6342</td><td>0.4262</td><td>0.6837</td><td>0.9086</td><td></td><td>0.6632</td></tr><tr><td>Hermite</td><td>2.00E-02</td><td>28.2341</td><td>0.9206</td><td>0.9932</td><td></td><td>0.6228</td><td>0.4508</td><td>0.6755</td><td>0.8528</td><td></td><td>0.6505</td></tr><tr><td>Mitchell</td><td>1.98E-02</td><td>28.5839</td><td>0.9205</td><td>0.9906</td><td></td><td>0.6451</td><td>0.5307</td><td>0.6737</td><td>0.7298</td><td></td><td>0.6448</td></tr><tr><td>Robidoux</td><td>2.01E-02</td><td>28.4212</td><td>0.9180</td><td>0.9899</td><td></td><td>0.6083</td><td>0.4935</td><td>0.6376</td><td>0.6932</td><td></td><td>0.6082</td></tr>
+            <tr><td>Polar_Triangle</td><td>2.05E-02</td><td>28.1544</td><td>0.9160</td><td>0.9904</td><td></td><td>0.5644</td><td>0.4326</td><td>0.6093</td><td>0.7181</td><td></td><td>0.5811</td></tr><tr><td>Polar_Box</td><td>2.12E-02</td><td>26.8881</td><td>0.9114</td><td>0.9960</td><td></td><td>0.4971</td><td>0.1436</td><td>0.5424</td><td>0.9849</td><td></td><td>0.5420</td></tr><tr><td>Box</td><td>2.12E-02</td><td>26.8881</td><td>0.9114</td><td>0.9960</td><td></td><td>0.4971</td><td>0.1436</td><td>0.5424</td><td>0.9849</td><td></td><td>0.5420</td></tr><tr><td>Point</td><td>2.12E-02</td><td>26.8881</td><td>0.9114</td><td>0.9960</td><td></td><td>0.4971</td><td>0.1436</td><td>0.5424</td><td>0.9849</td><td></td><td>0.5420</td></tr><tr><td>Polar_Point</td><td>2.13E-02</td><td>27.9395</td><td>0.9109</td><td>0.9879</td><td></td><td>0.4907</td><td>0.3836</td><td>0.5347</td><td>0.5985</td><td></td><td>0.5019</td></tr>
+            <tr><td>Polar_Sinc</td><td>2.13E-02</td><td>27.9395</td><td>0.9109</td><td>0.9879</td><td></td><td>0.4907</td><td>0.3836</td><td>0.5347</td><td>0.5985</td><td></td><td>0.5019</td></tr><tr><td>Polar_SincFast</td><td>2.13E-02</td><td>27.9395</td><td>0.9109</td><td>0.9879</td><td></td><td>0.4907</td><td>0.3836</td><td>0.5347</td><td>0.5985</td><td></td><td>0.5019</td></tr><tr><td>Triangle</td><td>2.13E-02</td><td>27.9395</td><td>0.9109</td><td>0.9879</td><td></td><td>0.4907</td><td>0.3836</td><td>0.5347</td><td>0.5985</td><td></td><td>0.5019</td></tr><tr><td>Jinc</td><td>2.14E-02</td><td>28.0855</td><td>0.9083</td><td>0.9862</td><td></td><td>0.4816</td><td>0.4169</td><td>0.4974</td><td>0.5197</td><td></td><td>0.4789</td></tr><tr><td>Polar_Quadratic</td><td>2.27E-02</td><td>27.3819</td><td>0.8997</td><td>0.9841</td><td></td><td>0.3406</td><td>0.2563</td><td>0.3739</td><td>0.4214</td><td></td><td>0.3481</td></tr>
+            <tr><td>Polar_Gaussian</td><td>2.31E-02</td><td>27.2447</td><td>0.8979</td><td>0.9841</td><td></td><td>0.3020</td><td>0.2250</td><td>0.3474</td><td>0.4183</td><td></td><td>0.3232</td></tr><tr><td>Gaussian</td><td>2.31E-02</td><td>27.2435</td><td>0.8979</td><td>0.9841</td><td></td><td>0.3016</td><td>0.2247</td><td>0.3472</td><td>0.4179</td><td></td><td>0.3229</td></tr><tr><td>Quadratic</td><td>2.33E-02</td><td>27.1775</td><td>0.8957</td><td>0.9828</td><td></td><td>0.2818</td><td>0.2096</td><td>0.3154</td><td>0.3571</td><td></td><td>0.2910</td></tr><tr><td>Polar_Jinc</td><td>2.50E-02</td><td>27.3668</td><td>0.8971</td><td>0.9800</td><td></td><td>0.1050</td><td>0.2528</td><td>0.3361</td><td>0.2251</td><td></td><td>0.2298</td></tr><tr><td>Polar_Cubic</td><td>2.56E-02</td><td>26.4018</td><td>0.8773</td><td>0.9765</td><td></td><td>0.0465</td><td>0.0325</td><td>0.0496</td><td>0.0589</td><td></td><td>0.0469</td></tr>
+            <tr><td>Polar_Spline</td><td>2.56E-02</td><td>26.4018</td><td>0.8773</td><td>0.9765</td><td></td><td>0.0465</td><td>0.0325</td><td>0.0496</td><td>0.0589</td><td></td><td>0.0469</td></tr><tr><td>Cubic</td><td>2.61E-02</td><td>26.2593</td><td>0.8739</td><td>0.9753</td><td></td><td>0.0000</td><td>0.0000</td><td>0.0000</td><td>0.0000</td><td></td><td>0.0000</td></tr><tr><td>Spline</td><td>2.61E-02</td><td>26.2593</td><td>0.8739</td><td>0.9753</td><td></td><td>0.0000</td><td>0.0000</td><td>0.0000</td><td>0.0000</td><td></td><td>0.0000</td></tr></tbody></table>
         </p>
         <h3 id="upsampling_commentary">Upsampling Commentary</h3>
         <p>
-            We started this little adventure to provide a bit more robustness to the numbers compared to my previous comparison done using mpv, and there are a few surprises in the results. The first one is that
-            orthogonal LanczosSharp ended up on top of the table, an option that shouldn't even be in the comparison. If you want to give it a try on mpv, you can use <inline_code>--scale=lanczos --scale-blur=0.9812505644269356</inline_code>.
+            Unsurprisingly, the Lanczos family is at the top. Lanczos is widely considered to be one of the best resampling filters, so this makes sense. There are a few surprises worth talking about though.
         </p>
         <p>
-            The second surprise is that Polar_Catrom is at the second place with the best scores for both SSIM and MS-SSIM. Polar_Catrom is an extremely sharp filter, albeit with too much aliasing and ringing.
-            Since it only rings once (when it overshoots), it's trivial to remove all ringing if we just clip the output of each pixel to the limits set by the surrounding input pixels.
-            <a href="https://github.com/Artoriuz/glsl-pixel-clipper/">I have actually written a shader for it</a>, but you can also just use libplacebo's native AR now.
-            If you want to give the filter a try on mpv, you can use <inline_code>--scale=ewa_robidoux --scale-param1=0 --scale-param2=0.5</inline_code>.
+            The first one is that orthogonal LanczosSharp ended up on top of the table, an option that shouldn't even be in the comparison since it's simply arbitrary nonsense.
+            If you want to give it a try on mpv, you can use <inline_code>--scale=lanczos --scale-blur=0.9812505644269356</inline_code>.
         </p>
         <p>
-            The third surprise is that there are some Lanczos variants on top of the baseline Lanczos: Hamming, Cosine and Welch. For the last two all you gotta do is set <inline_code>--scale=lanczos --scale-window=window</inline_code>,
-            but for the first you also have to set <inline_code>--scale-radius=4</inline_code>.
+            The second surprise is that Polar_Catrom has the best SSIM score in the table. Polar_Catrom is an extremely sharp filter that naturally produces too much aliasing and ringing.
+            If you want to give the filter a try on mpv, you can use <inline_code>--scale=ewa_robidoux --scale-param1=0.0 --scale-param2=0.5</inline_code>. This filter makes more sense when paired with antiring.
         </p>
         <p>
-            Finally, it's also a little bit funny to see Lanczos2 beating Catmull_Rom in the "orthogonal filters with radius = 2" category. And it's even funnier that Lanczos2Sharp beat them both, another filter that shouldn't even be here.
+            The third surprise is that there are some Lanczos variants on top of the normal Lanczos: Hamming, Cosine and Welch. For the last two all you gotta do is set <inline_code>--scale=lanczos --scale-window=window</inline_code>,
+            but for the first you also have to set <inline_code>--scale-radius=4</inline_code>. These are just Sinc filters with different windows, they all look very similar.
+        </p>
+        <p>
+            Finally, it's funny to see Lanczos2 beating Catmull_Rom. And it's even funnier that Lanczos2Sharp beats them both, another filter that shouldn't be here.
             To use Lanczos2 on mpv you can simply do <inline_code>--scale=lanczos --scale-radius=2</inline_code>, and for Lanczos2Sharp add <inline_code>--scale-blur=0.9549963639785485</inline_code>.
         </p>
         <p>
             You might have also noticed that Polar_LanczosRadius is on top of Polar_LanczosSharp. Polar_LanczosRadius is sharpened to have its third zero crossing exactly at 3,
             which corresponds to a blur factor of 0.9264075766146068 (3.0/3.2383154841662362). To try it on mpv you can use <inline_code>--scale=ewa_lanczos --scale-blur=0.9264075766146068</inline_code>.
-            On <inline_code>--vo=gpu</inline_code> you also have to specify <inline_code>--scale-radius=3.2383154841662362</inline_code>.
-        </p>
-        <p>
-            Overall it looks like the filters were more or less ranked from sharpest to softest. This makes perfect sense as the main problem with image upsampling is unintended blurriness. PSNR is calculated using the MSE so it's overly
-            sensitive to outliers, which naturally end up being the sharp transitions. SSIM was also literally designed to give good scores to distorted images that have similarish structures, which also favours sharpness. MAE is a little more
-            neutral than PSNR which is why we generally use it as our target when training distortion-based CNNs, so it should punish filters that are too sharp in detriment to ringing, aliasing and blocking. That's the main reason why most of those
-            CNNs end up generating images that look like oil painting. MS-SSIM was added to neutralise stupidly minor differences as we wouldn't be able to see them anyway from normal viewing distances.
         </p>
         <p>
             As usual, the filters are ranked based on full-reference distortion metrics that may not always correlate with the human perception of quality, and your personal preference is entirely subjective.
-        </p>
-        <p>
-            Please also keep in mind that only the named filters were "benchmarked", but you can make "custom" filters that score even higher using the expert controls.
+            Please also keep in mind that only the named filters were scored, but you can make "custom" filters that may score higher using the expert controls.
         </p>
         <h3 id="downsampling_methodology">Downsampling Methodology</h3>
         <p>
@@ -281,852 +215,43 @@
         <p>
             With that said, now we can proceed to the actual methodology. The reference is created with:
         </p>
-        <code>magick mogrify -colorspace RGB -filter box -resize 50% -colorspace sRGB -path box_ref inputs/*.png</code>
+        <code>magick mogrify -filter box -resize 50% -path box_ref inputs/*.png</code>
         <p>
-            The dataset is then brought downscaled with the following command for orthogonal resampling:
+            The dataset is then brought downsampled with the following command for orthogonal resampling:
         </p>
-        <code>magick mogrify -colorspace RGB -filter {resampling_filter} -resize 50% -colorspace sRGB -path low_res box_ref/*.png</code>
+        <code>magick mogrify -filter {resampling_filter} -resize 50% -path low_res box_ref/*.png</code>
         <p>
             And the following command for polar resampling:
         </p>
-        <code>magick mogrify -colorspace RGB -filter {resampling_filter} -distort Resize 50% -colorspace sRGB -path low_res box_ref/*.png</code>
+        <code>magick mogrify -filter {resampling_filter} -distort Resize 50% -path low_res box_ref/*.png</code>
         <p>
-            The <inline_code>{resampling_filter}</inline_code> argument is replaced by all available resampling filters. Everything else about the process stays the same, so we can proceed to the results.
+            The <inline_code>{resampling_filter}</inline_code> argument is replaced with all available resampling filters. Everything else about the process stays the same, so we can proceed to the results.
         </p>
         <h3 id="downsampling_results">Downsampling Results</h3>
         <p>
-            <table>
-                <tbody>
-                  <tr>
-                    <td>Filter</td>
-                    <td>MAE</td>
-                    <td>PSNR</td>
-                    <td>SSIM</td>
-                    <td>MS-SSIM</td>
-                    <td></td>
-                    <td>MAE (N)</td>
-                    <td>PSNR (N)</td>
-                    <td>SSIM (N)</td>
-                    <td>MS-SSIM (N)</td>
-                    <td></td>
-                    <td>Mean</td>
-                  </tr>
-                  <tr>
-                    <td>Lanczos2Sharp</td>
-                    <td>0.0052</td>
-                    <td>38.1382</td>
-                    <td>0.9941</td>
-                    <td>0.9993</td>
-                    <td></td>
-                    <td>1.0000</td>
-                    <td>1.0000</td>
-                    <td>1.0000</td>
-                    <td>1.0000</td>
-                    <td></td>
-                    <td>1.0000</td>
-                  </tr>
-                  <tr>
-                    <td>Polar_Hermite</td>
-                    <td>0.0058</td>
-                    <td>37.9258</td>
-                    <td>0.9937</td>
-                    <td>0.9992</td>
-                    <td></td>
-                    <td>0.9632</td>
-                    <td>0.9819</td>
-                    <td>0.9936</td>
-                    <td>0.9917</td>
-                    <td></td>
-                    <td>0.9826</td>
-                  </tr>
-                  <tr>
-                    <td>Lanczos2</td>
-                    <td>0.0062</td>
-                    <td>37.1522</td>
-                    <td>0.9924</td>
-                    <td>0.9992</td>
-                    <td></td>
-                    <td>0.9443</td>
-                    <td>0.9162</td>
-                    <td>0.9718</td>
-                    <td>0.9844</td>
-                    <td></td>
-                    <td>0.9542</td>
-                  </tr>
-                  <tr>
-                    <td>Catrom</td>
-                    <td>0.0062</td>
-                    <td>37.1418</td>
-                    <td>0.9923</td>
-                    <td>0.9992</td>
-                    <td></td>
-                    <td>0.9403</td>
-                    <td>0.9153</td>
-                    <td>0.9704</td>
-                    <td>0.9859</td>
-                    <td></td>
-                    <td>0.9530</td>
-                  </tr>
-                  <tr>
-                    <td>Polar_Mitchell</td>
-                    <td>0.0067</td>
-                    <td>36.8261</td>
-                    <td>0.9913</td>
-                    <td>0.9992</td>
-                    <td></td>
-                    <td>0.9109</td>
-                    <td>0.8885</td>
-                    <td>0.9544</td>
-                    <td>0.9830</td>
-                    <td></td>
-                    <td>0.9342</td>
-                  </tr>
-                  <tr>
-                    <td>Polar_Robidoux</td>
-                    <td>0.0071</td>
-                    <td>36.7730</td>
-                    <td>0.9905</td>
-                    <td>0.9992</td>
-                    <td></td>
-                    <td>0.8899</td>
-                    <td>0.8839</td>
-                    <td>0.9428</td>
-                    <td>0.9815</td>
-                    <td></td>
-                    <td>0.9246</td>
-                  </tr>
-                  <tr>
-                    <td>Polar_RobidouxSharp</td>
-                    <td>0.0068</td>
-                    <td>35.8553</td>
-                    <td>0.9911</td>
-                    <td>0.9989</td>
-                    <td></td>
-                    <td>0.9084</td>
-                    <td>0.8059</td>
-                    <td>0.9514</td>
-                    <td>0.9572</td>
-                    <td></td>
-                    <td>0.9057</td>
-                  </tr>
-                  <tr>
-                    <td>Hermite</td>
-                    <td>0.0072</td>
-                    <td>36.1529</td>
-                    <td>0.9909</td>
-                    <td>0.9989</td>
-                    <td></td>
-                    <td>0.8826</td>
-                    <td>0.8312</td>
-                    <td>0.9487</td>
-                    <td>0.9525</td>
-                    <td></td>
-                    <td>0.9037</td>
-                  </tr>
-                  <tr>
-                    <td>Polar_Lanczos2Sharp</td>
-                    <td>0.0075</td>
-                    <td>36.0829</td>
-                    <td>0.9895</td>
-                    <td>0.9990</td>
-                    <td></td>
-                    <td>0.8669</td>
-                    <td>0.8253</td>
-                    <td>0.9267</td>
-                    <td>0.9674</td>
-                    <td></td>
-                    <td>0.8966</td>
-                  </tr>
-                  <tr>
-                    <td>Parzen</td>
-                    <td>0.0070</td>
-                    <td>35.6504</td>
-                    <td>0.9901</td>
-                    <td>0.9989</td>
-                    <td></td>
-                    <td>0.8945</td>
-                    <td>0.7885</td>
-                    <td>0.9355</td>
-                    <td>0.9541</td>
-                    <td></td>
-                    <td>0.8931</td>
-                  </tr>
-                  <tr>
-                    <td>CubicSpline</td>
-                    <td>0.0075</td>
-                    <td>35.5080</td>
-                    <td>0.9895</td>
-                    <td>0.9989</td>
-                    <td></td>
-                    <td>0.8693</td>
-                    <td>0.7764</td>
-                    <td>0.9271</td>
-                    <td>0.9495</td>
-                    <td></td>
-                    <td>0.8806</td>
-                  </tr>
-                  <tr>
-                    <td>RobidouxSharp</td>
-                    <td>0.0081</td>
-                    <td>35.7346</td>
-                    <td>0.9883</td>
-                    <td>0.9989</td>
-                    <td></td>
-                    <td>0.8346</td>
-                    <td>0.7957</td>
-                    <td>0.9074</td>
-                    <td>0.9515</td>
-                    <td></td>
-                    <td>0.8723</td>
-                  </tr>
-                  <tr>
-                    <td>Lagrange</td>
-                    <td>0.0079</td>
-                    <td>35.5718</td>
-                    <td>0.9885</td>
-                    <td>0.9989</td>
-                    <td></td>
-                    <td>0.8424</td>
-                    <td>0.7818</td>
-                    <td>0.9097</td>
-                    <td>0.9545</td>
-                    <td></td>
-                    <td>0.8721</td>
-                  </tr>
-                  <tr>
-                    <td>Bohman</td>
-                    <td>0.0075</td>
-                    <td>35.1306</td>
-                    <td>0.9889</td>
-                    <td>0.9988</td>
-                    <td></td>
-                    <td>0.8693</td>
-                    <td>0.7443</td>
-                    <td>0.9169</td>
-                    <td>0.9404</td>
-                    <td></td>
-                    <td>0.8677</td>
-                  </tr>
-                  <tr>
-                    <td>Polar_Parzen</td>
-                    <td>0.0083</td>
-                    <td>35.5274</td>
-                    <td>0.9875</td>
-                    <td>0.9989</td>
-                    <td></td>
-                    <td>0.8209</td>
-                    <td>0.7781</td>
-                    <td>0.8953</td>
-                    <td>0.9557</td>
-                    <td></td>
-                    <td>0.8625</td>
-                  </tr>
-                  <tr>
-                    <td>Blackman</td>
-                    <td>0.0076</td>
-                    <td>34.9680</td>
-                    <td>0.9885</td>
-                    <td>0.9987</td>
-                    <td></td>
-                    <td>0.8603</td>
-                    <td>0.7305</td>
-                    <td>0.9104</td>
-                    <td>0.9359</td>
-                    <td></td>
-                    <td>0.8593</td>
-                  </tr>
-                  <tr>
-                    <td>Polar_Bohman</td>
-                    <td>0.0085</td>
-                    <td>35.0970</td>
-                    <td>0.9870</td>
-                    <td>0.9988</td>
-                    <td></td>
-                    <td>0.8098</td>
-                    <td>0.7415</td>
-                    <td>0.8860</td>
-                    <td>0.9451</td>
-                    <td></td>
-                    <td>0.8456</td>
-                  </tr>
-                  <tr>
-                    <td>Polar_Lanczos2</td>
-                    <td>0.0086</td>
-                    <td>35.1477</td>
-                    <td>0.9868</td>
-                    <td>0.9988</td>
-                    <td></td>
-                    <td>0.8051</td>
-                    <td>0.7458</td>
-                    <td>0.8837</td>
-                    <td>0.9454</td>
-                    <td></td>
-                    <td>0.8450</td>
-                  </tr>
-                  <tr>
-                    <td>Polar_Blackman</td>
-                    <td>0.0085</td>
-                    <td>35.0236</td>
-                    <td>0.9867</td>
-                    <td>0.9988</td>
-                    <td></td>
-                    <td>0.8059</td>
-                    <td>0.7352</td>
-                    <td>0.8822</td>
-                    <td>0.9434</td>
-                    <td></td>
-                    <td>0.8417</td>
-                  </tr>
-                  <tr>
-                    <td>Mitchell</td>
-                    <td>0.0089</td>
-                    <td>34.8539</td>
-                    <td>0.9862</td>
-                    <td>0.9986</td>
-                    <td></td>
-                    <td>0.7878</td>
-                    <td>0.7208</td>
-                    <td>0.8735</td>
-                    <td>0.9231</td>
-                    <td></td>
-                    <td>0.8263</td>
-                  </tr>
-                  <tr>
-                    <td>Bartlett</td>
-                    <td>0.0083</td>
-                    <td>34.4112</td>
-                    <td>0.9863</td>
-                    <td>0.9986</td>
-                    <td></td>
-                    <td>0.8201</td>
-                    <td>0.6832</td>
-                    <td>0.8749</td>
-                    <td>0.9213</td>
-                    <td></td>
-                    <td>0.8249</td>
-                  </tr>
-                  <tr>
-                    <td>LanczosSharp</td>
-                    <td>0.0082</td>
-                    <td>34.0812</td>
-                    <td>0.9871</td>
-                    <td>0.9985</td>
-                    <td></td>
-                    <td>0.8260</td>
-                    <td>0.6551</td>
-                    <td>0.8888</td>
-                    <td>0.9062</td>
-                    <td></td>
-                    <td>0.8190</td>
-                  </tr>
-                  <tr>
-                    <td>Kaiser</td>
-                    <td>0.0083</td>
-                    <td>34.2164</td>
-                    <td>0.9865</td>
-                    <td>0.9985</td>
-                    <td></td>
-                    <td>0.8174</td>
-                    <td>0.6666</td>
-                    <td>0.8785</td>
-                    <td>0.9132</td>
-                    <td></td>
-                    <td>0.8189</td>
-                  </tr>
-                  <tr>
-                    <td>Lanczos</td>
-                    <td>0.0085</td>
-                    <td>33.9740</td>
-                    <td>0.9864</td>
-                    <td>0.9984</td>
-                    <td></td>
-                    <td>0.8108</td>
-                    <td>0.6460</td>
-                    <td>0.8771</td>
-                    <td>0.9019</td>
-                    <td></td>
-                    <td>0.8090</td>
-                  </tr>
-                  <tr>
-                    <td>LanczosRadius</td>
-                    <td>0.0085</td>
-                    <td>33.9740</td>
-                    <td>0.9864</td>
-                    <td>0.9984</td>
-                    <td></td>
-                    <td>0.8108</td>
-                    <td>0.6460</td>
-                    <td>0.8771</td>
-                    <td>0.9019</td>
-                    <td></td>
-                    <td>0.8090</td>
-                  </tr>
-                  <tr>
-                    <td>Polar_Kaiser</td>
-                    <td>0.0091</td>
-                    <td>34.3405</td>
-                    <td>0.9850</td>
-                    <td>0.9986</td>
-                    <td></td>
-                    <td>0.7763</td>
-                    <td>0.6772</td>
-                    <td>0.8552</td>
-                    <td>0.9209</td>
-                    <td></td>
-                    <td>0.8074</td>
-                  </tr>
-                  <tr>
-                    <td>Polar_LanczosRadius</td>
-                    <td>0.0086</td>
-                    <td>33.9796</td>
-                    <td>0.9860</td>
-                    <td>0.9985</td>
-                    <td></td>
-                    <td>0.8017</td>
-                    <td>0.6465</td>
-                    <td>0.8706</td>
-                    <td>0.9045</td>
-                    <td></td>
-                    <td>0.8058</td>
-                  </tr>
-                  <tr>
-                    <td>Hann</td>
-                    <td>0.0087</td>
-                    <td>33.9521</td>
-                    <td>0.9855</td>
-                    <td>0.9985</td>
-                    <td></td>
-                    <td>0.7991</td>
-                    <td>0.6442</td>
-                    <td>0.8628</td>
-                    <td>0.9039</td>
-                    <td></td>
-                    <td>0.8025</td>
-                  </tr>
-                  <tr>
-                    <td>Polar_Triangle</td>
-                    <td>0.0092</td>
-                    <td>34.2415</td>
-                    <td>0.9855</td>
-                    <td>0.9983</td>
-                    <td></td>
-                    <td>0.7667</td>
-                    <td>0.6688</td>
-                    <td>0.8620</td>
-                    <td>0.8905</td>
-                    <td></td>
-                    <td>0.7970</td>
-                  </tr>
-                  <tr>
-                    <td>Robidoux</td>
-                    <td>0.0094</td>
-                    <td>34.2906</td>
-                    <td>0.9846</td>
-                    <td>0.9984</td>
-                    <td></td>
-                    <td>0.7560</td>
-                    <td>0.6729</td>
-                    <td>0.8488</td>
-                    <td>0.9015</td>
-                    <td></td>
-                    <td>0.7948</td>
-                  </tr>
-                  <tr>
-                    <td>Polar_Bartlett</td>
-                    <td>0.0094</td>
-                    <td>34.0368</td>
-                    <td>0.9834</td>
-                    <td>0.9985</td>
-                    <td></td>
-                    <td>0.7544</td>
-                    <td>0.6514</td>
-                    <td>0.8287</td>
-                    <td>0.9081</td>
-                    <td></td>
-                    <td>0.7857</td>
-                  </tr>
-                  <tr>
-                    <td>Polar_Hamming</td>
-                    <td>0.0095</td>
-                    <td>34.0253</td>
-                    <td>0.9833</td>
-                    <td>0.9985</td>
-                    <td></td>
-                    <td>0.7505</td>
-                    <td>0.6504</td>
-                    <td>0.8279</td>
-                    <td>0.9084</td>
-                    <td></td>
-                    <td>0.7843</td>
-                  </tr>
-                  <tr>
-                    <td>Cosine</td>
-                    <td>0.0090</td>
-                    <td>33.5286</td>
-                    <td>0.9848</td>
-                    <td>0.9983</td>
-                    <td></td>
-                    <td>0.7793</td>
-                    <td>0.6082</td>
-                    <td>0.8513</td>
-                    <td>0.8854</td>
-                    <td></td>
-                    <td>0.7810</td>
-                  </tr>
-                  <tr>
-                    <td>Hamming</td>
-                    <td>0.0091</td>
-                    <td>33.4712</td>
-                    <td>0.9845</td>
-                    <td>0.9983</td>
-                    <td></td>
-                    <td>0.7719</td>
-                    <td>0.6033</td>
-                    <td>0.8461</td>
-                    <td>0.8848</td>
-                    <td></td>
-                    <td>0.7765</td>
-                  </tr>
-                  <tr>
-                    <td>Polar_Hann</td>
-                    <td>0.0096</td>
-                    <td>33.5662</td>
-                    <td>0.9837</td>
-                    <td>0.9983</td>
-                    <td></td>
-                    <td>0.7458</td>
-                    <td>0.6114</td>
-                    <td>0.8343</td>
-                    <td>0.8869</td>
-                    <td></td>
-                    <td>0.7696</td>
-                  </tr>
-                  <tr>
-                    <td>Welch</td>
-                    <td>0.0093</td>
-                    <td>33.2882</td>
-                    <td>0.9838</td>
-                    <td>0.9982</td>
-                    <td></td>
-                    <td>0.7603</td>
-                    <td>0.5877</td>
-                    <td>0.8351</td>
-                    <td>0.8757</td>
-                    <td></td>
-                    <td>0.7647</td>
-                  </tr>
-                  <tr>
-                    <td>Polar_LanczosSharp</td>
-                    <td>0.0097</td>
-                    <td>33.4770</td>
-                    <td>0.9829</td>
-                    <td>0.9983</td>
-                    <td></td>
-                    <td>0.7408</td>
-                    <td>0.6038</td>
-                    <td>0.8220</td>
-                    <td>0.8849</td>
-                    <td></td>
-                    <td>0.7629</td>
-                  </tr>
-                  <tr>
-                    <td>Polar_Cosine</td>
-                    <td>0.0101</td>
-                    <td>33.2418</td>
-                    <td>0.9816</td>
-                    <td>0.9982</td>
-                    <td></td>
-                    <td>0.7157</td>
-                    <td>0.5838</td>
-                    <td>0.8010</td>
-                    <td>0.8751</td>
-                    <td></td>
-                    <td>0.7439</td>
-                  </tr>
-                  <tr>
-                    <td>Polar_Lanczos</td>
-                    <td>0.0101</td>
-                    <td>33.2418</td>
-                    <td>0.9816</td>
-                    <td>0.9982</td>
-                    <td></td>
-                    <td>0.7157</td>
-                    <td>0.5838</td>
-                    <td>0.8010</td>
-                    <td>0.8751</td>
-                    <td></td>
-                    <td>0.7439</td>
-                  </tr>
-                  <tr>
-                    <td>Polar_Welch</td>
-                    <td>0.0101</td>
-                    <td>33.2418</td>
-                    <td>0.9816</td>
-                    <td>0.9982</td>
-                    <td></td>
-                    <td>0.7157</td>
-                    <td>0.5838</td>
-                    <td>0.8010</td>
-                    <td>0.8751</td>
-                    <td></td>
-                    <td>0.7439</td>
-                  </tr>
-                  <tr>
-                    <td>Triangle</td>
-                    <td>0.0109</td>
-                    <td>32.7732</td>
-                    <td>0.9802</td>
-                    <td>0.9977</td>
-                    <td></td>
-                    <td>0.6654</td>
-                    <td>0.5440</td>
-                    <td>0.7781</td>
-                    <td>0.8165</td>
-                    <td></td>
-                    <td>0.7010</td>
-                  </tr>
-                  <tr>
-                    <td>Jinc</td>
-                    <td>0.0130</td>
-                    <td>31.9518</td>
-                    <td>0.9720</td>
-                    <td>0.9972</td>
-                    <td></td>
-                    <td>0.5428</td>
-                    <td>0.4741</td>
-                    <td>0.6486</td>
-                    <td>0.7583</td>
-                    <td></td>
-                    <td>0.6060</td>
-                  </tr>
-                  <tr>
-                    <td>Polar_Quadratic</td>
-                    <td>0.0134</td>
-                    <td>31.1154</td>
-                    <td>0.9713</td>
-                    <td>0.9966</td>
-                    <td></td>
-                    <td>0.5229</td>
-                    <td>0.4030</td>
-                    <td>0.6371</td>
-                    <td>0.6968</td>
-                    <td></td>
-                    <td>0.5649</td>
-                  </tr>
-                  <tr>
-                    <td>Polar_Gaussian</td>
-                    <td>0.0139</td>
-                    <td>30.7778</td>
-                    <td>0.9699</td>
-                    <td>0.9963</td>
-                    <td></td>
-                    <td>0.4927</td>
-                    <td>0.3743</td>
-                    <td>0.6139</td>
-                    <td>0.6610</td>
-                    <td></td>
-                    <td>0.5355</td>
-                  </tr>
-                  <tr>
-                    <td>Gaussian</td>
-                    <td>0.0139</td>
-                    <td>30.7743</td>
-                    <td>0.9698</td>
-                    <td>0.9963</td>
-                    <td></td>
-                    <td>0.4923</td>
-                    <td>0.3740</td>
-                    <td>0.6136</td>
-                    <td>0.6606</td>
-                    <td></td>
-                    <td>0.5352</td>
-                  </tr>
-                  <tr>
-                    <td>Quadratic</td>
-                    <td>0.0143</td>
-                    <td>30.5742</td>
-                    <td>0.9680</td>
-                    <td>0.9961</td>
-                    <td></td>
-                    <td>0.4710</td>
-                    <td>0.3570</td>
-                    <td>0.5837</td>
-                    <td>0.6441</td>
-                    <td></td>
-                    <td>0.5139</td>
-                  </tr>
-                  <tr>
-                    <td>Polar_Catrom</td>
-                    <td>0.0152</td>
-                    <td>28.6343</td>
-                    <td>0.9718</td>
-                    <td>0.9945</td>
-                    <td></td>
-                    <td>0.4166</td>
-                    <td>0.1921</td>
-                    <td>0.6454</td>
-                    <td>0.4575</td>
-                    <td></td>
-                    <td>0.4279</td>
-                  </tr>
-                  <tr>
-                    <td>Polar_Lagrange</td>
-                    <td>0.0155</td>
-                    <td>28.6092</td>
-                    <td>0.9706</td>
-                    <td>0.9942</td>
-                    <td></td>
-                    <td>0.3998</td>
-                    <td>0.1900</td>
-                    <td>0.6252</td>
-                    <td>0.4303</td>
-                    <td></td>
-                    <td>0.4113</td>
-                  </tr>
-                  <tr>
-                    <td>Polar_Cubic</td>
-                    <td>0.0176</td>
-                    <td>28.8798</td>
-                    <td>0.9528</td>
-                    <td>0.9942</td>
-                    <td></td>
-                    <td>0.2794</td>
-                    <td>0.2130</td>
-                    <td>0.3432</td>
-                    <td>0.4332</td>
-                    <td></td>
-                    <td>0.3172</td>
-                  </tr>
-                  <tr>
-                    <td>Polar_Spline</td>
-                    <td>0.0176</td>
-                    <td>28.8798</td>
-                    <td>0.9528</td>
-                    <td>0.9942</td>
-                    <td></td>
-                    <td>0.2794</td>
-                    <td>0.2130</td>
-                    <td>0.3432</td>
-                    <td>0.4332</td>
-                    <td></td>
-                    <td>0.3172</td>
-                  </tr>
-                  <tr>
-                    <td>Cubic</td>
-                    <td>0.0182</td>
-                    <td>28.5882</td>
-                    <td>0.9499</td>
-                    <td>0.9938</td>
-                    <td></td>
-                    <td>0.2426</td>
-                    <td>0.1882</td>
-                    <td>0.2965</td>
-                    <td>0.3843</td>
-                    <td></td>
-                    <td>0.2779</td>
-                  </tr>
-                  <tr>
-                    <td>Spline</td>
-                    <td>0.0182</td>
-                    <td>28.5882</td>
-                    <td>0.9499</td>
-                    <td>0.9938</td>
-                    <td></td>
-                    <td>0.2426</td>
-                    <td>0.1882</td>
-                    <td>0.2965</td>
-                    <td>0.3843</td>
-                    <td></td>
-                    <td>0.2779</td>
-                  </tr>
-                  <tr>
-                    <td>Sinc</td>
-                    <td>0.0191</td>
-                    <td>27.6882</td>
-                    <td>0.9545</td>
-                    <td>0.9922</td>
-                    <td></td>
-                    <td>0.1896</td>
-                    <td>0.1117</td>
-                    <td>0.3702</td>
-                    <td>0.2120</td>
-                    <td></td>
-                    <td>0.2209</td>
-                  </tr>
-                  <tr>
-                    <td>SincFast</td>
-                    <td>0.0191</td>
-                    <td>27.6882</td>
-                    <td>0.9545</td>
-                    <td>0.9922</td>
-                    <td></td>
-                    <td>0.1896</td>
-                    <td>0.1117</td>
-                    <td>0.3702</td>
-                    <td>0.2120</td>
-                    <td></td>
-                    <td>0.2209</td>
-                  </tr>
-                  <tr>
-                    <td>Polar_Jinc</td>
-                    <td>0.0196</td>
-                    <td>28.1480</td>
-                    <td>0.9518</td>
-                    <td>0.9910</td>
-                    <td></td>
-                    <td>0.1603</td>
-                    <td>0.1508</td>
-                    <td>0.3266</td>
-                    <td>0.0684</td>
-                    <td></td>
-                    <td>0.1765</td>
-                  </tr>
-                  <tr>
-                    <td>Polar_CubicSpline</td>
-                    <td>0.0205</td>
-                    <td>26.4606</td>
-                    <td>0.9557</td>
-                    <td>0.9908</td>
-                    <td></td>
-                    <td>0.1098</td>
-                    <td>0.0074</td>
-                    <td>0.3895</td>
-                    <td>0.0525</td>
-                    <td></td>
-                    <td>0.1398</td>
-                  </tr>
-                  <tr>
-                    <td>Point</td>
-                    <td>0.0223</td>
-                    <td>26.3740</td>
-                    <td>0.9313</td>
-                    <td>0.9903</td>
-                    <td></td>
-                    <td>0.0000</td>
-                    <td>0.0000</td>
-                    <td>0.0000</td>
-                    <td>0.0000</td>
-                    <td></td>
-                    <td>0.0000</td>
-                  </tr>
-                </tbody>
-                </table>
+          <table><tbody><tr><td>Filter</td><td>MAE</td><td>PSNR</td><td>SSIM</td><td>MS-SSIM</td><td></td><td>MAE (N)</td><td>PSNR (N)</td><td>SSIM (N)</td><td>MS-SSIM (N)</td><td></td><td>Mean</td></tr><tr><td>Lanczos2Sharp</td><td>3.83E-03</td><td>43.3791</td><td>0.9971</td><td>0.9998</td><td></td><td>1.0000</td><td>1.0000</td><td>1.0000</td><td>1.0000</td><td></td><td>1.0000</td></tr><tr><td>Lanczos2</td><td>4.68E-03</td><td>41.6652</td><td>0.9959</td><td>0.9998</td><td></td><td>0.9522</td><td>0.8971</td><td>0.9807</td><td>0.9928</td><td></td><td>0.9557</td></tr><tr><td>Catrom</td><td>4.76E-03</td><td>41.5216</td><td>0.9958</td><td>0.9998</td><td></td><td>0.9478</td><td>0.8884</td><td>0.9793</td><td>0.9933</td><td></td><td>0.9522</td></tr><tr><td>Polar_RobidouxSharp</td><td>4.95E-03</td><td>41.2762</td><td>0.9956</td><td>0.9997</td><td></td><td>0.9372</td><td>0.8737</td><td>0.9766</td><td>0.9859</td><td></td><td>0.9434</td></tr>
+            <tr><td>Polar_Hermite</td><td>4.92E-03</td><td>40.6300</td><td>0.9958</td><td>0.9998</td><td></td><td>0.9388</td><td>0.8349</td><td>0.9791</td><td>0.9914</td><td></td><td>0.9360</td></tr><tr><td>Parzen</td><td>5.11E-03</td><td>40.9916</td><td>0.9954</td><td>0.9997</td><td></td><td>0.9279</td><td>0.8566</td><td>0.9722</td><td>0.9855</td><td></td><td>0.9356</td></tr><tr><td>Polar_Mitchell</td><td>5.27E-03</td><td>40.7177</td><td>0.9948</td><td>0.9997</td><td></td><td>0.9190</td><td>0.8402</td><td>0.9634</td><td>0.9896</td><td></td><td>0.9280</td></tr><tr><td>Bohman</td><td>5.39E-03</td><td>40.5648</td><td>0.9950</td><td>0.9997</td><td></td><td>0.9121</td><td>0.8310</td><td>0.9658</td><td>0.9818</td><td></td><td>0.9227</td></tr><tr><td>Blackman</td><td>5.50E-03</td><td>40.4083</td><td>0.9948</td><td>0.9996</td><td></td><td>0.9061</td><td>0.8216</td><td>0.9631</td><td>0.9805</td><td></td><td>0.9178</td></tr>
+            <tr><td>CubicSpline</td><td>5.65E-03</td><td>40.0895</td><td>0.9945</td><td>0.9996</td><td></td><td>0.8978</td><td>0.8024</td><td>0.9577</td><td>0.9809</td><td></td><td>0.9097</td></tr><tr><td>Bartlett</td><td>5.89E-03</td><td>40.0099</td><td>0.9941</td><td>0.9996</td><td></td><td>0.8838</td><td>0.7976</td><td>0.9521</td><td>0.9788</td><td></td><td>0.9031</td></tr><tr><td>Polar_Robidoux</td><td>5.79E-03</td><td>39.7433</td><td>0.9938</td><td>0.9997</td><td></td><td>0.8900</td><td>0.7816</td><td>0.9471</td><td>0.9851</td><td></td><td>0.9010</td></tr><tr><td>LanczosSharp</td><td>5.89E-03</td><td>39.7429</td><td>0.9944</td><td>0.9996</td><td></td><td>0.8842</td><td>0.7816</td><td>0.9567</td><td>0.9719</td><td></td><td>0.8986</td></tr><tr><td>Kaiser</td><td>6.00E-03</td><td>39.7090</td><td>0.9940</td><td>0.9996</td><td></td><td>0.8778</td><td>0.7796</td><td>0.9503</td><td>0.9740</td><td></td><td>0.8954</td></tr>
+            <tr><td>Polar_Lanczos2Sharp</td><td>5.95E-03</td><td>39.6486</td><td>0.9935</td><td>0.9997</td><td></td><td>0.8808</td><td>0.7759</td><td>0.9429</td><td>0.9820</td><td></td><td>0.8954</td></tr><tr><td>Lanczos</td><td>6.11E-03</td><td>39.4625</td><td>0.9939</td><td>0.9995</td><td></td><td>0.8716</td><td>0.7648</td><td>0.9492</td><td>0.9697</td><td></td><td>0.8888</td></tr><tr><td>LanczosRadius</td><td>6.11E-03</td><td>39.4625</td><td>0.9939</td><td>0.9995</td><td></td><td>0.8716</td><td>0.7648</td><td>0.9492</td><td>0.9697</td><td></td><td>0.8888</td></tr><tr><td>Hann</td><td>6.23E-03</td><td>39.4293</td><td>0.9936</td><td>0.9996</td><td></td><td>0.8647</td><td>0.7628</td><td>0.9438</td><td>0.9717</td><td></td><td>0.8857</td></tr><tr><td>Polar_LanczosRadius</td><td>6.25E-03</td><td>39.3482</td><td>0.9934</td><td>0.9995</td><td></td><td>0.8636</td><td>0.7579</td><td>0.9413</td><td>0.9681</td><td></td><td>0.8827</td></tr>
+            <tr><td>Hermite</td><td>6.13E-03</td><td>38.7508</td><td>0.9938</td><td>0.9996</td><td></td><td>0.8707</td><td>0.7220</td><td>0.9464</td><td>0.9735</td><td></td><td>0.8782</td></tr><tr><td>Lagrange</td><td>6.31E-03</td><td>39.0270</td><td>0.9930</td><td>0.9996</td><td></td><td>0.8604</td><td>0.7386</td><td>0.9339</td><td>0.9774</td><td></td><td>0.8776</td></tr><tr><td>Cosine</td><td>6.50E-03</td><td>38.9978</td><td>0.9933</td><td>0.9995</td><td></td><td>0.8497</td><td>0.7369</td><td>0.9384</td><td>0.9654</td><td></td><td>0.8726</td></tr><tr><td>Hamming</td><td>6.54E-03</td><td>38.9830</td><td>0.9932</td><td>0.9995</td><td></td><td>0.8474</td><td>0.7360</td><td>0.9365</td><td>0.9649</td><td></td><td>0.8712</td></tr><tr><td>Welch</td><td>6.74E-03</td><td>38.7385</td><td>0.9928</td><td>0.9995</td><td></td><td>0.8364</td><td>0.7213</td><td>0.9314</td><td>0.9630</td><td></td><td>0.8630</td></tr>
+            <tr><td>Polar_Bohman</td><td>6.78E-03</td><td>38.5274</td><td>0.9919</td><td>0.9996</td><td></td><td>0.8338</td><td>0.7086</td><td>0.9156</td><td>0.9720</td><td></td><td>0.8575</td></tr><tr><td>Polar_Blackman</td><td>6.82E-03</td><td>38.4997</td><td>0.9918</td><td>0.9996</td><td></td><td>0.8318</td><td>0.7069</td><td>0.9141</td><td>0.9714</td><td></td><td>0.8561</td></tr><tr><td>Polar_Parzen</td><td>6.82E-03</td><td>38.3159</td><td>0.9917</td><td>0.9996</td><td></td><td>0.8316</td><td>0.6959</td><td>0.9127</td><td>0.9727</td><td></td><td>0.8532</td></tr><tr><td>Polar_Lanczos2</td><td>6.93E-03</td><td>38.2723</td><td>0.9915</td><td>0.9995</td><td></td><td>0.8253</td><td>0.6933</td><td>0.9095</td><td>0.9704</td><td></td><td>0.8496</td></tr><tr><td>Polar_Kaiser</td><td>7.02E-03</td><td>38.3664</td><td>0.9914</td><td>0.9995</td><td></td><td>0.8203</td><td>0.6989</td><td>0.9089</td><td>0.9658</td><td></td><td>0.8485</td></tr>
+            <tr><td>Polar_Bartlett</td><td>7.12E-03</td><td>38.4405</td><td>0.9913</td><td>0.9995</td><td></td><td>0.8148</td><td>0.7034</td><td>0.9073</td><td>0.9665</td><td></td><td>0.8480</td></tr><tr><td>RobidouxSharp</td><td>6.87E-03</td><td>37.9152</td><td>0.9917</td><td>0.9995</td><td></td><td>0.8291</td><td>0.6718</td><td>0.9132</td><td>0.9676</td><td></td><td>0.8454</td></tr><tr><td>Polar_LanczosSharp</td><td>7.22E-03</td><td>38.2044</td><td>0.9913</td><td>0.9994</td><td></td><td>0.8091</td><td>0.6892</td><td>0.9066</td><td>0.9575</td><td></td><td>0.8406</td></tr><tr><td>Polar_Hamming</td><td>7.26E-03</td><td>38.2059</td><td>0.9909</td><td>0.9995</td><td></td><td>0.8068</td><td>0.6893</td><td>0.9008</td><td>0.9639</td><td></td><td>0.8402</td></tr><tr><td>Polar_Hann</td><td>7.33E-03</td><td>37.9577</td><td>0.9910</td><td>0.9994</td><td></td><td>0.8029</td><td>0.6744</td><td>0.9021</td><td>0.9537</td><td></td><td>0.8333</td></tr>
+            <tr><td>Polar_Cosine</td><td>7.62E-03</td><td>37.7519</td><td>0.9904</td><td>0.9994</td><td></td><td>0.7865</td><td>0.6620</td><td>0.8914</td><td>0.9525</td><td></td><td>0.8231</td></tr><tr><td>Polar_Lanczos</td><td>7.62E-03</td><td>37.7519</td><td>0.9904</td><td>0.9994</td><td></td><td>0.7865</td><td>0.6620</td><td>0.8914</td><td>0.9525</td><td></td><td>0.8231</td></tr><tr><td>Polar_Welch</td><td>7.62E-03</td><td>37.7519</td><td>0.9904</td><td>0.9994</td><td></td><td>0.7865</td><td>0.6620</td><td>0.8914</td><td>0.9525</td><td></td><td>0.8231</td></tr><tr><td>Mitchell</td><td>7.65E-03</td><td>36.9061</td><td>0.9899</td><td>0.9994</td><td></td><td>0.7850</td><td>0.6112</td><td>0.8843</td><td>0.9525</td><td></td><td>0.8082</td></tr><tr><td>Polar_Triangle</td><td>7.97E-03</td><td>36.4602</td><td>0.9894</td><td>0.9992</td><td></td><td>0.7671</td><td>0.5844</td><td>0.8759</td><td>0.9402</td><td></td><td>0.7919</td></tr>
+            <tr><td>Robidoux</td><td>8.17E-03</td><td>36.3070</td><td>0.9887</td><td>0.9993</td><td></td><td>0.7558</td><td>0.5752</td><td>0.8636</td><td>0.9412</td><td></td><td>0.7840</td></tr><tr><td>Triangle</td><td>9.53E-03</td><td>34.9212</td><td>0.9853</td><td>0.9989</td><td></td><td>0.6787</td><td>0.4920</td><td>0.8091</td><td>0.9015</td><td></td><td>0.7203</td></tr><tr><td>Jinc</td><td>1.07E-02</td><td>34.4246</td><td>0.9818</td><td>0.9987</td><td></td><td>0.6104</td><td>0.4622</td><td>0.7532</td><td>0.8859</td><td></td><td>0.6779</td></tr><tr><td>Polar_Catrom</td><td>1.15E-02</td><td>33.5864</td><td>0.9863</td><td>0.9977</td><td></td><td>0.5677</td><td>0.4118</td><td>0.8255</td><td>0.7876</td><td></td><td>0.6482</td></tr><tr><td>Polar_Lagrange</td><td>1.18E-02</td><td>33.4384</td><td>0.9854</td><td>0.9975</td><td></td><td>0.5513</td><td>0.4030</td><td>0.8103</td><td>0.7597</td><td></td><td>0.6311</td></tr>
+            <tr><td>Polar_Quadratic</td><td>1.17E-02</td><td>33.1567</td><td>0.9781</td><td>0.9982</td><td></td><td>0.5551</td><td>0.3860</td><td>0.6931</td><td>0.8354</td><td></td><td>0.6174</td></tr><tr><td>Polar_Gaussian</td><td>1.21E-02</td><td>32.9220</td><td>0.9773</td><td>0.9981</td><td></td><td>0.5348</td><td>0.3719</td><td>0.6799</td><td>0.8199</td><td></td><td>0.6016</td></tr><tr><td>Gaussian</td><td>1.21E-02</td><td>32.9191</td><td>0.9773</td><td>0.9981</td><td></td><td>0.5345</td><td>0.3718</td><td>0.6797</td><td>0.8197</td><td></td><td>0.6014</td></tr><tr><td>Quadratic</td><td>1.25E-02</td><td>32.6161</td><td>0.9755</td><td>0.9979</td><td></td><td>0.5116</td><td>0.3536</td><td>0.6501</td><td>0.8067</td><td></td><td>0.5805</td></tr><tr><td>Sinc</td><td>1.42E-02</td><td>32.5248</td><td>0.9772</td><td>0.9965</td><td></td><td>0.4177</td><td>0.3481</td><td>0.6778</td><td>0.6661</td><td></td><td>0.5274</td></tr>
+            <tr><td>SincFast</td><td>1.42E-02</td><td>32.5248</td><td>0.9772</td><td>0.9965</td><td></td><td>0.4177</td><td>0.3481</td><td>0.6778</td><td>0.6661</td><td></td><td>0.5274</td></tr><tr><td>Polar_Jinc</td><td>1.52E-02</td><td>32.0175</td><td>0.9717</td><td>0.9951</td><td></td><td>0.3577</td><td>0.3176</td><td>0.5884</td><td>0.5210</td><td></td><td>0.4462</td></tr><tr><td>Polar_CubicSpline</td><td>1.62E-02</td><td>30.6892</td><td>0.9753</td><td>0.9955</td><td></td><td>0.3046</td><td>0.2378</td><td>0.6468</td><td>0.5597</td><td></td><td>0.4372</td></tr><tr><td>Polar_Cubic</td><td>1.56E-02</td><td>30.7526</td><td>0.9624</td><td>0.9966</td><td></td><td>0.3393</td><td>0.2416</td><td>0.4382</td><td>0.6759</td><td></td><td>0.4237</td></tr><tr><td>Polar_Spline</td><td>1.56E-02</td><td>30.7526</td><td>0.9624</td><td>0.9966</td><td></td><td>0.3393</td><td>0.2416</td><td>0.4382</td><td>0.6759</td><td></td><td>0.4237</td></tr>
+            <tr><td>Cubic</td><td>1.61E-02</td><td>30.4526</td><td>0.9599</td><td>0.9963</td><td></td><td>0.3074</td><td>0.2236</td><td>0.3976</td><td>0.6456</td><td></td><td>0.3935</td></tr><tr><td>Spline</td><td>1.61E-02</td><td>30.4526</td><td>0.9599</td><td>0.9963</td><td></td><td>0.3074</td><td>0.2236</td><td>0.3976</td><td>0.6456</td><td></td><td>0.3935</td></tr><tr><td>Point</td><td>2.16E-02</td><td>26.7292</td><td>0.9353</td><td>0.9900</td><td></td><td>0.0000</td><td>0.0000</td><td>0.0000</td><td>0.0000</td><td></td><td>0.0000</td></tr></tbody></table>
         </p>
         <h3 id="downsampling_commentary">Downsampling Commentary</h3>
         <p>
-            The results were relatively predictable, but there are a few things worth mentioning. The first one is that this methodology seems to really like filters with only 1 or 2 lobes.
-            Lanczos2Sharp (<inline_code>--dscale=lanczos --dscale-radius=2 --dscale-blur=0.9549963639785485</inline_code>) takes the podium but the other BC-Splines and the normal Lanczos2 aren't far behind.
+            The results were relatively predictable, but there are a few things worth mentioning.
         </p>
         <p>
-            It's a bit funny to see Polar_Hermite (<inline_code>--dscale=ewa_robidoux --dscale-param1=0 --dscale-param2=0</inline_code>) so high in the list, but I actually think it makes sense. Hermite is a short (radius 1) filter that does not have any negative sections, so using it to downscale makes the
-            operation very close to an "area average", the only difference is that pixels are weighted based on distance. Hermite is usually described as a "smooth" triangle, but it scores much higher than the "normal" triangle.
+            The first one is that this methodology seems to really like orthogonal filters with 2 lobes. Catrom and Lanczos2 are known to be good at downsampling, so the metrics are matching general perception here.
+            It's also good to see that Polar_RobidouxSharp was the best polar BC-Spline, considering the filter was specifically designed to be good at <inline_code>-distort</inline_code>.
         </p>
         <p>
-            It's also interesting to see that Polar_Robidoux wasn't the best polar BC-Spline, considering the filter was specifically designed to be good at <inline_code>-distort</inline_code>. In any case, it's only slightly behind
-            Polar_Mitchell. Please remember that these BC-splines are all sharper when used in polar resampling, so Polar_Mitchell is actually a pretty sharp filter and a relatively good alternative to Catrom if you prefer the look of polar resampling.
-        </p>
-        <p>
-            Both Lanczos (orthogonal sinc-sinc) and Polar_Lanczos (polar jinc-jinc) were pretty mediocre at best. That's a good thing because it shows the methodology can actually punish filters that are too sharp. Polar_Catrom, the sharpest filter we have in the comparison,
+            Both Lanczos (orthogonal sinc-sinc) and Polar_Lanczos (polar jinc-jinc) were mediocre at best. That's a good thing because it shows the methodology can actually punish filters that are too ringy. Polar_Catrom, the ringiest filter we have in the comparison,
             actually scored as one of the worst filters.
         </p>
         <p>
